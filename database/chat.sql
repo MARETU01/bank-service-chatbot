@@ -3,8 +3,12 @@
 -- Chat Service Database
 -- ========================================
 
+-- 设置客户端字符集
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- 创建数据库
-CREATE DATABASE IF NOT EXISTS chat_service;
+CREATE DATABASE IF NOT EXISTS chat_service DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE chat_service;
 
@@ -30,7 +34,7 @@ CREATE TABLE chat_sessions (
     INDEX idx_user_id (user_id),
     INDEX idx_status (status),
     INDEX idx_created_at (created_at)
-) ENGINE=InnoDB COMMENT='聊天会话表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天会话表';
 
 -- ========================================
 -- 聊天消息表
@@ -52,7 +56,7 @@ CREATE TABLE chat_messages (
     INDEX idx_message_id (message_id),
     INDEX idx_created_at (created_at),
     FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
-) ENGINE=InnoDB COMMENT='聊天消息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天消息表';
 
 -- ========================================
 -- 快捷回复表
@@ -70,7 +74,7 @@ CREATE TABLE quick_replies (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_category (category),
     INDEX idx_is_active (is_active)
-) ENGINE=InnoDB COMMENT='快捷回复表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='快捷回复表';
 
 -- ========================================
 -- 常见问题表
@@ -88,7 +92,7 @@ CREATE TABLE faqs (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_category (category),
     INDEX idx_is_active (is_active)
-) ENGINE=InnoDB COMMENT='常见问题表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='常见问题表';
 
 -- ========================================
 -- 智能回复记录表
@@ -105,7 +109,7 @@ CREATE TABLE ai_replies (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     INDEX idx_message_id (message_id),
     INDEX idx_confidence (confidence)
-) ENGINE=InnoDB COMMENT='智能回复记录表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='智能回复记录表';
 
 -- ========================================
 -- 附件表
@@ -123,7 +127,7 @@ CREATE TABLE attachments (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     INDEX idx_message_id (message_id),
     INDEX idx_file_type (file_type)
-) ENGINE=InnoDB COMMENT='附件表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='附件表';
 
 -- ========================================
 -- 客服工作统计表
@@ -142,7 +146,7 @@ CREATE TABLE agent_stats (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     UNIQUE KEY uk_agent_date (agent_id, stat_date),
     INDEX idx_stat_date (stat_date)
-) ENGINE=InnoDB COMMENT='客服工作统计表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='客服工作统计表';
 
 -- ========================================
 -- 聊天标签表
@@ -156,7 +160,7 @@ CREATE TABLE chat_tags (
     INDEX idx_session_id (session_id),
     INDEX idx_tag_name (tag_name),
     FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
-) ENGINE=InnoDB COMMENT='聊天标签表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天标签表';
 
 -- ========================================
 -- 插入示例数据

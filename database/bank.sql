@@ -3,8 +3,12 @@
 -- Bank Service Database
 -- ========================================
 
+-- 设置客户端字符集
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- 创建数据库
-CREATE DATABASE IF NOT EXISTS bank_service;
+CREATE DATABASE IF NOT EXISTS bank_service DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE bank_service;
 
@@ -26,7 +30,7 @@ CREATE TABLE accounts (
     INDEX idx_account_number (account_number),
     INDEX idx_user_id (user_id),
     INDEX idx_status (status)
-) ENGINE=InnoDB COMMENT='账户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='账户表';
 
 -- ========================================
 -- 交易记录表
@@ -48,7 +52,7 @@ CREATE TABLE transactions (
     INDEX idx_transaction_id (transaction_id),
     INDEX idx_transaction_type (transaction_type),
     INDEX idx_transaction_time (transaction_time)
-) ENGINE=InnoDB COMMENT='交易记录表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='交易记录表';
 
 -- ========================================
 -- 账单表
@@ -71,7 +75,7 @@ CREATE TABLE bills (
     INDEX idx_bill_number (bill_number),
     INDEX idx_due_date (due_date),
     INDEX idx_status (status)
-) ENGINE=InnoDB COMMENT='账单表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='账单表';
 
 -- ========================================
 -- 转账记录表
@@ -97,7 +101,7 @@ CREATE TABLE transfers (
     INDEX idx_to_account (to_account_id),
     INDEX idx_transfer_id (transfer_id),
     INDEX idx_transfer_time (transfer_time)
-) ENGINE=InnoDB COMMENT='转账记录表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='转账记录表';
 
 -- ========================================
 -- 账户限额表
@@ -112,7 +116,7 @@ CREATE TABLE account_limits (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
-) ENGINE=InnoDB COMMENT='账户限额表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='账户限额表';
 
 -- ========================================
 -- 插入示例数据

@@ -3,10 +3,6 @@
 -- User Service Database
 -- ========================================
 
--- 设置客户端字符集
-SET NAMES utf8mb4;
-SET CHARACTER SET utf8mb4;
-
 -- 创建数据库
 CREATE DATABASE IF NOT EXISTS user_service DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

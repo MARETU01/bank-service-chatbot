@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class JwtUtils {
 
-    private static final String SECRET = "secondspinsecondspinsecondspinaa";
+    private static final String SECRET = "maretumaretumaretumaretumaretuaa";
     private static final SecretKey signingKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     private static final Long expirationTime = 86400000L;
 

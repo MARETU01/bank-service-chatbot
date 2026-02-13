@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 用户信息表
+ * 用户安全信息表
  *
  * @author maretu
  * @since 2025-04-23
@@ -19,71 +19,51 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("users")
-public class Users implements Serializable {
+@TableName("user_security")
+public class UserSecurity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户ID
+     * ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户名
+     * 用户ID
      */
-    private String username;
+    private Long userId;
 
     /**
-     * 密码(加密)
+     * 安全问题
      */
-    private String password;
+    private String securityQuestion;
 
     /**
-     * 邮箱
+     * 安全答案
      */
-    private String email;
+    private String securityAnswer;
 
     /**
-     * 手机号
+     * 是否启用双因素认证
      */
-    private String phone;
+    private Boolean twoFactorEnabled;
 
     /**
-     * 真实姓名
+     * 双因素认证密钥
      */
-    private String realName;
+    private String twoFactorSecret;
 
     /**
-     * 身份证号
+     * 登录失败次数
      */
-    private String idCard;
+    private Integer failedLoginAttempts;
 
     /**
-     * 状态: 0-禁用, 1-正常
+     * 锁定到期时间
      */
-    private Integer status;
-
-    /**
-     * 邮箱是否验证
-     */
-    private Boolean emailVerified;
-
-    /**
-     * 手机是否验证
-     */
-    private Boolean phoneVerified;
-
-    /**
-     * 最后登录时间
-     */
-    private LocalDateTime lastLoginTime;
-
-    /**
-     * 最后登录IP
-     */
-    private String lastLoginIp;
+    private LocalDateTime lockedUntil;
 
     /**
      * 创建时间

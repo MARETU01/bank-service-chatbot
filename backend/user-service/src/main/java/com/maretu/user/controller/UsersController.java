@@ -19,9 +19,10 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public Result<String> login(@RequestBody Users user) {
+    public Result<String> login(@RequestHeader("X-Client-IP") String ip,
+                                @RequestBody Users user) {
         try {
-            return Result.success(usersService.login(user));
+            return Result.success(usersService.login(user, ip));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

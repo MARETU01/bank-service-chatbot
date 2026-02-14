@@ -10,6 +10,7 @@ import com.maretu.user.service.IUsersService;
 import com.maretu.user.utils.HashUtil;
 import com.maretu.user.utils.MailUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -26,7 +27,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     @Override
-    public String login(Users user) {
+    public String login(Users user, String ip) {
         Users userToLogin = lambdaQuery()
                 .eq(user.getEmail() != null, Users::getEmail, user.getEmail())
                 .or()
@@ -42,6 +43,20 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         context.setUserId(Math.toIntExact(userToLogin.getId()))
                 .setUsername(userToLogin.getUsername())
                 .setEmail(userToLogin.getEmail());
+        loginLog(userToLogin.setLastLoginIp(ip));
         return JwtUtils.generateJwt(context);
+    }
+
+    @Async("virtualThreadPoolExecutor")
+    public void loginLog(Users user) {
+        try {
+            lambdaUpdate()
+                    .eq(Users::getId, user.getId())
+                    .set(Users::getLastLoginIp, user.getLastLoginIp())
+                    .set(Users::getLastLoginTime, System.currentTimeMillis())
+                    .update();
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

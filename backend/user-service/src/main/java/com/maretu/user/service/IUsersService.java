@@ -13,5 +13,5 @@ import com.maretu.user.pojo.Users;
  */
 public interface IUsersService extends IService<Users> {
 
-    String login(Users user);
+    String login(Users user, String ip);
 }

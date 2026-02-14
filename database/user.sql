@@ -20,7 +20,6 @@ CREATE TABLE users (
     real_name VARCHAR(50) COMMENT '真实姓名',
     id_card VARCHAR(18) UNIQUE COMMENT '身份证号',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-禁用, 1-正常',
-    email_verified BOOLEAN DEFAULT FALSE COMMENT '邮箱是否验证',
     phone_verified BOOLEAN DEFAULT FALSE COMMENT '手机是否验证',
     last_login_time DATETIME COMMENT '最后登录时间',
     last_login_ip VARCHAR(45) COMMENT '最后登录IP',

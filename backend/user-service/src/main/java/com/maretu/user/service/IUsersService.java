@@ -2,7 +2,6 @@ package com.maretu.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.maretu.user.pojo.Users;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -15,20 +14,4 @@ import org.springframework.web.multipart.MultipartFile;
 public interface IUsersService extends IService<Users> {
 
     String login(Users user);
-
-    Boolean sendCode(Users user);
-
-    Integer register(Users user, String verification);
-
-    Boolean sendForgetPasswordCode(Users user);
-
-    Boolean sendResetPasswordCode(Users user);
-
-    Boolean resetPassword(Users user, String verification);
-
-    Users getUserInfo(Users user, Integer id);
-
-    Boolean updateUserInfo(Integer userId, Users userInfo);
-
-    Boolean updateAvatar(Integer userId, MultipartFile file);
 }

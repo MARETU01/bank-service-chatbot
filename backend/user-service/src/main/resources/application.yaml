@@ -1,2 +1,14 @@
 server:
   port: 8081
+
+spring:
+  application:
+    name: user-service
+  cloud:
+    nacos:
+      server-addr: ipv6.maretu.top:8848
+      username: nacos
+      password: maretu
+  config:
+    import:
+      - "nacos:email-config.yaml?group=DEFAULT_GROUP&refresh=true"

@@ -27,4 +27,14 @@ public class UsersController {
             return Result.failure(e.getMessage());
         }
     }
+
+    @PostMapping("/code")
+    public Result<Boolean> sendCode(@RequestBody Users user,
+                                    @RequestParam String type) {
+        try {
+            return Result.success(usersService.sendCode(user, type));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
 }

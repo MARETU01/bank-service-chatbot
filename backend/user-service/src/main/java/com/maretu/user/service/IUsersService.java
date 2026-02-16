@@ -14,4 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface IUsersService extends IService<Users> {
 
     String login(Users user, String ip);
+
+    Boolean sendCode(Users user, String type);
 }

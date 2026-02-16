@@ -1,2 +1,29 @@
 server:
   port: 8083
+
+spring:
+  application:
+    name: chat-service
+  cloud:
+    nacos:
+      server-addr: ipv6.maretu.top:8848
+      username: nacos
+      password: maretu
+  config:
+    import:
+      - "nacos:shared-log.yaml?group=DEFAULT_GROUP&refresh=true"
+      - "nacos:shared-jdbc.yaml?group=DEFAULT_GROUP&refresh=true"
+      - "nacos:shared-redis.yaml?group=DEFAULT_GROUP&refresh=true"
+
+maretu:
+  mysql:
+    host: ipv6.maretu.top
+    port: 3306
+    database: chat_service
+    username: root
+    password: maretu
+  redis:
+    host: ipv6.maretu.top
+    port: 6379
+    password: maretu
+    db: 0

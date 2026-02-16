@@ -18,21 +18,11 @@ public class UsersController {
         this.jacksonObjectMapper = jacksonObjectMapper;
     }
 
-//    @PostMapping("/login")
-//    public Result<String> login(@RequestHeader("X-Client-IP") String ip,
-//                                @RequestBody Users user) {
-//        try {
-//            return Result.success(usersService.login(user, ip));
-//        } catch (Exception e) {
-//            return Result.failure(e.getMessage());
-//        }
-//    }
-
-    @GetMapping("/{id}")
-    public Result<Users> getUserById(@PathVariable("id") Long id) {
+    @PostMapping("/login")
+    public Result<String> login(@RequestHeader("X-Client-IP") String ip,
+                                @RequestBody Users user) {
         try {
-            System.out.println("Received request to get user with ID: " + id);
-            return Result.success(usersService.getById(id));
+            return Result.success(usersService.login(user, ip));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

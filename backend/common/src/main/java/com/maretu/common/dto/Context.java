@@ -11,4 +11,6 @@ public class Context {
     private String username;
 
     private String email;
+
+    private String ip;
 }

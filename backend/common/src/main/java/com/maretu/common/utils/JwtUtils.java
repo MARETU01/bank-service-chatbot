@@ -46,7 +46,8 @@ public class JwtUtils {
         Context context = new Context();
         context.setUserId(Integer.parseInt(claims.get("userId").toString()))
                 .setUsername(claims.get("username", String.class))
-                .setEmail(claims.get("email", String.class));
+                .setEmail(claims.get("email", String.class))
+                .setIp(claims.get("ip", String.class));
         return context;
     }
 }

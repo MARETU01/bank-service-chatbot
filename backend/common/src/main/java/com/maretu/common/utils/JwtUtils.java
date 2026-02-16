@@ -44,9 +44,9 @@ public class JwtUtils {
     public static Context parseJwt(String jwt) {
         Claims claims =  Jwts.parser().verifyWith(signingKey).build().parseSignedClaims(jwt).getPayload();
         Context context = new Context();
-        context.setUserId(Integer.parseInt(claims.get("userId").toString()));
-        context.setUsername(claims.get("username", String.class));
-        context.setEmail(claims.get("email", String.class));
+        context.setUserId(Integer.parseInt(claims.get("userId").toString()))
+                .setUsername(claims.get("username", String.class))
+                .setEmail(claims.get("email", String.class));
         return context;
     }
 }

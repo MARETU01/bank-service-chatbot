@@ -18,6 +18,11 @@ public class UsersController {
         this.jacksonObjectMapper = jacksonObjectMapper;
     }
 
+    @GetMapping("/test")
+    public Result<String> test() {
+        return Result.success("User service is up and running!");
+    }
+
     @PostMapping("/login")
     public Result<String> login(@RequestHeader("X-Client-IP") String ip,
                                 @RequestBody Users user) {

@@ -12,7 +12,4 @@ public interface UserClient {
 
     @RequestLine("GET /users/{id}")
     UserDTO getUser(@Param("id") Long id);
-
-    @RequestLine("GET /user?ids={ids}")
-    List<UserDTO> getUsersInfo(@Param("ids") List<Integer> userIds);
 }

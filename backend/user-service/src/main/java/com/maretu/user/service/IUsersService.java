@@ -1,7 +1,7 @@
 package com.maretu.user.service;
 
-import com.maretu.user.pojo.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.maretu.user.pojo.Users;
 
 /**
  * <p>
@@ -16,4 +16,6 @@ public interface IUsersService extends IService<Users> {
     String login(Users user, String ip);
 
     Boolean sendCode(Users user, String type);
+
+    Boolean register(Users user, String verifyCode);
 }

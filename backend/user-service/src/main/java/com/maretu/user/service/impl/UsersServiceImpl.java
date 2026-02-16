@@ -15,11 +15,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.time.LocalDateTime;
 
 /**
- * <p>
  * 用户信息表 服务实现类
  * </p>
  *
@@ -66,6 +67,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 .setUsername(userToLogin.getUsername())
                 .setEmail(userToLogin.getEmail())
                 .setIp(ip);
+        self.loginLog(userToLogin, ip);
         return JwtUtils.generateJwt(token);
     }
 
@@ -100,8 +102,36 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return true;
     }
 
+    @Override
+    public Boolean register(Users user, String verifyCode) {
+        if (lambdaQuery().eq(Users::getEmail, user.getEmail()).one() != null) {
+            throw new RuntimeException("email already registered");
+        } else if (lambdaQuery().eq(Users::getUsername, user.getUsername()).one() != null) {
+            throw new RuntimeException("username already registered");
+        }
+        String storedCode = stringRedisTemplate.opsForValue().get(
+                RedisConstants.VERIFY_CODE_KEY + user.getEmail()
+        );
+        if (!Objects.equals(storedCode, verifyCode)) {
+            throw new RuntimeException("verification code not correct");
+        }
+        String encodedPassword = HashUtil.encodePassword(user.getPassword());
+        user.setPassword(encodedPassword)
+                .setEmailVerified(true);
+        save(user);
+        stringRedisTemplate.delete(RedisConstants.VERIFY_CODE_KEY + user.getEmail());
+        return null;
+    }
+
     @Async("virtualThreadPoolExecutor")
     public void sendEmail(String email, String code) {
         mailUtil.sendVerificationCodeMail(email, code);
+    }
+
+    @Async("virtualThreadPoolExecutor")
+    public void loginLog(Users user, String ip) {
+        user.setLastLoginIp(ip)
+                .setLastLoginTime(LocalDateTime.now());
+        updateById(user);
     }
 }

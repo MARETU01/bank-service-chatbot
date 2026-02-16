@@ -1,4 +1,4 @@
-package com.maretu.chatbot.config;
+package com.maretu.chat.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

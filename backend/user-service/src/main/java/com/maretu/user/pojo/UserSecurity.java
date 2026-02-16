@@ -1,20 +1,21 @@
 package com.maretu.user.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.LocalDateTime;
+import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
+ * <p>
  * 用户安全信息表
+ * </p>
  *
  * @author maretu
- * @since 2025-04-23
+ * @since 2026-02-16
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

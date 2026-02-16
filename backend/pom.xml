@@ -31,7 +31,7 @@
         
         <jwt.version>0.12.6</jwt.version>
         <mysql.version>8.0.28</mysql.version>
-        <mybatis-plus.version>3.5.12</mybatis-plus.version>
+        <mybatis-plus.version>3.5.15</mybatis-plus.version>
         <org.projectlombok.version>1.18.34</org.projectlombok.version>
     </properties>
 

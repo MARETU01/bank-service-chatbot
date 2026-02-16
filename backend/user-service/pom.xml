@@ -20,19 +20,19 @@
             <groupId>com.maretu</groupId>
             <artifactId>common</artifactId>
             <version>1.0.0</version>
-            <scope>compile</scope>
+        </dependency>
+
+        <!-- Api -->
+        <dependency>
+            <groupId>com.maretu</groupId>
+            <artifactId>api</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- Spring Security -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
         <!-- Spring Cloud Alibaba -->
@@ -52,12 +52,13 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- Database -->
+        <!-- OK http -->
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
         </dependency>
-        
+
+        <!-- Mysql -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -75,10 +76,10 @@
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
 
-        <!-- Validation -->
+        <!-- Connect Pool -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
         </dependency>
 
         <!-- Email Support -->

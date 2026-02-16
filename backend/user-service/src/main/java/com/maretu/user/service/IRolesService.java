@@ -1,25 +1,16 @@
 package com.maretu.user.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.maretu.user.pojo.Roles;
-
-import java.util.List;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
- * 角色服务类
+ * <p>
+ * 角色表 服务类
+ * </p>
  *
  * @author maretu
- * @since 2025-04-23
+ * @since 2026-02-16
  */
 public interface IRolesService extends IService<Roles> {
 
-    /**
-     * 根据角色代码获取角色
-     */
-    Roles getByCode(String roleCode);
-
-    /**
-     * 获取用户的所有角色代码
-     */
-    List<String> getRoleCodesByUserId(Long userId);
 }

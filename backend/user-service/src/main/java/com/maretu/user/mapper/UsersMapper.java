@@ -1,15 +1,15 @@
 package com.maretu.user.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.maretu.user.pojo.Users;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
- *  Mapper 接口
+ * 用户信息表 Mapper 接口
  * </p>
  *
- * @author 
- * @since 2025-04-23
+ * @author maretu
+ * @since 2026-02-16
  */
 public interface UsersMapper extends BaseMapper<Users> {
 

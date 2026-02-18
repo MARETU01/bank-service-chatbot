@@ -1,7 +1,10 @@
 package com.maretu.user.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maretu.common.utils.Result;
+import com.maretu.user.dto.ResetPasswordReq;
+import com.maretu.user.dto.UpdateProfileReq;
 import com.maretu.user.pojo.Users;
 import com.maretu.user.service.IUsersService;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +46,58 @@ public class UsersController {
                                     @RequestParam String verifyCode) {
         try {
             return Result.success(usersService.register(user, verifyCode));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @PostMapping("/refresh")
+    public Result<String> refreshToken(@RequestHeader("user-info") String userJson,
+                                       @RequestHeader("X-Client-IP") String ip) throws JsonProcessingException {
+        Users user = jacksonObjectMapper.readValue(userJson, Users.class);
+        if (!user.getLastLoginIp().equals(ip)) {
+            return Result.failure("IP address mismatch");
+        }
+        try {
+            return Result.success(usersService.refresh(user, ip));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @GetMapping("/me")
+    public Result<Users> getCurrentUser(@RequestHeader("user-info") String userJson,
+                                        @RequestHeader("X-Client-IP") String ip) throws JsonProcessingException {
+        Users user = jacksonObjectMapper.readValue(userJson, Users.class);
+        if (!user.getLastLoginIp().equals(ip)) {
+            return Result.failure("IP address mismatch");
+        }
+        try {
+            return Result.success(usersService.getCurrentUser(user));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @PutMapping("/profile")
+    public Result<Users> updateProfile(@RequestHeader("user-info") String userJson,
+                                       @RequestHeader("X-Client-IP") String ip,
+                                       @RequestBody UpdateProfileReq req) throws JsonProcessingException {
+        Users user = jacksonObjectMapper.readValue(userJson, Users.class);
+        if (!user.getLastLoginIp().equals(ip)) {
+            return Result.failure("IP address mismatch");
+        }
+        try {
+            return Result.success(usersService.updateProfile(user, req));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @PostMapping("/password/reset")
+    public Result<Boolean> resetPassword(@RequestBody ResetPasswordReq req) {
+        try {
+            return Result.success(usersService.resetPassword(req));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

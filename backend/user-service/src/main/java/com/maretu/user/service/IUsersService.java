@@ -1,6 +1,8 @@
 package com.maretu.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.maretu.user.dto.ResetPasswordReq;
+import com.maretu.user.dto.UpdateProfileReq;
 import com.maretu.user.pojo.Users;
 
 /**
@@ -18,4 +20,12 @@ public interface IUsersService extends IService<Users> {
     Boolean sendCode(Users user, String type);
 
     Boolean register(Users user, String verifyCode);
+
+    String refresh(Users user, String ip);
+
+    Users getCurrentUser(Users user);
+
+    Users updateProfile(Users currentUser, UpdateProfileReq req);
+
+    Boolean resetPassword(ResetPasswordReq req);
 }

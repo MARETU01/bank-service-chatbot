@@ -3,6 +3,8 @@ package com.maretu.user.service.impl;
 import com.maretu.common.dto.Context;
 import com.maretu.common.utils.JwtUtils;
 import com.maretu.common.utils.RedisConstants;
+import com.maretu.user.dto.ResetPasswordReq;
+import com.maretu.user.dto.UpdateProfileReq;
 import com.maretu.user.pojo.Users;
 import com.maretu.user.mapper.UsersMapper;
 import com.maretu.user.service.IUsersService;
@@ -120,7 +122,127 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 .setEmailVerified(true);
         save(user);
         stringRedisTemplate.delete(RedisConstants.VERIFY_CODE_KEY + user.getEmail());
-        return null;
+        return true;
+    }
+
+    @Override
+    public String refresh(Users user, String ip) {
+        Users userInfo = lambdaQuery().eq(Users::getId, user.getId()).one();
+        if (userInfo == null) {
+            throw new RuntimeException("user not found");
+        }
+        if (userInfo.getStatus() != 1) {
+            throw new RuntimeException("user's status is not active");
+        }
+        Context token = new Context();
+        token.setUserId(Math.toIntExact(userInfo.getId()))
+                .setUsername(userInfo.getUsername())
+                .setEmail(userInfo.getEmail())
+                .setIp(ip);
+        self.loginLog(userInfo, ip);
+        return JwtUtils.generateJwt(token);
+    }
+
+    @Override
+    public Users getCurrentUser(Users user) {
+        Users userInfo = lambdaQuery().eq(Users::getId, user.getId()).one();
+        if (userInfo == null) {
+            throw new RuntimeException("user not found");
+        }
+        userInfo.setPassword(null);
+        return userInfo;
+    }
+
+    @Override
+    public Users updateProfile(Users currentUser, UpdateProfileReq req) {
+        if (currentUser == null || currentUser.getId() == null) {
+            throw new RuntimeException("user not found");
+        }
+
+        Users userInfo = lambdaQuery().eq(Users::getId, currentUser.getId()).one();
+        if (userInfo == null) {
+            throw new RuntimeException("user not found");
+        }
+        if (userInfo.getStatus() != 1) {
+            throw new RuntimeException("user's status is not active");
+        }
+
+        boolean needUpdate = false;
+
+        if (StringUtils.hasText(req.getUsername()) && !Objects.equals(req.getUsername(), userInfo.getUsername())) {
+            // 查重（排除自己）
+            Users existing = lambdaQuery().eq(Users::getUsername, req.getUsername()).one();
+            if (existing != null && !Objects.equals(existing.getId(), userInfo.getId())) {
+                throw new RuntimeException("username already registered");
+            }
+            userInfo.setUsername(req.getUsername());
+            needUpdate = true;
+        }
+
+        if (StringUtils.hasText(req.getPhone()) && !Objects.equals(req.getPhone(), userInfo.getPhone())) {
+            Users existing = lambdaQuery().eq(Users::getPhone, req.getPhone()).one();
+            if (existing != null && !Objects.equals(existing.getId(), userInfo.getId())) {
+                throw new RuntimeException("phone already registered");
+            }
+            userInfo.setPhone(req.getPhone());
+            needUpdate = true;
+        }
+
+        if (StringUtils.hasText(req.getRealName()) && !Objects.equals(req.getRealName(), userInfo.getRealName())) {
+            userInfo.setRealName(req.getRealName());
+            needUpdate = true;
+        }
+
+        if (!needUpdate) {
+            userInfo.setPassword(null);
+            return userInfo;
+        }
+
+        updateById(userInfo);
+
+        Users updated = lambdaQuery().eq(Users::getId, userInfo.getId()).one();
+        if (updated != null) {
+            updated.setPassword(null);
+        }
+        return updated;
+    }
+
+    @Override
+    public Boolean resetPassword(ResetPasswordReq req) {
+        if (req == null) {
+            throw new RuntimeException("request is required");
+        }
+        if (!StringUtils.hasText(req.getEmail())) {
+            throw new RuntimeException("email is required");
+        }
+        if (!StringUtils.hasText(req.getVerifyCode())) {
+            throw new RuntimeException("verifyCode is required");
+        }
+        if (!StringUtils.hasText(req.getNewPassword())) {
+            throw new RuntimeException("newPassword is required");
+        }
+
+        Users userInfo = lambdaQuery().eq(Users::getEmail, req.getEmail()).one();
+        if (userInfo == null) {
+            throw new RuntimeException("user not found");
+        }
+        if (userInfo.getStatus() != 1) {
+            throw new RuntimeException("user's status is not active");
+        }
+
+        String storedCode = stringRedisTemplate.opsForValue().get(
+                RedisConstants.RESET_PASSWORD_KEY + req.getEmail()
+        );
+        if (!Objects.equals(storedCode, req.getVerifyCode())) {
+            throw new RuntimeException("verification code not correct");
+        }
+
+        String encodedPassword = HashUtil.encodePassword(req.getNewPassword());
+        userInfo.setPassword(encodedPassword);
+        updateById(userInfo);
+        stringRedisTemplate.delete(RedisConstants.RESET_PASSWORD_KEY + req.getEmail());
+        return true;
+
     }
 
     @Async("virtualThreadPoolExecutor")

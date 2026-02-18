@@ -1,6 +1,7 @@
 package com.maretu.user.service.impl;
 
 import com.maretu.common.dto.Context;
+import com.maretu.common.utils.DesensitizeUtils;
 import com.maretu.common.utils.JwtUtils;
 import com.maretu.common.utils.RedisConstants;
 import com.maretu.user.dto.ResetPasswordReq;
@@ -149,8 +150,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         if (userInfo == null) {
             throw new RuntimeException("user not found");
         }
-        userInfo.setPassword(null);
-        return userInfo;
+        return maskUserForResponse(userInfo);
     }
 
     @Override
@@ -194,17 +194,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         }
 
         if (!needUpdate) {
-            userInfo.setPassword(null);
-            return userInfo;
+            return maskUserForResponse(userInfo);
         }
 
         updateById(userInfo);
 
         Users updated = lambdaQuery().eq(Users::getId, userInfo.getId()).one();
-        if (updated != null) {
-            updated.setPassword(null);
-        }
-        return updated;
+        return maskUserForResponse(updated);
     }
 
     @Override
@@ -242,7 +238,6 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         updateById(userInfo);
         stringRedisTemplate.delete(RedisConstants.RESET_PASSWORD_KEY + req.getEmail());
         return true;
-
     }
 
     @Async("virtualThreadPoolExecutor")
@@ -255,5 +250,15 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         user.setLastLoginIp(ip)
                 .setLastLoginTime(LocalDateTime.now());
         updateById(user);
+    }
+
+    private Users maskUserForResponse(Users user) {
+        if (user == null) {
+            return null;
+        }
+        return user.setPassword(null)
+                .setRealName(DesensitizeUtils.maskRealName(user.getRealName()))
+                .setPhone(DesensitizeUtils.maskPhone(user.getPhone()))
+                .setEmail(DesensitizeUtils.maskEmail(user.getEmail()));
     }
 }

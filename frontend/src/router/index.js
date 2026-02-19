@@ -8,6 +8,18 @@ const routes = [
     redirect: '/dashboard',
     children: [
       {
+        path: '/login',
+        name: 'Login',
+        component: () => import('../views/LoginView.vue'),
+        meta: { title: '登录页面', icon: '📊' }
+      },
+      {
+        path: '/register',
+        name: 'Register',
+        component: () => import('../views/RegisterView.vue'),
+        meta: { title: '注册页面', icon: '📊' }
+      },
+      {
         path: '/dashboard',
         name: 'Dashboard',
         component: () => import('../views/Dashboard.vue'),

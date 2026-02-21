@@ -6,27 +6,27 @@
         <h2>🏦 银行服务机器人</h2>
       </div>
       <nav class="menu">
-        <router-link to="/" class="menu-item">
+        <router-link to="/app/dashboard" class="menu-item">
           <span class="icon">📊</span>
           <span>仪表盘</span>
         </router-link>
-        <router-link to="/accounts" class="menu-item">
+        <router-link to="/app/accounts" class="menu-item">
           <span class="icon">💳</span>
           <span>账户管理</span>
         </router-link>
-        <router-link to="/transactions" class="menu-item">
+        <router-link to="/app/transactions" class="menu-item">
           <span class="icon">📝</span>
           <span>交易记录</span>
         </router-link>
-        <router-link to="/transfers" class="menu-item">
+        <router-link to="/app/transfers" class="menu-item">
           <span class="icon">💸</span>
           <span>转账服务</span>
         </router-link>
-        <router-link to="/chatbot" class="menu-item">
+        <router-link to="/app/chatbot" class="menu-item">
           <span class="icon">🤖</span>
           <span>智能客服</span>
         </router-link>
-        <router-link to="/profile" class="menu-item">
+        <router-link to="/app/profile" class="menu-item">
           <span class="icon">👤</span>
           <span>个人中心</span>
         </router-link>
@@ -70,12 +70,12 @@ export default {
 
     const pageTitle = computed(() => {
       const titles = {
-        '/': '仪表盘',
-        '/accounts': '账户管理',
-        '/transactions': '交易记录',
-        '/transfers': '转账服务',
-        '/chatbot': '智能客服',
-        '/profile': '个人中心'
+        '/app/dashboard': '仪表盘',
+        '/app/accounts': '账户管理',
+        '/app/transactions': '交易记录',
+        '/app/transfers': '转账服务',
+        '/app/chatbot': '智能客服',
+        '/app/profile': '个人中心'
       }
       return titles[route.path] || '银行服务'
     })

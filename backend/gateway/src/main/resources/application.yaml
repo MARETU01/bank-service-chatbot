@@ -24,7 +24,7 @@ spring:
       password: maretu
   config:
     import:
-      - "nacos:gateway-routes.json?group=DEFAULT_GROUP&refresh=true"
+      - "nacos:gateway-routes.yaml?group=DEFAULT_GROUP&refresh=true"
 
 maretu:
   auth:

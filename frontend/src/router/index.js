@@ -21,7 +21,7 @@ const routes = [
     meta: { title: '注册页面' }
   },
   {
-    path: '/app',
+    path: '/',
     component: Layout,
     children: [
       {

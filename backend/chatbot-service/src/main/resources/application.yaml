@@ -14,6 +14,17 @@ spring:
       - "nacos:shared-log.yaml?group=DEFAULT_GROUP&refresh=true"
       - "nacos:shared-jdbc.yaml?group=DEFAULT_GROUP&refresh=true"
       - "nacos:shared-redis.yaml?group=DEFAULT_GROUP&refresh=true"
+  ai:
+    openai:
+      api-key: "ms-2cc7452c-4482-4a2f-9788-c692b8811aaf"
+      base-url: "https://api-inference.modelscope.cn/v1/"
+      chat:
+        options:
+          model: "Qwen/Qwen3.5-397B-A17B"
+    ollama:
+      base-url: http://ipv6.maretu.top:11434
+      chat:
+        model: deepseek-r1:7b
 
 maretu:
   mysql:

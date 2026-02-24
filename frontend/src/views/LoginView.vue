@@ -3,6 +3,10 @@
     <div class="login-wrapper">
       <div class="login-card">
         <div class="login-header">
+          <router-link to="/" class="home-link" title="返回首页">
+            <span class="home-icon">🏠</span>
+            <span>返回首页</span>
+          </router-link>
           <h1>🏦 银行服务机器人</h1>
           <p>欢迎登录</p>
         </div>
@@ -77,7 +81,7 @@ export default {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,10 +94,12 @@ export default {
 }
 
 .login-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  padding: 40px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  padding: 45px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .login-header {
@@ -101,9 +107,37 @@ export default {
   margin-bottom: 32px;
 }
 
+.home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #667eea;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s;
+  background: rgba(102, 126, 234, 0.1);
+  margin-bottom: 20px;
+}
+
+.home-link:hover {
+  background: rgba(102, 126, 234, 0.2);
+  color: #764ba2;
+  transform: translateX(-2px);
+}
+
+.home-icon {
+  font-size: 16px;
+}
+
 .login-header h1 {
-  font-size: 24px;
-  color: #1e3a5f;
+  font-size: 26px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0 0 8px 0;
 }
 
@@ -114,53 +148,57 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #333;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #555;
   font-weight: 500;
+  text-align: left;
+  padding-left: 4px;
 }
 
 .form-group input {
   width: 100%;
-  padding: 12px 16px;
+  padding: 11px 14px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   font-size: 14px;
   transition: border-color 0.3s, box-shadow 0.3s;
   box-sizing: border-box;
+  background: #fafafa;
 }
 
 .form-group input:focus {
-  outline: none;
-  border-color: #1e3a5f;
-  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+  background: white;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
 .form-group input::placeholder {
-  color: #999;
+  color: #bbb;
 }
 
 .login-btn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 25px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: all 0.3s;
+  margin-top: 12px;
 }
 
 .login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
 }
 
 .login-btn:active {
@@ -168,29 +206,27 @@ export default {
 }
 
 .login-footer {
-  margin-top: 24px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
   text-align: center;
 }
 
 .login-footer p {
-  margin: 12px 0 0 0;
+  margin: 0;
   color: #666;
   font-size: 14px;
 }
 
-.login-footer p:first-child {
-  margin-top: 0;
-}
-
 .login-footer a {
-  color: #1e3a5f;
+  color: #667eea;
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
+  font-weight: 600;
+  transition: all 0.3s;
 }
 
 .login-footer a:hover {
-  color: #2d5a87;
-  text-decoration: underline;
+  color: #764ba2;
+  text-decoration: none;
 }
 </style>

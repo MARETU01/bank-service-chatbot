@@ -43,7 +43,7 @@ public class UsersController {
 
     @PostMapping("/register")
     public Result<Boolean> register(@RequestBody Users user,
-                                    @RequestParam String verifyCode) {
+                                    @RequestParam("verifyCode") String verifyCode) {
         try {
             return Result.success(usersService.register(user, verifyCode));
         } catch (Exception e) {

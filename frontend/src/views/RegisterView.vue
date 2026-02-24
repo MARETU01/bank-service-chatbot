@@ -39,7 +39,11 @@
               id="register-email" 
               placeholder="请输入邮箱"
               required
+              :class="{ 'input-error': emailError }"
+              @blur="validateEmail"
+              @input="validateEmail"
             >
+            <span v-if="emailError" class="error-message">{{ emailError }}</span>
           </div>
           <div class="form-group">
             <label for="register-phone">手机号</label>
@@ -59,7 +63,11 @@
               id="register-password" 
               placeholder="请设置密码"
               required
+              :class="{ 'input-error': passwordError }"
+              @blur="validatePassword"
+              @input="validatePassword"
             >
+            <span v-if="passwordError" class="error-message">{{ passwordError }}</span>
           </div>
           <div class="form-group">
             <label for="register-confirm-password">确认密码</label>
@@ -69,7 +77,11 @@
               id="register-confirm-password" 
               placeholder="请再次输入密码"
               required
+              :class="{ 'input-error': confirmPasswordError }"
+              @blur="validateConfirmPassword"
+              @input="validateConfirmPassword"
             >
+            <span v-if="confirmPasswordError" class="error-message">{{ confirmPasswordError }}</span>
           </div>
           <div class="form-group verification-group">
             <label for="register-verification">验证码</label>
@@ -84,9 +96,9 @@
               <button 
                 type="button" 
                 @click="sendVerificationCode" 
-                ref="verificationBtn"
                 class="verification-btn"
-              >获取验证码</button>
+                :disabled="countdown > 0"
+              >{{ countdown > 0 ? `重新发送 (${countdown})` : '获取验证码' }}</button>
             </div>
           </div>
           <button type="submit" class="register-btn">注册</button>
@@ -112,60 +124,103 @@ export default {
         confirmPassword: ''
       },
       verification: '',
-      isSendingCode: false
+      isSendingCode: false,
+      countdown: 0,
+      emailError: '',
+      passwordError: '',
+      confirmPasswordError: ''
     }
   },
   methods: {
-    sendVerificationCode() {
-      console.log('1. 方法开始执行');
-      if (this.isSendingCode) return;
-      this.isSendingCode = true;
-      console.log('2. 防重复点击逻辑通过');
-
-      if (this.registerForm.password !== this.registerForm.confirmPassword) {
-        alert('两次密码不一致'); // 原生 alert
-        this.isSendingCode = false;
+    validateEmail() {
+      const email = this.registerForm.email;
+      if (!email) {
+        this.emailError = '';
         return;
       }
-      console.log('3. 密码验证通过，准备发送请求');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        this.emailError = '请输入正确的邮箱格式';
+      } else {
+        this.emailError = '';
+      }
+    },
+    
+    validatePassword() {
+      const password = this.registerForm.password;
+      if (!password) {
+        this.passwordError = '';
+        return;
+      }
+      if (password.length < 6) {
+        this.passwordError = '密码长度不能少于 6 位';
+      } else {
+        this.passwordError = '';
+      }
+    },
+    
+    validateConfirmPassword() {
+      const password = this.registerForm.password;
+      const confirmPassword = this.registerForm.confirmPassword;
+      if (!confirmPassword) {
+        this.confirmPasswordError = '';
+        return;
+      }
+      if (password !== confirmPassword) {
+        this.confirmPasswordError = '两次输入的密码不一致';
+      } else {
+        this.confirmPasswordError = '';
+      }
+    },
+    
+    sendVerificationCode() {
+      // 如果正在倒计时，直接返回
+      if (this.countdown > 0) return;
+      
+      // 验证邮箱
+      this.validateEmail();
+      if (this.emailError) {
+        return;
+      }
 
-      this.$http.post('/users/register/code', this.registerForm)
+      this.$http.post('/users/code', {
+        email: this.registerForm.email
+      }, {
+        params: {
+          type: 'register'
+        }
+      })
         .then(response => {
-          console.log('验证码返回数据:', response.data);
           if (response.data.code === 1) {
-            alert(response.data.message || '验证码发送成功'); // 成功提示
+            alert(response.data.message || '验证码发送成功');
             this.startCountdown();
           } else {
-            alert(response.data.message || '验证码发送失败'); // 失败提示
+            alert(response.data.message || '验证码发送失败');
           }
         })
         .catch(error => {
           console.error('验证码请求错误:', error);
           alert('网络错误，请稍后重试');
-        })
-        .finally(() => {
-          this.isSendingCode = false;
         });
     },
     
     startCountdown() {
-      let countdown = 60;
-      const btn = this.$refs.verificationBtn;
-      btn.disabled = true;
+      this.countdown = 60;
       const timer = setInterval(() => {
-        btn.textContent = `重新发送 (${countdown})`;
-        countdown--;
-        if (countdown < 0) {
+        this.countdown--;
+        if (this.countdown <= 0) {
           clearInterval(timer);
-          btn.disabled = false;
-          btn.textContent = '获取验证码';
         }
       }, 1000);
     },
     
     handleRegister() {
-      if (this.registerForm.password !== this.registerForm.confirmPassword) {
-        alert('两次密码不一致');
+      // 验证所有字段
+      this.validateEmail();
+      this.validatePassword();
+      this.validateConfirmPassword();
+      
+      if (this.emailError || this.passwordError || this.confirmPasswordError) {
         return;
       }
 
@@ -179,7 +234,7 @@ export default {
 
       this.$http.post('/users/register', payload, {
         params: {
-          verification: this.verification
+          verifyCode: this.verification
         }
       })
         .then(response => {
@@ -303,6 +358,24 @@ export default {
 
 .form-group input::placeholder {
   color: #bbb;
+}
+
+.form-group input.input-error {
+  border-color: #f44336;
+  background: #ffebee;
+}
+
+.form-group input.input-error:focus {
+  border-color: #f44336;
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.15);
+}
+
+.error-message {
+  display: block;
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 4px;
+  padding-left: 4px;
 }
 
 .verification-group {

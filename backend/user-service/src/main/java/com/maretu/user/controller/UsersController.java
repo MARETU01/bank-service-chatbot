@@ -33,7 +33,7 @@ public class UsersController {
 
     @PostMapping("/code")
     public Result<Boolean> sendCode(@RequestBody Users user,
-                                    @RequestParam String type) {
+                                    @RequestParam("type") String type) {
         try {
             return Result.success(usersService.sendCode(user, type));
         } catch (Exception e) {

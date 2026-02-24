@@ -12,14 +12,18 @@
         </div>
         <form @submit.prevent="handleLogin">
           <div class="form-group">
-            <label for="login-email">邮箱</label>
+            <label for="login-account">手机号 / 邮箱</label>
             <input 
-              v-model="loginForm.email" 
+              v-model="loginForm.account" 
               type="text" 
-              id="login-email" 
-              placeholder="请输入邮箱"
+              id="login-account" 
+              placeholder="请输入手机号或邮箱"
               required
+              :class="{ 'input-error': accountError }"
+              @blur="validateAccount"
+              @input="validateAccount"
             >
+            <span v-if="accountError" class="error-message">{{ accountError }}</span>
           </div>
           <div class="form-group">
             <label for="login-password">密码</label>
@@ -47,14 +51,62 @@ export default {
   data() {
     return {
       loginForm: {
-        email: '',
+        account: '',
         password: ''
-      }
+      },
+      accountError: ''
     }
   },
   methods: {
+    // 验证输入是否为邮箱格式
+    isEmail(str) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(str);
+    },
+    // 验证输入是否为手机号格式（支持国际手机号）
+    isPhone(str) {
+      // 只验证是否为纯数字，长度在 7-15 位之间（国际手机号标准）
+      const phoneRegex = /^\d{7,15}$/;
+      return phoneRegex.test(str);
+    },
+    // 验证账号输入（只验证邮箱格式，不验证手机号）
+    validateAccount() {
+      const account = this.loginForm.account;
+      if (!account) {
+        this.accountError = '';
+        return;
+      }
+      // 如果是邮箱格式，验证通过
+      if (this.isEmail(account)) {
+        this.accountError = '';
+        return;
+      }
+      // 如果是手机号（纯数字 7-15 位），验证通过
+      if (this.isPhone(account)) {
+        this.accountError = '';
+        return;
+      }
+      // 既不是邮箱也不是手机号，显示错误
+      this.accountError = '请输入有效的手机号或邮箱地址';
+    },
     handleLogin() {
-      this.$http.post('/users/login', this.loginForm)
+      // 验证输入格式
+      this.validateAccount();
+      if (this.accountError) {
+        return;
+      }
+      
+      // 根据输入类型设置对应的登录参数
+      const loginData = {
+        password: this.loginForm.password
+      };
+      if (this.isEmail(this.loginForm.account)) {
+        loginData.email = this.loginForm.account;
+      } else {
+        loginData.phone = this.loginForm.account;
+      }
+      
+      this.$http.post('/users/login', loginData)
         .then(response => {
           console.log('Login response:', response.data);
           if (response.data.code === 1) {
@@ -63,7 +115,7 @@ export default {
             
             alert('登录成功');
             // 跳转到根路径'/'
-            this.$router.push('/');
+            this.$router.push('/dashboard');
           } else {
             // 登录失败，显示错误信息
             alert(response.data.message || '登录失败，请重试');
@@ -180,6 +232,24 @@ export default {
 
 .form-group input::placeholder {
   color: #bbb;
+}
+
+.form-group input.input-error {
+  border-color: #f44336;
+  background: #ffebee;
+}
+
+.form-group input.input-error:focus {
+  border-color: #f44336;
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.15);
+}
+
+.error-message {
+  display: block;
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 4px;
+  padding-left: 4px;
 }
 
 .login-btn {

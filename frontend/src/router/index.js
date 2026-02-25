@@ -21,6 +21,12 @@ const routes = [
     meta: { title: '注册页面' }
   },
   {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('../views/ResetPasswordView.vue'),
+    meta: { title: '重设密码' }
+  },
+  {
     path: '/',
     component: Layout,
     children: [

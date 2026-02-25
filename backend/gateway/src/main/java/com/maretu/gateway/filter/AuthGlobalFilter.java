@@ -42,9 +42,9 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             if (token == null || token.isEmpty()) {
                 return chain.filter(exchange);
             }
-            Context user;
+            Context context;
             try {
-                user = JwtUtils.parseJwt(token);
+                context = JwtUtils.parseJwt(token);
             } catch (ExpiredJwtException e) {
                 // 构建错误响应
                 ServerHttpResponse response = exchange.getResponse();
@@ -58,9 +58,9 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
                 return response.writeWith(Mono.just(buffer));
             }
-            String userJson = jacksonObjectMapper.writeValueAsString(user);
+            String userJson = jacksonObjectMapper.writeValueAsString(context);
             ServerWebExchange newExchange = exchange.mutate()
-                    .request(builder -> builder.header("user-info", userJson))
+                    .request(builder -> builder.header("context-info", userJson))
                     .build();
             return chain.filter(newExchange);
         }

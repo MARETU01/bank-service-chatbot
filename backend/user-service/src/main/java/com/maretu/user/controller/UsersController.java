@@ -32,8 +32,12 @@ public class UsersController {
     }
 
     @PostMapping("/code")
-    public Result<Boolean> sendCode(@RequestBody Users user,
-                                    @RequestParam("type") String type) {
+    public Result<Boolean> sendCode(@RequestBody(required = false) Users user,
+                                    @RequestHeader(value = "user-info", required = false) String userJson,
+                                    @RequestParam("type") String type) throws JsonProcessingException {
+        if (userJson != null && !userJson.isEmpty()) {
+            user.setEmail(jacksonObjectMapper.readValue(userJson, Users.class).getEmail());
+        }
         try {
             return Result.success(usersService.sendCode(user, type));
         } catch (Exception e) {

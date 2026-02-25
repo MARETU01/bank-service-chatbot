@@ -21,7 +21,7 @@ public interface IUsersService extends IService<Users> {
 
     Boolean register(Users user, String verifyCode);
 
-    Boolean resetPassword(ResetPasswordReq req);
+    Boolean resetPassword(ResetPasswordReq req, String verifyCode);
 
     String refresh(Users user, String ip);
 

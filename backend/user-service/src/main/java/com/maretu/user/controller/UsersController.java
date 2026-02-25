@@ -56,9 +56,14 @@ public class UsersController {
     }
 
     @PostMapping("/reset-password")
-    public Result<Boolean> resetPassword(@RequestBody ResetPasswordReq req) {
+    public Result<Boolean> resetPassword(@RequestHeader(value = "user-info", required = false) String userJson,
+                                         @RequestBody(required = false) ResetPasswordReq req,
+                                         @RequestParam("verifyCode") String verifyCode) throws JsonProcessingException {
+        if (userJson != null && !userJson.isEmpty()) {
+            req.setEmail(jacksonObjectMapper.readValue(userJson, Users.class).getEmail());
+        }
         try {
-            return Result.success(usersService.resetPassword(req));
+            return Result.success(usersService.resetPassword(req, verifyCode));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

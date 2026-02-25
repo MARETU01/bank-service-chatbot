@@ -127,14 +127,14 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     @Override
-    public Boolean resetPassword(ResetPasswordReq req) {
+    public Boolean resetPassword(ResetPasswordReq req, String verifyCode) {
         if (req == null) {
             throw new RuntimeException("request is required");
         }
         if (!StringUtils.hasText(req.getEmail())) {
             throw new RuntimeException("email is required");
         }
-        if (!StringUtils.hasText(req.getVerifyCode())) {
+        if (!StringUtils.hasText(verifyCode)) {
             throw new RuntimeException("verifyCode is required");
         }
         if (!StringUtils.hasText(req.getNewPassword())) {
@@ -152,7 +152,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         String storedCode = stringRedisTemplate.opsForValue().get(
                 RedisConstants.RESET_PASSWORD_KEY + req.getEmail()
         );
-        if (!Objects.equals(storedCode, req.getVerifyCode())) {
+        if (!Objects.equals(storedCode, verifyCode)) {
             throw new RuntimeException("verification code not correct");
         }
 

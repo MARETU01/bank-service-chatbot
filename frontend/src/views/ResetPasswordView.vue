@@ -44,200 +44,156 @@
           
           <div class="form-title-section">
             <h1>重设密码</h1>
-            <p>验证身份后设置新密码</p>
-          </div>
-          
-          <!-- 进度指示器 -->
-          <div class="progress-steps">
-            <div class="progress-step" :class="{ active: currentStep >= 1, completed: currentStep > 1 }">
-              <div class="step-number">1</div>
-              <div class="step-label">验证身份</div>
-            </div>
-            <div class="progress-line" :class="{ active: currentStep > 1 }"></div>
-            <div class="progress-step" :class="{ active: currentStep >= 2, completed: currentStep > 2 }">
-              <div class="step-number">2</div>
-              <div class="step-label">设置新密码</div>
-            </div>
-            <div class="progress-line" :class="{ active: currentStep > 2 }"></div>
-            <div class="progress-step" :class="{ active: currentStep >= 3 }">
-              <div class="step-number">3</div>
-              <div class="step-label">完成</div>
-            </div>
+            <p>填写以下信息，重置您的密码</p>
           </div>
           
           <form @submit.prevent="handleSubmit">
-            <!-- 步骤 1: 验证身份 -->
-            <transition name="slide-fade">
-              <div v-if="currentStep === 1" class="step-content">
-                <div class="form-section-title">
-                  <span class="section-number">01</span>
-                  <span>验证身份</span>
-                </div>
-                
-                <div class="form-group">
-                  <label for="reset-email">
-                    <span class="label-icon">📧</span>
-                    注册邮箱
-                    <span class="required">*</span>
-                  </label>
-                  <div class="input-wrapper">
-                    <input 
-                      v-model="resetForm.email" 
-                      type="email" 
-                      id="reset-email" 
-                      placeholder="请输入注册时使用的邮箱"
-                      required
-                      :class="{ 'input-error': emailError }"
-                      @blur="validateEmail"
-                      @input="validateEmail"
-                    >
-                  </div>
-                  <transition name="fade">
-                    <span v-if="emailError" class="error-message">
-                      <span class="error-icon">⚠️</span> {{ emailError }}
-                    </span>
-                  </transition>
-                </div>
-                
-                <div class="form-group verification-group">
-                  <label for="reset-verification">
-                    <span class="label-icon">🔑</span>
-                    验证码
-                    <span class="required">*</span>
-                  </label>
-                  <div class="verification-input-wrapper">
-                    <input 
-                      v-model="verification" 
-                      type="text" 
-                      id="reset-verification" 
-                      placeholder="请输入验证码"
-                      required
-                    >
-                    <button 
-                      type="button" 
-                      @click="sendVerificationCode" 
-                      class="verification-btn"
-                      :disabled="countdown > 0 || isLoading"
-                    >
-                      {{ countdown > 0 ? `重新发送 (${countdown})` : '获取验证码' }}
-                    </button>
-                  </div>
-                </div>
-                
-                <button type="button" class="next-btn" @click="goToStep2" :disabled="isLoading">
-                  <span v-if="isLoading" class="loading-spinner"></span>
-                  <span>{{ isLoading ? '验证中...' : '下一步' }}</span>
+            <div class="form-group">
+              <label for="reset-email">
+                <span class="label-icon">📧</span>
+                注册邮箱
+                <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <input 
+                  v-model="resetForm.email" 
+                  type="email" 
+                  id="reset-email" 
+                  placeholder="请输入注册时使用的邮箱"
+                  required
+                  :class="{ 'input-error': emailError }"
+                  @blur="validateEmail"
+                  @input="validateEmail"
+                >
+              </div>
+              <transition name="fade">
+                <span v-if="emailError" class="error-message">
+                  <span class="error-icon">⚠️</span> {{ emailError }}
+                </span>
+              </transition>
+            </div>
+            
+            <div class="form-group verification-group">
+              <label for="reset-verification">
+                <span class="label-icon">🔑</span>
+                验证码
+                <span class="required">*</span>
+              </label>
+              <div class="verification-input-wrapper">
+                <input 
+                  v-model="verification" 
+                  type="text" 
+                  id="reset-verification" 
+                  placeholder="请输入验证码"
+                  required
+                >
+                <button 
+                  type="button" 
+                  @click="sendVerificationCode" 
+                  class="verification-btn"
+                  :disabled="countdown > 0 || isLoading"
+                >
+                  {{ countdown > 0 ? `重新发送 (${countdown})` : '获取验证码' }}
                 </button>
               </div>
-            </transition>
+            </div>
             
-            <!-- 步骤 2: 设置新密码 -->
-            <transition name="slide-fade">
-              <div v-if="currentStep === 2" class="step-content">
-                <div class="form-section-title">
-                  <span class="section-number">02</span>
-                  <span>设置新密码</span>
-                </div>
-                
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="reset-password">
-                      <span class="label-icon">🔒</span>
-                      新密码
-                      <span class="required">*</span>
-                    </label>
-                    <div class="input-wrapper password-input">
-                      <input 
-                        v-model="resetForm.password" 
-                        :type="showPassword ? 'text' : 'password'" 
-                        id="reset-password" 
-                        placeholder="请设置新密码"
-                        required
-                        :class="{ 'input-error': passwordError }"
-                        @blur="validatePassword"
-                        @input="validatePassword"
-                      >
-                      <button 
-                        type="button" 
-                        class="password-toggle"
-                        @click="showPassword = !showPassword"
-                        tabindex="-1"
-                      >
-                        {{ showPassword ? '🙈' : '👁️' }}
-                      </button>
-                    </div>
-                    <transition name="fade">
-                      <span v-if="passwordError" class="error-message">
-                        <span class="error-icon">⚠️</span> {{ passwordError }}
-                      </span>
-                    </transition>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label for="reset-confirm-password">
-                      <span class="label-icon">🔐</span>
-                      确认密码
-                      <span class="required">*</span>
-                    </label>
-                    <div class="input-wrapper password-input">
-                      <input 
-                        v-model="resetForm.confirmPassword" 
-                        :type="showConfirmPassword ? 'text' : 'password'" 
-                        id="reset-confirm-password" 
-                        placeholder="请再次输入新密码"
-                        required
-                        :class="{ 'input-error': confirmPasswordError }"
-                        @blur="validateConfirmPassword"
-                        @input="validateConfirmPassword"
-                      >
-                      <button 
-                        type="button" 
-                        class="password-toggle"
-                        @click="showConfirmPassword = !showConfirmPassword"
-                        tabindex="-1"
-                      >
-                        {{ showConfirmPassword ? '🙈' : '👁️' }}
-                      </button>
-                    </div>
-                    <transition name="fade">
-                      <span v-if="confirmPasswordError" class="error-message">
-                        <span class="error-icon">⚠️</span> {{ confirmPasswordError }}
-                      </span>
-                    </transition>
-                  </div>
-                </div>
-                
-                <div class="password-requirements">
-                  <h4>密码要求：</h4>
-                  <ul>
-                    <li :class="{ valid: resetForm.password.length >= 6 }">至少 6 个字符</li>
-                    <li :class="{ valid: resetForm.password.length >= 8 }">建议 8 个字符以上更安全</li>
-                  </ul>
-                </div>
-                
-                <div class="step-actions">
-                  <button type="button" class="back-btn" @click="currentStep = 1">上一步</button>
-                  <button type="submit" class="reset-btn" :disabled="isLoading">
-                    <span v-if="isLoading" class="loading-spinner"></span>
-                    <span>{{ isLoading ? '重置中...' : '确认重置' }}</span>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reset-password">
+                  <span class="label-icon">🔒</span>
+                  新密码
+                  <span class="required">*</span>
+                </label>
+                <div class="input-wrapper password-input">
+                  <input 
+                    v-model="resetForm.password" 
+                    :type="showPassword ? 'text' : 'password'" 
+                    id="reset-password" 
+                    placeholder="请设置新密码"
+                    required
+                    :class="{ 'input-error': passwordError }"
+                    @blur="validatePassword"
+                    @input="validatePassword"
+                  >
+                  <button 
+                    type="button" 
+                    class="password-toggle"
+                    @click="showPassword = !showPassword"
+                    tabindex="-1"
+                  >
+                    {{ showPassword ? '🙈' : '👁️' }}
                   </button>
                 </div>
+                <transition name="fade">
+                  <span v-if="passwordError" class="error-message">
+                    <span class="error-icon">⚠️</span> {{ passwordError }}
+                  </span>
+                </transition>
+              </div>
+              
+              <div class="form-group">
+                <label for="reset-confirm-password">
+                  <span class="label-icon">🔐</span>
+                  确认密码
+                  <span class="required">*</span>
+                </label>
+                <div class="input-wrapper password-input">
+                  <input 
+                    v-model="resetForm.confirmPassword" 
+                    :type="showConfirmPassword ? 'text' : 'password'" 
+                    id="reset-confirm-password" 
+                    placeholder="请再次输入新密码"
+                    required
+                    :class="{ 'input-error': confirmPasswordError }"
+                    @blur="validateConfirmPassword"
+                    @input="validateConfirmPassword"
+                  >
+                  <button 
+                    type="button" 
+                    class="password-toggle"
+                    @click="showConfirmPassword = !showConfirmPassword"
+                    tabindex="-1"
+                  >
+                    {{ showConfirmPassword ? '🙈' : '👁️' }}
+                  </button>
+                </div>
+                <transition name="fade">
+                  <span v-if="confirmPasswordError" class="error-message">
+                    <span class="error-icon">⚠️</span> {{ confirmPasswordError }}
+                  </span>
+                </transition>
+              </div>
+            </div>
+            
+            <div class="password-requirements">
+              <h4>密码要求：</h4>
+              <ul>
+                <li :class="{ valid: resetForm.password.length >= 6 }">至少 6 个字符</li>
+                <li :class="{ valid: resetForm.password.length >= 8 }">建议 8 个字符以上更安全</li>
+              </ul>
+            </div>
+            
+            <!-- 成功提示 -->
+            <transition name="slide-fade">
+              <div v-if="isSuccess" class="success-message">
+                <div class="success-icon">✅</div>
+                <h3>密码重置成功！</h3>
+                <p>请使用新密码登录</p>
               </div>
             </transition>
             
-            <!-- 步骤 3: 完成 -->
-            <transition name="slide-fade">
-              <div v-if="currentStep === 3" class="step-content step-complete">
-                <div class="complete-icon">✅</div>
-                <h2>密码重置成功！</h2>
-                <p>您的密码已成功更新，请使用新密码登录</p>
-                <div class="complete-actions">
-                  <router-link to="/login" class="login-btn">
-                    <span>返回登录</span>
-                  </router-link>
-                </div>
-              </div>
-            </transition>
+            <button type="submit" class="reset-btn" :disabled="isLoading || isSuccess">
+              <span v-if="isLoading" class="loading-spinner"></span>
+              <span v-if="isSuccess">重置成功</span>
+              <span v-else>{{ isLoading ? '重置中...' : '确认重置' }}</span>
+            </button>
+            
+            <div v-if="isSuccess" class="success-actions">
+              <router-link to="/login" class="login-btn">
+                <span>返回登录</span>
+              </router-link>
+            </div>
           </form>
         </div>
       </div>
@@ -249,7 +205,6 @@
 export default {
   data() {
     return {
-      currentStep: 1,
       resetForm: {
         email: '',
         password: '',
@@ -263,7 +218,7 @@ export default {
       showPassword: false,
       showConfirmPassword: false,
       isLoading: false,
-      isVerified: false
+      isSuccess: false
     }
   },
   methods: {
@@ -349,50 +304,17 @@ export default {
       }, 1000);
     },
     
-    async goToStep2() {
-      this.validateEmail();
-      
-      if (this.emailError || !this.resetForm.email) {
-        alert('请输入正确的邮箱地址');
-        return;
-      }
-      
-      if (!this.verification) {
-        alert('请输入验证码');
-        return;
-      }
-      
-      this.isLoading = true;
-      try {
-        // 验证验证码
-        const response = await this.$http.post('/users/verify', {
-          email: this.resetForm.email,
-          code: this.verification
-        }, {
-          params: {
-            type: 'reset'
-          }
-        });
-        
-        if (response.data.code === 1) {
-          this.isVerified = true;
-          this.currentStep = 2;
-        } else {
-          alert(response.data.message || '验证码错误');
-        }
-      } catch (error) {
-        console.error('验证码验证错误:', error);
-        alert('验证码错误，请重试');
-      } finally {
-        this.isLoading = false;
-      }
-    },
-    
     async handleSubmit() {
+      this.validateEmail();
       this.validatePassword();
       this.validateConfirmPassword();
       
-      if (this.passwordError || this.confirmPasswordError) {
+      if (this.emailError || this.passwordError || this.confirmPasswordError) {
+        return;
+      }
+
+      if (!this.resetForm.email || !this.verification) {
+        alert('请填写邮箱和验证码');
         return;
       }
 
@@ -406,13 +328,16 @@ export default {
       try {
         const response = await this.$http.post('/users/reset-password', {
           email: this.resetForm.email,
-          password: this.resetForm.password,
-          code: this.verification
+          newPassword: this.resetForm.password
+        }, {
+          params: {
+            verifyCode: this.verification
+          }
         });
         
         console.log('重置密码返回数据:', response.data);
         if (response.data.code === 1) {
-          this.currentStep = 3;
+          this.isSuccess = true;
         } else {
           alert(response.data.message || '重置失败');
         }
@@ -608,98 +533,6 @@ export default {
   color: #888;
   margin: 0;
   font-size: 14px;
-}
-
-/* 进度指示器 */
-.progress-steps {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 35px;
-  padding: 20px 10px;
-}
-
-.progress-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-.step-number {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #e8e8e8;
-  color: #999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.progress-step.active .step-number {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-}
-
-.progress-step.completed .step-number {
-  background: #10b981;
-  color: white;
-}
-
-.step-label {
-  font-size: 12px;
-  color: #999;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.progress-step.active .step-label,
-.progress-step.completed .step-label {
-  color: #667eea;
-}
-
-.progress-line {
-  flex: 1;
-  height: 3px;
-  background: #e8e8e8;
-  margin: 0 15px;
-  margin-top: -25px;
-  transition: background 0.3s;
-}
-
-.progress-line.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* 分节标题 */
-.form-section-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 25px 0 18px 0;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-.section-number {
-  font-size: 14px;
-  font-weight: 700;
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
-  padding: 4px 10px;
-  border-radius: 6px;
-}
-
-.form-section-title span:last-child {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
 }
 
 /* 表单行布局 */
@@ -902,34 +735,46 @@ export default {
   font-weight: bold;
 }
 
-/* 步骤操作按钮 */
-.step-actions {
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.back-btn {
-  flex: 1;
-  padding: 15px;
-  background: #f5f5f5;
-  color: #666;
-  border: none;
+/* 成功消息 */
+.success-message {
+  text-align: center;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
   border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+  margin-bottom: 20px;
+  animation: fadeIn 0.5s ease;
 }
 
-.back-btn:hover {
-  background: #e8e8e8;
-  color: #333;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.next-btn,
+.success-icon {
+  font-size: 60px;
+  margin-bottom: 15px;
+}
+
+.success-message h3 {
+  font-size: 22px;
+  color: #155724;
+  margin: 0 0 10px 0;
+}
+
+.success-message p {
+  color: #155724;
+  margin: 0;
+  font-size: 14px;
+}
+
+.success-actions {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* 重置按钮 */
 .reset-btn {
-  flex: 2;
+  width: 100%;
   padding: 15px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -943,58 +788,24 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  margin-top: 10px;
 }
 
-.next-btn:hover:not(:disabled),
 .reset-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
 }
 
-.next-btn:active:not(:disabled),
 .reset-btn:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.next-btn:disabled,
 .reset-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-/* 完成状态 */
-.step-complete {
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.complete-icon {
-  font-size: 80px;
-  margin-bottom: 20px;
-  animation: bounce 0.6s ease;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
-.step-complete h2 {
-  font-size: 26px;
-  color: #1a1a2e;
-  margin: 0 0 15px 0;
-}
-
-.step-complete p {
-  color: #888;
-  font-size: 15px;
-  margin: 0 0 30px 0;
-}
-
-.complete-actions {
-  margin-top: 30px;
-}
-
+/* 登录按钮 */
 .login-btn {
   display: inline-block;
   padding: 15px 40px;
@@ -1121,28 +932,12 @@ export default {
     width: 100%;
   }
   
-  .step-actions {
-    flex-direction: column;
+  .success-actions {
+    margin-top: 15px;
   }
   
-  .back-btn,
-  .next-btn,
-  .reset-btn {
-    flex: 1;
-  }
-  
-  .progress-steps {
-    padding: 15px 5px;
-  }
-  
-  .step-label {
-    font-size: 10px;
-  }
-  
-  .step-number {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
+  .login-btn {
+    width: 100%;
   }
 }
 </style>

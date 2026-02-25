@@ -108,21 +108,22 @@ export default {
 .layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: var(--color-gray-50);
 }
 
 .sidebar {
-  width: 240px;
-  background: linear-gradient(180deg, #1e3a5f 0%, #2d5a87 100%);
-  color: white;
-  transition: width 0.3s;
+  width: var(--sidebar-width);
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  color: var(--color-white);
+  transition: width var(--transition-normal);
   position: fixed;
   height: 100vh;
   overflow-y: auto;
+  z-index: var(--z-sticky);
 }
 
 .sidebar.collapsed {
-  width: 60px;
+  width: var(--sidebar-collapsed-width);
 }
 
 .sidebar.collapsed .logo h2,
@@ -131,18 +132,18 @@ export default {
 }
 
 .logo {
-  padding: 20px;
+  padding: var(--spacing-2xl);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .logo h2 {
-  font-size: 18px;
+  font-size: var(--font-size-2xl);
   margin: 0;
   white-space: nowrap;
 }
 
 .menu {
-  padding: 10px 0;
+  padding: var(--spacing-md) 0;
 }
 
 .menu-item {
@@ -151,13 +152,13 @@ export default {
   padding: 15px 20px;
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: all 0.3s;
+  transition: all var(--transition-normal);
 }
 
 .menu-item:hover,
 .menu-item.router-link-active {
   background: rgba(255, 255, 255, 0.1);
-  color: white;
+  color: var(--color-white);
 }
 
 .menu-item .icon {
@@ -169,32 +170,32 @@ export default {
 
 .main-content {
   flex: 1;
-  margin-left: 240px;
-  transition: margin-left 0.3s;
+  margin-left: var(--sidebar-width);
+  transition: margin-left var(--transition-normal);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: var(--spacing-lg) var(--spacing-3xl);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: var(--z-sticky);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--spacing-lg);
 }
 
 .header-left h1 {
-  font-size: 20px;
+  font-size: var(--font-size-3xl);
   margin: 0;
-  color: #1e3a5f;
+  color: var(--color-primary);
 }
 
 .menu-toggle {
@@ -202,20 +203,27 @@ export default {
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: #1e3a5f;
+  color: var(--color-primary);
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.menu-toggle:hover {
+  background: var(--color-gray-100);
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--spacing-xl);
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #666;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
 }
 
 .avatar {
@@ -224,12 +232,13 @@ export default {
 
 .logout-btn {
   padding: 8px 16px;
-  background: #e74c3c;
-  color: white;
+  background: var(--color-danger);
+  color: var(--color-white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background var(--transition-normal);
+  font-size: var(--font-size-sm);
 }
 
 .logout-btn:hover {
@@ -237,6 +246,21 @@ export default {
 }
 
 .page-content {
-  padding: 30px;
+  padding: var(--spacing-3xl);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: var(--sidebar-collapsed-width);
+  }
+  
+  .main-content {
+    margin-left: var(--sidebar-collapsed-width);
+  }
+  
+  .sidebar.collapsed .logo h2,
+  .sidebar.collapsed .menu-item span:last-child {
+    display: none;
+  }
 }
 </style>

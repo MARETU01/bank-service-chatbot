@@ -1,0 +1,134 @@
+/**
+ * 全局样式变量
+ * 统一银行服务机器人前端项目的样式风格
+ */
+
+:root {
+  /* ========== 颜色系统 ========== */
+  
+  /* 主色调 - 深蓝色系 */
+  --color-primary: #1e3a5f;
+  --color-primary-light: #2d5a87;
+  --color-primary-dark: #152a45;
+  
+  /* 渐变色 - 紫色系（用于登录/注册页面） */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-primary-reverse: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  
+  /* 功能色 */
+  --color-success: #28a745;
+  --color-success-light: #d4edda;
+  --color-warning: #ffc107;
+  --color-warning-light: #fff3cd;
+  --color-danger: #dc3545;
+  --color-danger-light: #f8d7da;
+  --color-info: #17a2b8;
+  --color-info-light: #d1ecf1;
+  
+  /* 中性色 */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-50: #f8f9fa;
+  --color-gray-100: #e9ecef;
+  --color-gray-200: #e0e0e0;
+  --color-gray-300: #ced4da;
+  --color-gray-400: #adb5bd;
+  --color-gray-500: #6c757d;
+  --color-gray-600: #666666;
+  --color-gray-700: #495057;
+  --color-gray-800: #343a40;
+  --color-gray-900: #212529;
+  
+  /* 文本颜色 */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-disabled: #cccccc;
+  --text-inverse: #ffffff;
+  
+  /* ========== 间距系统 ========== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  --spacing-3xl: 30px;
+  --spacing-4xl: 40px;
+  --spacing-5xl: 50px;
+  --spacing-6xl: 60px;
+  
+  /* ========== 圆角系统 ========== */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-full: 9999px;
+  
+  /* ========== 阴影系统 ========== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-2xl: 0 25px 80px rgba(0, 0, 0, 0.25);
+  
+  /* 卡片阴影 */
+  --card-shadow: var(--shadow-md);
+  --card-hover-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  
+  /* ========== 字体系统 ========== */
+  --font-family: 'Avenir', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', monospace;
+  
+  /* 字体大小 */
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 16px;
+  --font-size-2xl: 18px;
+  --font-size-3xl: 20px;
+  --font-size-4xl: 24px;
+  --font-size-5xl: 28px;
+  --font-size-6xl: 32px;
+  
+  /* 字重 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* 行高 */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+  
+  /* ========== 过渡动画 ========== */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* ========== 断点 ========== */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1400px;
+  
+  /* ========== Z-Index ========== */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal-backdrop: 999;
+  --z-modal: 1000;
+  --z-tooltip: 1100;
+  
+  /* ========== 布局 ========== */
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 60px;
+  --header-height: 64px;
+  --container-max-width: 1200px;
+  --container-max-width-lg: 1400px;
+}

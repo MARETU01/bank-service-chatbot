@@ -55,6 +55,15 @@ public class UsersController {
         }
     }
 
+    @PostMapping("/reset-password")
+    public Result<Boolean> resetPassword(@RequestBody ResetPasswordReq req) {
+        try {
+            return Result.success(usersService.resetPassword(req));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
     @PostMapping("/refresh")
     public Result<String> refreshToken(@RequestHeader("user-info") String userJson,
                                        @RequestHeader("X-Client-IP") String ip) throws JsonProcessingException {
@@ -93,15 +102,6 @@ public class UsersController {
         }
         try {
             return Result.success(usersService.updateProfile(user, req));
-        } catch (Exception e) {
-            return Result.failure(e.getMessage());
-        }
-    }
-
-    @PostMapping("/password/reset")
-    public Result<Boolean> resetPassword(@RequestBody ResetPasswordReq req) {
-        try {
-            return Result.success(usersService.resetPassword(req));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

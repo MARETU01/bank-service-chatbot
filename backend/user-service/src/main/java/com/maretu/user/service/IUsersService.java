@@ -21,11 +21,11 @@ public interface IUsersService extends IService<Users> {
 
     Boolean register(Users user, String verifyCode);
 
+    Boolean resetPassword(ResetPasswordReq req);
+
     String refresh(Users user, String ip);
 
     Users getCurrentUser(Users user);
 
     Users updateProfile(Users currentUser, UpdateProfileReq req);
-
-    Boolean resetPassword(ResetPasswordReq req);
 }

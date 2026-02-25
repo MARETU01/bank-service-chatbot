@@ -76,32 +76,32 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     @Override
     public Boolean sendCode(Users user, String type) {
-        try {
-            int verificationCode = ThreadLocalRandom.current().nextInt(100000, 1000000);
-            switch (type) {
-                case "register":
-                    stringRedisTemplate.opsForValue().set(
-                            RedisConstants.VERIFY_CODE_KEY + user.getEmail(),
-                            String.valueOf(verificationCode),
-                            RedisConstants.VERIFY_CODE_TTL,
-                            TimeUnit.MINUTES
-                    );
-                    break;
-                case "reset-password":
-                    stringRedisTemplate.opsForValue().set(
-                            RedisConstants.RESET_PASSWORD_KEY + user.getEmail(),
-                            String.valueOf(verificationCode),
-                            RedisConstants.RESET_PASSWORD_TTL,
-                            TimeUnit.MINUTES
-                    );
-                    break;
-                default:
-                    throw new RuntimeException("unsupported type: " + type);
+        int verificationCode = ThreadLocalRandom.current().nextInt(100000, 1000000);
+        String key;
+
+        long ttl = switch (type) {
+            case "register" -> {
+                key = RedisConstants.VERIFY_CODE_KEY + user.getEmail();
+                yield RedisConstants.VERIFY_CODE_TTL;
             }
-            self.sendEmail(user.getEmail(), String.valueOf(verificationCode));
-        } catch (Exception e) {
-            throw new RuntimeException("failed to send verification code");
+            case "reset-password" -> {
+                key = RedisConstants.RESET_PASSWORD_KEY + user.getEmail();
+                yield RedisConstants.RESET_PASSWORD_TTL;
+            }
+            default -> throw new RuntimeException("unsupported type: " + type);
+        };
+
+        Boolean ok = stringRedisTemplate.opsForValue().setIfAbsent(
+                key,
+                String.valueOf(verificationCode),
+                ttl,
+                TimeUnit.MINUTES
+        );
+        if (!Boolean.TRUE.equals(ok)) {
+            throw new RuntimeException("verification code already sent, please try later");
         }
+
+        self.sendEmail(user.getEmail(), String.valueOf(verificationCode), key);
         return true;
     }
 
@@ -123,6 +123,43 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 .setEmailVerified(true);
         save(user);
         stringRedisTemplate.delete(RedisConstants.VERIFY_CODE_KEY + user.getEmail());
+        return true;
+    }
+
+    @Override
+    public Boolean resetPassword(ResetPasswordReq req) {
+        if (req == null) {
+            throw new RuntimeException("request is required");
+        }
+        if (!StringUtils.hasText(req.getEmail())) {
+            throw new RuntimeException("email is required");
+        }
+        if (!StringUtils.hasText(req.getVerifyCode())) {
+            throw new RuntimeException("verifyCode is required");
+        }
+        if (!StringUtils.hasText(req.getNewPassword())) {
+            throw new RuntimeException("newPassword is required");
+        }
+
+        Users userInfo = lambdaQuery().eq(Users::getEmail, req.getEmail()).one();
+        if (userInfo == null) {
+            throw new RuntimeException("user not found");
+        }
+        if (userInfo.getStatus() != 1) {
+            throw new RuntimeException("user's status is not active");
+        }
+
+        String storedCode = stringRedisTemplate.opsForValue().get(
+                RedisConstants.RESET_PASSWORD_KEY + req.getEmail()
+        );
+        if (!Objects.equals(storedCode, req.getVerifyCode())) {
+            throw new RuntimeException("verification code not correct");
+        }
+
+        String encodedPassword = HashUtil.encodePassword(req.getNewPassword());
+        userInfo.setPassword(encodedPassword);
+        updateById(userInfo);
+        stringRedisTemplate.delete(RedisConstants.RESET_PASSWORD_KEY + req.getEmail());
         return true;
     }
 
@@ -203,46 +240,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return maskUserForResponse(updated);
     }
 
-    @Override
-    public Boolean resetPassword(ResetPasswordReq req) {
-        if (req == null) {
-            throw new RuntimeException("request is required");
-        }
-        if (!StringUtils.hasText(req.getEmail())) {
-            throw new RuntimeException("email is required");
-        }
-        if (!StringUtils.hasText(req.getVerifyCode())) {
-            throw new RuntimeException("verifyCode is required");
-        }
-        if (!StringUtils.hasText(req.getNewPassword())) {
-            throw new RuntimeException("newPassword is required");
-        }
-
-        Users userInfo = lambdaQuery().eq(Users::getEmail, req.getEmail()).one();
-        if (userInfo == null) {
-            throw new RuntimeException("user not found");
-        }
-        if (userInfo.getStatus() != 1) {
-            throw new RuntimeException("user's status is not active");
-        }
-
-        String storedCode = stringRedisTemplate.opsForValue().get(
-                RedisConstants.RESET_PASSWORD_KEY + req.getEmail()
-        );
-        if (!Objects.equals(storedCode, req.getVerifyCode())) {
-            throw new RuntimeException("verification code not correct");
-        }
-
-        String encodedPassword = HashUtil.encodePassword(req.getNewPassword());
-        userInfo.setPassword(encodedPassword);
-        updateById(userInfo);
-        stringRedisTemplate.delete(RedisConstants.RESET_PASSWORD_KEY + req.getEmail());
-        return true;
-    }
-
     @Async("virtualThreadPoolExecutor")
-    public void sendEmail(String email, String code) {
-        mailUtil.sendVerificationCodeMail(email, code);
+    public void sendEmail(String email, String code, String key) {
+        try {
+            mailUtil.sendVerificationCodeMail(email, code);
+        } catch (Exception e) {
+            stringRedisTemplate.delete(key);
+        }
     }
 
     @Async("virtualThreadPoolExecutor")

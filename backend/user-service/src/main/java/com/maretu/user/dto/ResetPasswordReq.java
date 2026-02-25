@@ -8,7 +8,8 @@ import lombok.Data;
 @Data
 public class ResetPasswordReq {
     private String email;
+
     private String verifyCode;
+
     private String newPassword;
 }
-

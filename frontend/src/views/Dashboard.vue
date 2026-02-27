@@ -127,9 +127,6 @@ export default {
 
 <style scoped>
 .dashboard {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 40px 50px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -138,14 +135,14 @@ export default {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 30px;
-  margin-bottom: 40px;
+  gap: 25px;
+  margin-bottom: 30px;
 }
 
 .stat-card {
   display: flex;
   align-items: center;
-  padding: 30px;
+  padding: 24px;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   border-radius: 20px;
@@ -156,7 +153,7 @@ export default {
 .stat-card:hover {
   transform: translateY(-5px);
   background: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .stat-icon {
@@ -199,22 +196,21 @@ export default {
   font-size: 32px;
   font-weight: 700;
   color: white;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* 快捷操作 */
 .quick-actions {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
-  padding: 30px;
   border-radius: 20px;
+  padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .quick-actions h2 {
   margin: 0 0 25px 0;
-  font-size: 28px;
+  font-size: 24px;
   color: white;
   font-weight: 600;
 }
@@ -230,8 +226,8 @@ export default {
   flex-direction: column;
   align-items: center;
   padding: 25px 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s;
@@ -242,8 +238,9 @@ export default {
 
 .action-btn:hover {
   background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .action-icon {
@@ -255,15 +252,15 @@ export default {
 .recent-transactions {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
-  padding: 30px;
   border-radius: 20px;
+  padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .recent-transactions h2 {
   margin: 0 0 25px 0;
-  font-size: 28px;
+  font-size: 24px;
   color: white;
   font-weight: 600;
 }
@@ -281,12 +278,13 @@ export default {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 15px;
   transition: all 0.3s;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .transaction-item:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
   transform: translateX(5px);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .transaction-icon {
@@ -347,14 +345,14 @@ export default {
 .notices {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
-  padding: 30px;
   border-radius: 20px;
+  padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .notices h2 {
   margin: 0 0 25px 0;
-  font-size: 28px;
+  font-size: 24px;
   color: white;
   font-weight: 600;
 }
@@ -373,12 +371,13 @@ export default {
   border-radius: 12px;
   gap: 15px;
   transition: all 0.3s;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .notice-item:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
   transform: translateX(5px);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .notice-tag {
@@ -419,7 +418,7 @@ export default {
 /* 响应式设计 */
 @media (max-width: 992px) {
   .dashboard {
-    padding: 30px;
+    padding: 0 20px;
   }
 
   .stats-grid {
@@ -433,7 +432,7 @@ export default {
 
 @media (max-width: 576px) {
   .dashboard {
-    padding: 20px;
+    padding: 0 15px;
   }
 
   .stats-grid {
@@ -447,7 +446,7 @@ export default {
   .quick-actions h2,
   .recent-transactions h2,
   .notices h2 {
-    font-size: 22px;
+    font-size: 20px;
   }
 }
 </style>

@@ -441,15 +441,18 @@ export default {
 <style scoped>
 .transfers {
   max-width: 1200px;
+  margin: 0 auto;
 }
 
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: 30px;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 28px;
+  font-weight: 600;
 }
 
 .transfer-container {
@@ -459,16 +462,18 @@ export default {
 }
 
 .form-card, .payees-card, .history-card {
-  background: white;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .form-card h3 {
   margin: 0 0 20px 0;
-  color: #1e3a5f;
-  font-size: 18px;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .form-group {
@@ -478,35 +483,44 @@ export default {
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #333;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
+  font-weight: 500;
 }
 
 .required {
-  color: #dc3545;
+  color: #f45c43;
 }
 
 .form-group select,
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   font-size: 14px;
   box-sizing: border-box;
-  transition: border-color 0.3s;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transition: all 0.3s;
+}
+
+.form-group select option {
+  background: #667eea;
+  color: white;
 }
 
 .form-group select:focus,
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #1e3a5f;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .error-msg {
-  color: #dc3545;
+  color: #f45c43;
   font-size: 12px;
   margin-top: 4px;
   display: block;
@@ -521,14 +535,14 @@ export default {
 .currency {
   position: absolute;
   left: 12px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 16px;
 }
 
 .amount-input input {
   padding-left: 30px;
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .transfer-type-options {
@@ -542,19 +556,23 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .type-option:hover {
-  border-color: #1e3a5f;
-  background: #f8f9fa;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .type-option input[type="radio"]:checked + .option-content {
-  color: #1e3a5f;
+  color: white;
+}
+
+.type-option input[type="radio"]:checked ~ .option-content .option-name {
+  color: #ffd700;
 }
 
 .option-content {
@@ -563,13 +581,13 @@ export default {
 }
 
 .option-name {
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: white;
 }
 
 .option-desc {
   font-size: 12px;
-  color: #999;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .form-actions {
@@ -582,28 +600,37 @@ export default {
 .btn {
   padding: 12px 32px;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   transition: all 0.3s;
 }
 
 .btn.reset {
-  background: #f0f0f0;
-  color: #333;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn.reset:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .btn.primary {
-  background: #1e3a5f;
+  background: rgba(255, 255, 255, 0.25);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .btn.primary:hover:not(:disabled) {
-  background: #2d5a87;
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -617,23 +644,25 @@ export default {
 
 .card-header h3 {
   margin: 0;
-  color: #1e3a5f;
+  color: white;
   font-size: 16px;
+  font-weight: 600;
 }
 
 .add-payee-btn, .view-all-btn {
-  background: none;
-  border: none;
-  color: #1e3a5f;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
   cursor: pointer;
   font-size: 13px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background 0.3s;
+  padding: 4px 12px;
+  border-radius: 12px;
+  transition: all 0.3s;
 }
 
 .add-payee-btn:hover, .view-all-btn:hover {
-  background: #e8f0f8;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .payees-list {
@@ -649,27 +678,27 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .payee-item:hover {
-  border-color: #1e3a5f;
-  background: #f8f9fa;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .payee-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #1e3a5f;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .payee-info {
@@ -677,18 +706,18 @@ export default {
 }
 
 .payee-name {
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: white;
 }
 
 .payee-account {
   font-size: 13px;
-  color: #999;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .payee-bank {
   font-size: 12px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* 历史记录 */
@@ -707,7 +736,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .history-info {
@@ -717,25 +746,25 @@ export default {
 }
 
 .history-name {
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: white;
 }
 
 .history-time {
   font-size: 12px;
-  color: #999;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .history-amount {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .history-amount.success {
-  color: #28a745;
+  color: #38ef7d;
 }
 
 .history-amount.pending {
-  color: #856404;
+  color: #ffd700;
 }
 
 /* 弹窗 */
@@ -745,7 +774,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -753,11 +783,12 @@ export default {
 }
 
 .modal {
-  background: white;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
   width: 100%;
   max-width: 450px;
   padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .modal-header {
@@ -766,20 +797,33 @@ export default {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 20px;
   cursor: pointer;
-  color: #999;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .confirm-info {
@@ -795,20 +839,20 @@ export default {
 }
 
 .info-row .label {
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
 }
 
 .info-row .value {
-  color: #333;
+  color: white;
   font-weight: 500;
 }
 
 .info-row.highlight .value,
 .info-row .value.amount {
   font-size: 24px;
-  color: #1e3a5f;
-  font-weight: bold;
+  color: #ffd700;
+  font-weight: 700;
 }
 
 .modal-footer {
@@ -817,12 +861,17 @@ export default {
   justify-content: flex-end;
   margin-top: 24px;
   padding-top: 16px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .btn.cancel {
-  background: #f0f0f0;
-  color: #333;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* 成功弹窗 */
@@ -834,22 +883,25 @@ export default {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #28a745;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
   color: white;
   font-size: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
+  box-shadow: 0 10px 30px rgba(56, 239, 125, 0.3);
 }
 
 .success-modal h3 {
   margin: 0 0 12px 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 24px;
+  font-weight: 600;
 }
 
 .success-modal p {
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
   margin: 0 0 24px 0;
 }
 
@@ -858,5 +910,12 @@ export default {
   border-top: none;
   margin-top: 0;
   padding-top: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 992px) {
+  .transfer-container {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

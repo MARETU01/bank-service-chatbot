@@ -450,44 +450,56 @@ export default {
 <style scoped>
 .transactions {
   max-width: 1400px;
+  margin: 0 auto;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
 }
 
 .export-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  background: white;
-  border: 1px solid #1e3a5f;
-  color: #1e3a5f;
-  border-radius: 6px;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .export-btn:hover {
-  background: #1e3a5f;
-  color: white;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .filter-section {
-  background: white;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
   padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 25px;
 }
 
 .filter-row {
@@ -504,46 +516,63 @@ export default {
 
 .filter-group label {
   font-size: 13px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
   margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .filter-group select,
 .filter-group input {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   font-size: 14px;
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.filter-group select option {
+  background: #667eea;
+  color: white;
 }
 
 .filter-group select:focus,
 .filter-group input:focus {
   outline: none;
-  border-color: #1e3a5f;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.filter-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
 }
 
 .search-btn {
-  padding: 8px 24px;
-  background: #1e3a5f;
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   align-self: flex-end;
-  transition: background 0.3s;
+  transition: all 0.3s;
 }
 
 .search-btn:hover {
-  background: #2d5a87;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .transactions-table {
-  background: white;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   margin-bottom: 20px;
 }
 
@@ -553,104 +582,108 @@ table {
 }
 
 thead {
-  background: #f8f9fa;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 th {
-  padding: 16px;
+  padding: 18px 16px;
   text-align: left;
   font-size: 14px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 600;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 td {
   padding: 16px;
   font-size: 14px;
-  color: #333;
-  border-bottom: 1px solid #e9ecef;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 tbody tr:hover {
-  background: #f8f9fa;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .type-badge {
   display: inline-block;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .type-badge.income {
-  background: #d4edda;
-  color: #28a745;
+  background: rgba(56, 239, 125, 0.2);
+  color: #38ef7d;
 }
 
 .type-badge.expense {
-  background: #f8d7da;
-  color: #dc3545;
+  background: rgba(244, 92, 67, 0.2);
+  color: #f45c43;
 }
 
 .type-badge.transfer {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: rgba(102, 126, 234, 0.2);
+  color: #a8b5ff;
 }
 
 .type-badge.payment {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
 }
 
 td.income {
-  color: #28a745;
-  font-weight: 600;
+  color: #38ef7d;
+  font-weight: 700;
 }
 
 td.expense,
 td.transfer,
 td.payment {
-  color: #dc3545;
-  font-weight: 600;
+  color: #f45c43;
+  font-weight: 700;
 }
 
 .status-badge {
   display: inline-block;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 20px;
   font-size: 12px;
+  font-weight: 600;
 }
 
 .status-badge.success {
-  background: #d4edda;
-  color: #28a745;
+  background: rgba(56, 239, 125, 0.2);
+  color: #38ef7d;
 }
 
 .status-badge.pending {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
 }
 
 .status-badge.failed {
-  background: #f8d7da;
-  color: #dc3545;
+  background: rgba(244, 92, 67, 0.2);
+  color: #f45c43;
 }
 
 .detail-btn {
   padding: 6px 16px;
-  background: #1e3a5f;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
-  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
   cursor: pointer;
   font-size: 13px;
-  transition: background 0.3s;
+  font-weight: 500;
+  transition: all 0.3s;
 }
 
 .detail-btn:hover {
-  background: #2d5a87;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .pagination {
@@ -659,29 +692,40 @@ td.payment {
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .pagination button {
-  padding: 8px 20px;
-  background: #1e3a5f;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .pagination button:disabled {
-  background: #ccc;
+  background: rgba(255, 255, 255, 0.05);
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .page-info {
   font-size: 14px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
 }
 
 /* 弹窗样式 */
@@ -691,7 +735,8 @@ td.payment {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -699,13 +744,14 @@ td.payment {
 }
 
 .modal {
-  background: white;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
   width: 100%;
   max-width: 600px;
   max-height: 80vh;
   overflow-y: auto;
   padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .modal-header {
@@ -714,20 +760,33 @@ td.payment {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 20px;
   cursor: pointer;
-  color: #999;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .detail-grid {
@@ -748,26 +807,26 @@ td.payment {
 
 .detail-item .label {
   font-size: 13px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .detail-item .value {
   font-size: 15px;
-  color: #333;
+  color: white;
   font-weight: 500;
 }
 
 .detail-item .value.amount {
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .detail-item .value.amount.income {
-  color: #28a745;
+  color: #38ef7d;
 }
 
 .detail-item .value.amount:not(.income) {
-  color: #dc3545;
+  color: #f45c43;
 }
 
 .modal-footer {
@@ -776,24 +835,38 @@ td.payment {
   justify-content: flex-end;
   margin-top: 24px;
   padding-top: 16px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .btn {
   padding: 10px 24px;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
 }
 
 .btn.cancel {
-  background: #f0f0f0;
-  color: #333;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .btn.primary {
-  background: #1e3a5f;
+  background: rgba(255, 255, 255, 0.25);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.btn.primary:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 </style>

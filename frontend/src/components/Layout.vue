@@ -3,7 +3,7 @@
     <!-- 侧边栏 -->
     <aside class="sidebar">
       <div class="logo">
-        <h2>🏦 银行服务机器人</h2>
+        <h2><span class="logo-icon">🏦</span> 银行服务机器人</h2>
       </div>
       <nav class="menu">
         <router-link to="/dashboard" class="menu-item">
@@ -125,13 +125,15 @@ export default {
 .layout {
   display: flex;
   min-height: 100vh;
-  background-color: var(--color-gray-50);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .sidebar {
   width: var(--sidebar-width);
-  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-  color: var(--color-white);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
   transition: width var(--transition-normal);
   position: fixed;
   height: 100vh;
@@ -148,19 +150,47 @@ export default {
   display: none;
 }
 
+.sidebar.collapsed .menu-item {
+  justify-content: center;
+  padding: 15px 0;
+}
+
+.sidebar.collapsed .menu-item .icon {
+  margin-right: 0;
+}
+
 .logo {
-  padding: var(--spacing-2xl);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 25px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  overflow: hidden;
 }
 
 .logo h2 {
-  font-size: var(--font-size-2xl);
+  font-size: 20px;
   margin: 0;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  transition: opacity var(--transition-normal);
+}
+
+.logo-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed .logo {
+  padding: 25px 10px;
+}
+
+.sidebar.collapsed .logo h2 {
+  opacity: 0;
 }
 
 .menu {
-  padding: var(--spacing-md) 0;
+  padding: 15px 0;
 }
 
 .menu-item {
@@ -169,20 +199,33 @@ export default {
   padding: 15px 20px;
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: all var(--transition-normal);
+  transition: all 0.3s;
+  margin: 5px 10px;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .menu-item:hover,
 .menu-item.router-link-active {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-white);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.menu-item:hover:not(.router-link-active) {
+  transform: translateX(5px);
 }
 
 .menu-item .icon {
-  font-size: 20px;
+  font-size: 22px;
   margin-right: 12px;
   width: 24px;
   text-align: center;
+  flex-shrink: 0;
+}
+
+.menu-item span:last-child {
+  white-space: nowrap;
+  transition: opacity var(--transition-normal);
 }
 
 .main-content {
@@ -195,9 +238,10 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-lg) var(--spacing-3xl);
-  background: var(--color-white);
-  box-shadow: var(--shadow-md);
+  padding: 20px 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
@@ -206,41 +250,43 @@ export default {
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: 20px;
 }
 
 .header-left h1 {
-  font-size: var(--font-size-3xl);
+  font-size: 24px;
   margin: 0;
-  color: var(--color-primary);
+  color: white;
+  font-weight: 600;
 }
 
 .menu-toggle {
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 20px;
   cursor: pointer;
-  color: var(--color-primary);
-  padding: var(--spacing-xs);
-  border-radius: var(--radius-md);
-  transition: background var(--transition-fast);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: all 0.3s;
 }
 
 .menu-toggle:hover {
-  background: var(--color-gray-100);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xl);
+  gap: 20px;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
 }
 
 .avatar {
@@ -248,22 +294,25 @@ export default {
 }
 
 .logout-btn {
-  padding: 8px 16px;
-  background: var(--color-danger);
-  color: var(--color-white);
-  border: none;
-  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
   cursor: pointer;
-  transition: background var(--transition-normal);
-  font-size: var(--font-size-sm);
+  transition: all 0.3s;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .logout-btn:hover {
-  background: #c0392b;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .page-content {
-  padding: var(--spacing-3xl);
+  padding: 30px 40px;
 }
 
 @media (max-width: 768px) {
@@ -277,6 +326,18 @@ export default {
   
   .sidebar.collapsed .logo h2,
   .sidebar.collapsed .menu-item span:last-child {
+    display: none;
+  }
+  
+  .header {
+    padding: 15px 20px;
+  }
+  
+  .header-left h1 {
+    font-size: 18px;
+  }
+  
+  .user-info span:last-child {
     display: none;
   }
 }

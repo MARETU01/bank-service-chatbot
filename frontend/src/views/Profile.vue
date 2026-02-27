@@ -265,9 +265,10 @@ export default {
 }
 
 .profile-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
 }
 
@@ -276,13 +277,14 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .card-header h2 {
   margin: 0;
-  font-size: 18px;
-  color: #1e3a5f;
+  font-size: 20px;
+  color: white;
+  font-weight: 600;
 }
 
 .card-body {
@@ -296,30 +298,31 @@ export default {
   gap: 20px;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+  background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 32px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .user-info h3 {
   margin: 0 0 8px 0;
-  color: #333;
+  color: white;
+  font-weight: 600;
 }
 
 .user-id {
   margin: 0;
-  color: #999;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 14px;
 }
 
@@ -329,9 +332,9 @@ export default {
   padding: 4px 12px;
   background: linear-gradient(135deg, #ffd700, #ffed4e);
   color: #333;
-  border-radius: 12px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* 信息网格 */
@@ -349,37 +352,49 @@ export default {
 
 .info-item label {
   font-size: 14px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
 }
 
 .info-value {
   font-size: 16px;
-  color: #333;
+  color: white;
   font-weight: 500;
 }
 
 .edit-input {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   font-size: 14px;
   margin-top: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .edit-btn {
-  padding: 8px 16px;
-  background: #1e3a5f;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.3s;
+  font-weight: 500;
+  transition: all 0.3s;
 }
 
 .edit-btn:hover {
-  background: #2d5a87;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* 安全设置 */
@@ -388,7 +403,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .security-item:last-child {
@@ -407,49 +422,54 @@ export default {
 
 .security-info h4 {
   margin: 0 0 4px 0;
-  color: #333;
+  color: white;
+  font-weight: 500;
 }
 
 .security-info p {
   margin: 0;
-  color: #999;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
 }
 
 .action-btn {
-  padding: 6px 16px;
-  background: white;
-  border: 1px solid #1e3a5f;
-  color: #1e3a5f;
-  border-radius: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 13px;
+  font-weight: 500;
   transition: all 0.3s;
 }
 
 .action-btn:hover {
-  background: #1e3a5f;
-  color: white;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .verified-badge {
-  padding: 6px 16px;
-  background: #e8f5e9;
-  color: #2e7d32;
-  border-radius: 6px;
+  padding: 8px 16px;
+  background: rgba(56, 239, 125, 0.2);
+  color: #38ef7d;
+  border-radius: 20px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* 账户概览 */
 .view-all {
-  color: #1e3a5f;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s;
 }
 
 .view-all:hover {
-  text-decoration: underline;
+  color: white;
 }
 
 .account-summary {
@@ -461,33 +481,36 @@ export default {
 .summary-item {
   text-align: center;
   padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
 }
 
 .summary-label {
   font-size: 14px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 8px;
 }
 
 .summary-value {
   font-size: 20px;
-  color: #1e3a5f;
-  font-weight: bold;
+  color: white;
+  font-weight: 700;
 }
 
 /* 快捷操作 */
 .quick-actions {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 20px;
 }
 
 .quick-actions h3 {
   margin: 0 0 16px 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .action-grid {
@@ -502,16 +525,18 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   text-decoration: none;
-  color: #333;
+  color: white;
   transition: all 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .action-card:hover {
-  background: #e8f0f8;
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .action-icon {
@@ -525,7 +550,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -533,11 +559,12 @@ export default {
 }
 
 .modal {
-  background: white;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
   width: 100%;
   max-width: 400px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .modal-header {
@@ -545,20 +572,33 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 20px;
   cursor: pointer;
-  color: #999;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .modal-body {
@@ -572,17 +612,30 @@ export default {
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #333;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
+  font-weight: 500;
 }
 
 .form-group input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   font-size: 14px;
   box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .modal-footer {
@@ -590,26 +643,53 @@ export default {
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 20px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .cancel-btn,
 .confirm-btn {
-  padding: 10px 20px;
-  border-radius: 6px;
+  padding: 10px 24px;
+  border-radius: 12px;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.3s;
 }
 
 .cancel-btn {
-  background: white;
-  border: 1px solid #ddd;
-  color: #666;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .confirm-btn {
-  background: #1e3a5f;
-  border: none;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   color: white;
+}
+
+.confirm-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .account-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 </style>

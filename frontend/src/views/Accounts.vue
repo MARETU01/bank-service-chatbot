@@ -206,18 +206,21 @@ export default {
 <style scoped>
 .accounts {
   max-width: 1200px;
+  margin: 0 auto;
 }
 
 .accounts-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
 }
 
 .accounts-header h2 {
   margin: 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 28px;
+  font-weight: 600;
 }
 
 .add-btn {
@@ -225,37 +228,42 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: #1e3a5f;
+  background: rgba(255, 255, 255, 0.15);
   color: white;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.3s;
+  font-weight: 500;
+  transition: all 0.3s;
 }
 
 .add-btn:hover {
-  background: #2d5a87;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .accounts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  gap: 25px;
   margin-bottom: 30px;
 }
 
 .account-card {
-  background: white;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
 }
 
 .account-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 .account-header {
@@ -272,34 +280,35 @@ export default {
 }
 
 .type-icon {
-  font-size: 24px;
+  font-size: 28px;
 }
 
 .type-name {
   font-size: 16px;
-  font-weight: bold;
-  color: #333;
+  font-weight: 600;
+  color: white;
 }
 
 .account-status {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 20px;
   font-size: 12px;
+  font-weight: 600;
 }
 
 .account-status.active {
-  background: #d4edda;
-  color: #28a745;
+  background: rgba(56, 239, 125, 0.2);
+  color: #38ef7d;
 }
 
 .account-status.frozen {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
 }
 
 .account-number {
-  font-size: 18px;
-  color: #666;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
   margin-bottom: 16px;
   letter-spacing: 2px;
 }
@@ -311,14 +320,15 @@ export default {
 .balance-label {
   display: block;
   font-size: 13px;
-  color: #999;
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 4px;
 }
 
 .balance-amount {
   font-size: 28px;
-  font-weight: bold;
-  color: #1e3a5f;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .account-actions {
@@ -330,40 +340,48 @@ export default {
   flex: 1;
   padding: 10px;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   transition: all 0.3s;
 }
 
 .action-btn.primary {
-  background: #1e3a5f;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .action-btn.primary:hover {
-  background: #2d5a87;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .action-btn.secondary {
-  background: #f0f0f0;
-  color: #333;
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .action-btn.secondary:hover {
-  background: #e0e0e0;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .account-detail-section {
-  background: white;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .account-detail-section h2 {
   margin: 0 0 20px 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 24px;
+  font-weight: 600;
 }
 
 .detail-card {
@@ -376,26 +394,26 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
 }
 
 .detail-label {
   font-size: 13px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 8px;
 }
 
 .detail-value {
   font-size: 16px;
-  color: #333;
+  color: white;
   font-weight: 500;
 }
 
 .detail-value.amount {
   font-size: 20px;
-  color: #1e3a5f;
-  font-weight: bold;
+  color: #ffd700;
+  font-weight: 700;
 }
 
 /* 弹窗样式 */
@@ -405,7 +423,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -413,11 +432,12 @@ export default {
 }
 
 .modal {
-  background: white;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
   width: 100%;
   max-width: 400px;
   padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .modal-header {
@@ -429,15 +449,28 @@ export default {
 
 .modal-header h3 {
   margin: 0;
-  color: #1e3a5f;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 20px;
   cursor: pointer;
-  color: #999;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .modal-body {
@@ -451,24 +484,37 @@ export default {
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #333;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
+  font-weight: 500;
 }
 
 .form-group select,
 .form-group input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   font-size: 14px;
   box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.form-group select option {
+  background: #667eea;
+  color: white;
 }
 
 .form-group select:focus,
 .form-group input:focus {
   outline: none;
-  border-color: #1e3a5f;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .modal-footer {
@@ -480,18 +526,32 @@ export default {
 .btn {
   padding: 10px 24px;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
 }
 
 .btn.cancel {
-  background: #f0f0f0;
-  color: #333;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .btn.primary {
-  background: #1e3a5f;
+  background: rgba(255, 255, 255, 0.25);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.btn.primary:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 </style>

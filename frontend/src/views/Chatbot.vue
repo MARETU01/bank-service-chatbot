@@ -248,9 +248,10 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
 }
 
@@ -285,7 +286,7 @@ export default {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #f0f0f0;
+  background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -300,28 +301,30 @@ export default {
 }
 
 .message-bubble {
-  background: #f0f0f0;
+  background: rgba(255, 255, 255, 0.15);
   padding: 12px 16px;
   border-radius: 12px;
   border-top-left-radius: 4px;
-}
-
-.message.user .message-bubble {
-  background: #1e3a5f;
-  color: white;
-  border-radius: 12px;
-  border-top-right-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .message-bubble p {
   margin: 0;
   white-space: pre-wrap;
   line-height: 1.5;
+  color: white;
+}
+
+.message.user .message-bubble {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  border-radius: 12px;
+  border-top-right-radius: 4px;
 }
 
 .message-time {
   font-size: 12px;
-  color: #999;
+  color: rgba(255, 255, 255, 0.6);
   padding: 0 4px;
 }
 
@@ -340,7 +343,7 @@ export default {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #999;
+  background: rgba(255, 255, 255, 0.5);
   animation: typing 1.4s infinite;
 }
 
@@ -367,23 +370,23 @@ export default {
   flex-wrap: wrap;
   gap: 8px;
   padding: 12px 20px;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-  border-bottom: 1px solid #e9ecef;
+  background: rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .quick-label {
   font-size: 13px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
 }
 
 .quick-btn {
   padding: 6px 12px;
-  background: white;
-  border: 1px solid #1e3a5f;
-  color: #1e3a5f;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
   border-radius: 16px;
   cursor: pointer;
   font-size: 13px;
@@ -391,15 +394,16 @@ export default {
 }
 
 .quick-btn:hover {
-  background: #1e3a5f;
-  color: white;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* 输入区域 */
 .chat-input-area {
   padding: 16px 20px;
-  background: white;
-  border-top: 1px solid #e9ecef;
+  background: rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .input-wrapper {
@@ -410,46 +414,56 @@ export default {
 .input-wrapper input {
   flex: 1;
   padding: 12px 16px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 24px;
   font-size: 14px;
-  transition: border-color 0.3s;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transition: all 0.3s;
 }
 
 .input-wrapper input:focus {
   outline: none;
-  border-color: #1e3a5f;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.input-wrapper input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .send-btn {
   padding: 12px 24px;
-  background: #1e3a5f;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 24px;
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: background 0.3s;
+  transition: all 0.3s;
 }
 
 .send-btn:hover:not(:disabled) {
-  background: #2d5a87;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .send-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 /* 侧边栏 */
 .chat-sidebar {
   width: 300px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   overflow-y: auto;
   padding: 20px;
 }
@@ -457,13 +471,14 @@ export default {
 .sidebar-header {
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .sidebar-header h3 {
   margin: 0;
-  color: #1e3a5f;
+  color: white;
   font-size: 16px;
+  font-weight: 600;
 }
 
 .faq-list {
@@ -478,14 +493,17 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .faq-item:hover {
-  background: #e8f0f8;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .faq-icon {
@@ -494,7 +512,7 @@ export default {
 
 .faq-question {
   font-size: 14px;
-  color: #333;
+  color: white;
 }
 
 .contact-list {
@@ -508,8 +526,9 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .contact-icon {
@@ -518,12 +537,12 @@ export default {
 
 .contact-label {
   font-size: 12px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .contact-value {
   font-size: 14px;
-  color: #333;
+  color: white;
   font-weight: 500;
 }
 

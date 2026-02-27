@@ -135,6 +135,7 @@ export default {
   color: white;
   transition: width var(--transition-normal);
   position: fixed;
+  top: 0;
   height: 100vh;
   overflow-y: auto;
   z-index: var(--z-sticky);
@@ -147,10 +148,12 @@ export default {
 }
 
 .sidebar-toggle-container {
-  padding: 15px 20px;
+  padding: 20px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   justify-content: flex-end;
+  height: 64px;
+  align-items: center;
 }
 
 .sidebar-toggle {
@@ -255,13 +258,14 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
+  padding: 0 40px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
+  height: 64px;
 }
 
 .header-left {

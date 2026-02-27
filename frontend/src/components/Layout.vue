@@ -2,8 +2,8 @@
   <div class="layout">
     <!-- 侧边栏 -->
     <aside class="sidebar">
-      <div class="logo">
-        <h2><span class="logo-icon">🏦</span> 银行服务机器人</h2>
+      <div class="sidebar-toggle-container">
+        <button class="sidebar-toggle" @click="toggleSidebar">☰</button>
       </div>
       <nav class="menu">
         <router-link to="/dashboard" class="menu-item">
@@ -38,8 +38,7 @@
       <!-- 顶部导航 -->
       <header class="header">
         <div class="header-left">
-          <button class="menu-toggle" @click="toggleSidebar">☰</button>
-          <h1>{{ pageTitle }}</h1>
+          <h1><span class="logo-icon">🏦</span> 银行服务机器人</h1>
         </div>
         <div class="header-right">
           <span class="user-info">
@@ -139,13 +138,40 @@ export default {
   height: 100vh;
   overflow-y: auto;
   z-index: var(--z-sticky);
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar.collapsed {
   width: var(--sidebar-collapsed-width);
 }
 
-.sidebar.collapsed .logo h2,
+.sidebar-toggle-container {
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sidebar-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar.collapsed .sidebar-toggle-container {
+  justify-content: center;
+}
+
 .sidebar.collapsed .menu-item span:last-child {
   display: none;
 }
@@ -159,38 +185,25 @@ export default {
   margin-right: 0;
 }
 
-.logo {
-  padding: 25px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  overflow: hidden;
-}
-
-.logo h2 {
-  font-size: 20px;
-  margin: 0;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  transition: opacity var(--transition-normal);
-}
-
 .logo-icon {
   font-size: 28px;
   flex-shrink: 0;
 }
 
-.sidebar.collapsed .logo {
-  padding: 25px 10px;
-}
-
-.sidebar.collapsed .logo h2 {
-  opacity: 0;
+.header-left h1 {
+  font-size: 24px;
+  margin: 0;
+  color: white;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .menu {
   padding: 15px 0;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .menu-item {
@@ -260,20 +273,6 @@ export default {
   font-weight: 600;
 }
 
-.menu-toggle {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 20px;
-  cursor: pointer;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 10px;
-  transition: all 0.3s;
-}
-
-.menu-toggle:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
 
 .header-right {
   display: flex;
@@ -324,7 +323,10 @@ export default {
     margin-left: var(--sidebar-collapsed-width);
   }
   
-  .sidebar.collapsed .logo h2,
+  .sidebar-toggle-container {
+    padding: 15px 10px;
+  }
+  
   .sidebar.collapsed .menu-item span:last-child {
     display: none;
   }

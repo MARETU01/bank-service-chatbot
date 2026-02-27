@@ -247,6 +247,10 @@ export default {
   transition: margin-left var(--transition-normal);
 }
 
+.sidebar.collapsed + .main-content {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
 .header {
   display: flex;
   justify-content: space-between;

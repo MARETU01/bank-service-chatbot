@@ -7,8 +7,23 @@
         <span class="brand-name">银行服务机器人</span>
       </div>
       <div class="nav-links">
-        <router-link to="/login" class="nav-btn login-btn">登录</router-link>
-        <router-link to="/register" class="nav-btn register-btn">注册</router-link>
+        <!-- 未登录状态 -->
+        <template v-if="!isLoggedIn">
+          <router-link to="/login" class="nav-btn login-btn">登录</router-link>
+          <router-link to="/register" class="nav-btn register-btn">注册</router-link>
+        </template>
+        <!-- 已登录状态 -->
+        <template v-else>
+          <router-link to="/dashboard" class="nav-btn dashboard-btn">
+            <span class="btn-icon">📊</span>
+            仪表盘
+          </router-link>
+          <span class="user-info">
+            <span class="avatar">👤</span>
+            <span class="username">{{ userName }}</span>
+          </span>
+          <button class="nav-btn logout-btn" @click="handleLogout">退出</button>
+        </template>
       </div>
     </nav>
 
@@ -90,8 +105,41 @@
 </template>
 
 <script>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+
 export default {
-  name: 'HomeView'
+  name: 'HomeView',
+  setup() {
+    const store = useStore()
+    const router = useRouter()
+
+    // 登录状态
+    const isLoggedIn = computed(() => store.state.isLoggedIn)
+
+    // 用户名
+    const userName = computed(() => {
+      const user = store.state.user
+      return user?.username || user?.email || '用户'
+    })
+
+    // 退出登录
+    const handleLogout = async () => {
+      try {
+        await store.dispatch('logout')
+      } catch (error) {
+        console.error('Logout error:', error)
+        router.push('/')
+      }
+    }
+
+    return {
+      isLoggedIn,
+      userName,
+      handleLogout
+    }
+  }
 }
 </script>
 
@@ -158,6 +206,56 @@ export default {
 .register-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 已登录状态样式 */
+.dashboard-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dashboard-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  padding: 8px 15px;
+}
+
+.avatar {
+  font-size: 22px;
+}
+
+.username {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.logout-btn {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.logout-btn:hover {
+  background: white;
+  color: #667eea;
 }
 
 /* 主要内容区 */

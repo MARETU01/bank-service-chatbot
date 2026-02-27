@@ -143,7 +143,7 @@ export default createStore({
     // 登出动作
     async logout({ commit }) {
       commit('CLEAR_USER')
-      router.push('/login')
+      router.push('/')
     },
     
     // 初始化用户状态（应用启动时调用）

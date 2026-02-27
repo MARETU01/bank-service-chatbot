@@ -106,7 +106,7 @@ export default {
         await store.dispatch('logout')
       } catch (error) {
         console.error('Logout error:', error)
-        router.push('/login')
+        router.push('/')
       }
     }
 

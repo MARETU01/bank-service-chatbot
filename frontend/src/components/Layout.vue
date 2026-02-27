@@ -61,12 +61,14 @@
 <script>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Layout',
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const store = useStore()
 
     const pageTitle = computed(() => {
       const titles = {
@@ -80,18 +82,33 @@ export default {
       return titles[route.path] || '银行服务'
     })
 
-    const currentUser = {
-      name: '张三',
-      id: '10001'
-    }
+    // 从 Vuex 获取用户信息
+    const currentUser = computed(() => {
+      const user = store.state.user
+      if (user) {
+        return {
+          name: user.username || user.email || '用户',
+          id: user.userId
+        }
+      }
+      // 如果还没有用户信息，显示默认值
+      return {
+        name: '用户',
+        id: ''
+      }
+    })
 
     const toggleSidebar = () => {
       document.querySelector('.sidebar').classList.toggle('collapsed')
     }
 
-    const handleLogout = () => {
-      alert('退出登录')
-      router.push('/login')
+    const handleLogout = async () => {
+      try {
+        await store.dispatch('logout')
+      } catch (error) {
+        console.error('Logout error:', error)
+        router.push('/login')
+      }
     }
 
     return {

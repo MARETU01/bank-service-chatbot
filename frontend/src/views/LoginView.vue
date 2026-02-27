@@ -104,9 +104,9 @@
               </router-link>
             </div>
             
-            <button type="submit" class="login-btn" :disabled="isLoading">
-              <span v-if="isLoading" class="loading-spinner"></span>
-              <span>{{ isLoading ? '登录中...' : '立即登录' }}</span>
+            <button type="submit" class="login-btn" :disabled="loading">
+              <span v-if="loading" class="loading-spinner"></span>
+              <span>{{ loading ? '登录中...' : '立即登录' }}</span>
             </button>
           </form>
           
@@ -120,6 +120,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   data() {
     return {
@@ -128,9 +130,11 @@ export default {
         password: ''
       },
       accountError: '',
-      showPassword: false,
-      isLoading: false
+      showPassword: false
     }
+  },
+  computed: {
+    ...mapState(['loading'])
   },
   methods: {
     isEmail(str) {
@@ -138,7 +142,7 @@ export default {
       return emailRegex.test(str);
     },
     isPhone(str) {
-      const phoneRegex = /^\d{7,15}$/;
+      const phoneRegex = /^\d{11}$/;
       return phoneRegex.test(str);
     },
     validateAccount() {
@@ -163,8 +167,6 @@ export default {
         return;
       }
       
-      this.isLoading = true;
-      
       const loginData = {
         password: this.loginForm.password
       };
@@ -175,20 +177,18 @@ export default {
       }
       
       try {
-        const response = await this.$http.post('/users/login', loginData);
-        console.log('Login response:', response.data);
-        if (response.data.code === 1) {
-          localStorage.setItem('token', response.data.data);
-          alert('登录成功');
-          this.$router.push('/dashboard');
+        const result = await this.$store.dispatch('login', loginData);
+        
+        if (result.success) {
+          // 登录成功，获取 redirect 参数或跳转到仪表盘
+          const redirect = this.$route.query.redirect || '/dashboard';
+          this.$router.push(redirect);
         } else {
-          alert(response.data.message || '登录失败，请重试');
+          alert(result.message || '登录失败，请重试');
         }
       } catch (error) {
         console.error('Login error:', error);
-        alert(error.response?.data?.message || '网络错误，请稍后重试');
-      } finally {
-        this.isLoading = false;
+        alert('网络错误，请稍后重试');
       }
     }
   }

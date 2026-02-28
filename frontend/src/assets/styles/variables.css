@@ -131,4 +131,54 @@
   --header-height: 64px;
   --container-max-width: 1200px;
   --container-max-width-lg: 1400px;
+  
+  /* ========== Glassmorphism 玻璃态效果 ========== */
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-bg-hover: rgba(255, 255, 255, 0.25);
+  --glass-bg-active: rgba(255, 255, 255, 0.35);
+  --glass-bg-light: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-border-hover: rgba(255, 255, 255, 0.3);
+  --glass-border-active: rgba(255, 255, 255, 0.4);
+  --glass-blur: blur(10px);
+  
+  /* ========== 渐变色 ========== */
+  --gradient-balance: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-income: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --gradient-expense: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  --gradient-transfer: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-activity: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --gradient-important: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  
+  /* ========== 文本颜色（用于渐变背景） ========== */
+  --text-on-gradient: rgba(255, 255, 255, 0.9);
+  --text-on-gradient-secondary: rgba(255, 255, 255, 0.8);
+  --text-on-gradient-muted: rgba(255, 255, 255, 0.6);
+  --text-on-gradient-placeholder: rgba(255, 255, 255, 0.5);
+  
+  /* ========== 状态颜色 ========== */
+  --status-success: #38ef7d;
+  --status-success-bg: rgba(56, 239, 125, 0.2);
+  --status-warning: #ffd700;
+  --status-warning-bg: rgba(255, 215, 0, 0.2);
+  --status-danger: #f45c43;
+  --status-danger-bg: rgba(244, 92, 67, 0.2);
+  
+  /* ========== 输入框样式 ========== */
+  --input-bg: rgba(255, 255, 255, 0.1);
+  --input-bg-focus: rgba(255, 255, 255, 0.15);
+  --input-border: rgba(255, 255, 255, 0.3);
+  --input-border-focus: rgba(255, 255, 255, 0.5);
+  --input-placeholder: rgba(255, 255, 255, 0.5);
+  
+  /* ========== 按钮样式 ========== */
+  --btn-glass-bg: rgba(255, 255, 255, 0.2);
+  --btn-glass-border: rgba(255, 255, 255, 0.3);
+  --btn-glass-hover: rgba(255, 255, 255, 0.3);
+  
+  /* ========== 交易类型颜色 ========== */
+  --transaction-income: #38ef7d;
+  --transaction-income-bg: rgba(56, 239, 125, 0.2);
+  --transaction-expense: #f45c43;
+  --transaction-expense-bg: rgba(244, 92, 67, 0.2);
 }

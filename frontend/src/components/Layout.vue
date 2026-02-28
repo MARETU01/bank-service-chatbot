@@ -124,15 +124,15 @@ export default {
 .layout {
   display: flex;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
 }
 
 .sidebar {
   width: var(--sidebar-width);
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur);
+  border-right: 1px solid var(--glass-border);
+  color: var(--color-white);
   transition: width var(--transition-normal);
   position: fixed;
   top: 0;
@@ -148,27 +148,27 @@ export default {
 }
 
 .sidebar-toggle-container {
-  padding: 20px 20px;
+  padding: var(--spacing-2xl) var(--spacing-2xl);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   justify-content: flex-end;
-  height: 64px;
+  height: var(--header-height);
   align-items: center;
 }
 
 .sidebar-toggle {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 20px;
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border);
+  font-size: var(--font-size-2xl);
   cursor: pointer;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 10px;
-  transition: all 0.3s;
+  color: var(--color-white);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-normal);
 }
 
 .sidebar-toggle:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-border-hover);
 }
 
 .sidebar.collapsed .sidebar-toggle-container {
@@ -181,7 +181,7 @@ export default {
 
 .sidebar.collapsed .menu-item {
   justify-content: center;
-  padding: 15px 0;
+  padding: var(--spacing-lg) 0;
 }
 
 .sidebar.collapsed .menu-item .icon {
@@ -189,22 +189,22 @@ export default {
 }
 
 .logo-icon {
-  font-size: 28px;
+  font-size: var(--font-size-5xl);
   flex-shrink: 0;
 }
 
 .header-left h1 {
-  font-size: 24px;
+  font-size: var(--font-size-4xl);
   margin: 0;
-  color: white;
-  font-weight: 600;
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-lg);
 }
 
 .menu {
-  padding: 15px 0;
+  padding: var(--spacing-lg) 0;
   flex: 1;
   overflow-y: auto;
 }
@@ -212,19 +212,19 @@ export default {
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 15px 20px;
-  color: rgba(255, 255, 255, 0.8);
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  color: var(--text-on-gradient-secondary);
   text-decoration: none;
-  transition: all 0.3s;
-  margin: 5px 10px;
-  border-radius: 12px;
+  transition: all var(--transition-normal);
+  margin: var(--spacing-xs) var(--spacing-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
 }
 
 .menu-item:hover,
 .menu-item.router-link-active {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
+  background: var(--glass-bg);
+  color: var(--color-white);
 }
 
 .menu-item:hover:not(.router-link-active) {
@@ -232,9 +232,9 @@ export default {
 }
 
 .menu-item .icon {
-  font-size: 22px;
-  margin-right: 12px;
-  width: 24px;
+  font-size: var(--font-size-2xl);
+  margin-right: var(--spacing-lg);
+  width: var(--spacing-3xl);
   text-align: center;
   flex-shrink: 0;
 }
@@ -258,68 +258,68 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  padding: 0 var(--spacing-4xl);
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  height: 64px;
+  height: var(--header-height);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--spacing-2xl);
 }
 
 .header-left h1 {
-  font-size: 24px;
+  font-size: var(--font-size-4xl);
   margin: 0;
-  color: white;
-  font-weight: 600;
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
 }
 
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--spacing-2xl);
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
+  gap: var(--spacing-lg);
+  color: var(--text-on-gradient);
+  font-weight: var(--font-weight-medium);
 }
 
 .avatar {
-  font-size: 24px;
+  font-size: var(--font-size-4xl);
 }
 
 .logout-btn {
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: var(--glass-bg-light);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border-hover);
+  border-radius: var(--radius-full);
   cursor: pointer;
-  transition: all 0.3s;
-  font-size: 14px;
-  font-weight: 500;
+  transition: all var(--transition-normal);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--glass-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .page-content {
-  padding: 30px 40px;
+  padding: var(--spacing-3xl) var(--spacing-4xl);
 }
 
 @media (max-width: 768px) {
@@ -332,7 +332,7 @@ export default {
   }
   
   .sidebar-toggle-container {
-    padding: 15px 10px;
+    padding: var(--spacing-lg) var(--spacing-lg);
   }
   
   .sidebar.collapsed .menu-item span:last-child {
@@ -340,11 +340,11 @@ export default {
   }
   
   .header {
-    padding: 15px 20px;
+    padding: var(--spacing-lg) var(--spacing-2xl);
   }
   
   .header-left h1 {
-    font-size: 18px;
+    font-size: var(--font-size-2xl);
   }
   
   .user-info span:last-child {

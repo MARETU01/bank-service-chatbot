@@ -202,19 +202,19 @@ export default {
 
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: var(--spacing-2xl);
 }
 
 .login-container {
   width: 100%;
   max-width: 1100px;
-  background: white;
-  border-radius: 24px;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+  background: var(--color-white);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-2xl);
   overflow: hidden;
   display: flex;
   min-height: 650px;
@@ -223,7 +223,7 @@ export default {
 /* 左侧品牌区域 */
 .login-brand {
   flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -251,42 +251,42 @@ export default {
 .brand-content {
   position: relative;
   z-index: 1;
-  color: white;
+  color: var(--color-white);
   text-align: center;
 }
 
 .brand-logo {
   font-size: 80px;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-2xl);
   filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2));
 }
 
 .brand-content h1 {
-  font-size: 32px;
-  font-weight: 700;
-  margin: 0 0 15px 0;
+  font-size: var(--font-size-6xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-lg) 0;
   letter-spacing: 2px;
 }
 
 .brand-slogan {
-  font-size: 16px;
+  font-size: var(--font-size-lg);
   opacity: 0.9;
-  margin: 0 0 30px 0;
-  font-weight: 300;
+  margin: 0 0 var(--spacing-3xl) 0;
+  font-weight: var(--font-weight-normal);
 }
 
 .brand-description {
-  font-size: 14px;
+  font-size: var(--font-size-md);
   opacity: 0.8;
-  line-height: 1.8;
-  margin: 0 0 40px 0;
+  line-height: var(--line-height-relaxed);
+  margin: 0 0 var(--spacing-4xl) 0;
   max-width: 350px;
 }
 
 .brand-features {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: var(--spacing-2xl);
   justify-items: center;
 }
 
@@ -294,26 +294,26 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 15px 25px;
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  transition: transform 0.3s, background 0.3s;
+  gap: var(--spacing-sm);
+  background: var(--glass-bg);
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  border-radius: var(--radius-2xl);
+  backdrop-filter: var(--glass-blur);
+  transition: transform var(--transition-normal), background var(--transition-normal);
 }
 
 .feature-item:hover {
   transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--glass-bg-hover);
 }
 
 .feature-icon {
-  font-size: 28px;
+  font-size: var(--font-size-5xl);
 }
 
 .feature-item span:last-child {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 右侧表单区域 */
@@ -322,8 +322,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 50px;
-  background: white;
+  padding: var(--spacing-5xl);
+  background: var(--color-white);
 }
 
 .login-form-wrapper {
@@ -332,31 +332,31 @@ export default {
 }
 
 .form-header {
-  margin-bottom: 30px;
+  margin-bottom: var(--spacing-3xl);
 }
 
 .home-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: #666;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
   text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 20px;
-  transition: all 0.3s;
-  background: #f5f5f5;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-normal);
+  background: var(--color-gray-50);
 }
 
 .home-link:hover {
-  background: #667eea;
-  color: white;
+  background: var(--color-primary-light);
+  color: var(--color-white);
   transform: translateX(-3px);
 }
 
 .home-icon {
-  font-size: 18px;
+  font-size: var(--font-size-2xl);
   font-weight: bold;
 }
 
@@ -365,40 +365,40 @@ export default {
 }
 
 .form-title-section h1 {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: var(--font-size-6xl);
+  font-weight: var(--font-weight-bold);
   color: #1a1a2e;
-  margin: 0 0 10px 0;
+  margin: 0 0 var(--spacing-lg) 0;
 }
 
 .form-title-section p {
-  color: #888;
+  color: var(--text-tertiary);
   margin: 0;
-  font-size: 15px;
+  font-size: var(--font-size-lg);
 }
 
 /* 表单样式 */
 .form-group {
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-2xl);
 }
 
 .form-group label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #333;
-  font-weight: 600;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
 .label-icon {
-  font-size: 16px;
+  font-size: var(--font-size-xl);
 }
 
 .required {
-  color: #e74c3c;
-  margin-left: 2px;
+  color: var(--color-danger);
+  margin-left: var(--spacing-xs);
 }
 
 .input-wrapper {
@@ -407,29 +407,29 @@ export default {
 
 .input-wrapper input {
   width: 100%;
-  padding: 14px 16px;
-  border: 2px solid #e8e8e8;
-  border-radius: 12px;
-  font-size: 15px;
-  transition: all 0.3s;
+  padding: 14px var(--spacing-lg);
+  border: 2px solid var(--color-gray-200);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-lg);
+  transition: all var(--transition-normal);
   box-sizing: border-box;
-  background: #fafafa;
+  background: var(--color-gray-50);
 }
 
 .input-wrapper input:focus {
-  background: white;
-  border-color: #667eea;
+  background: var(--color-white);
+  border-color: var(--color-primary-light);
   box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
   outline: none;
 }
 
 .input-wrapper input::placeholder {
-  color: #aaa;
+  color: var(--color-gray-400);
 }
 
 .input-wrapper input.input-error {
-  border-color: #e74c3c;
-  background: #fef5f5;
+  border-color: var(--color-danger);
+  background: var(--color-danger-light);
 }
 
 .password-input input {
@@ -438,16 +438,16 @@ export default {
 
 .password-toggle {
   position: absolute;
-  right: 12px;
+  right: var(--spacing-lg);
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 20px;
-  padding: 5px;
+  font-size: var(--font-size-2xl);
+  padding: var(--spacing-xs);
   opacity: 0.6;
-  transition: opacity 0.3s;
+  transition: opacity var(--transition-normal);
 }
 
 .password-toggle:hover {
@@ -458,29 +458,29 @@ export default {
 .error-message {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #e74c3c;
-  font-size: 13px;
-  margin-top: 8px;
-  padding-left: 4px;
+  gap: var(--spacing-xs);
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-sm);
+  padding-left: var(--spacing-xs);
 }
 
 .error-icon {
-  font-size: 14px;
+  font-size: var(--font-size-md);
 }
 
 /* 表单选项 */
 .form-options {
-  margin-bottom: 25px;
+  margin-bottom: var(--spacing-2xl);
   text-align: right;
 }
 
 .forgot-link {
-  color: #667eea;
+  color: var(--color-primary-light);
   text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color 0.3s;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-normal);
 }
 
 .forgot-link:hover {
@@ -490,19 +490,19 @@ export default {
 /* 登录按钮 */
 .login-btn {
   width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  padding: var(--spacing-lg);
+  background: var(--gradient-primary);
+  color: var(--color-white);
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all var(--transition-normal);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: var(--spacing-lg);
 }
 
 .login-btn:hover:not(:disabled) {
@@ -523,8 +523,8 @@ export default {
   width: 20px;
   height: 20px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
+  border-top-color: var(--color-white);
+  border-radius: var(--radius-full);
   animation: spin 0.8s linear infinite;
 }
 
@@ -534,21 +534,21 @@ export default {
 
 /* 页脚 */
 .login-footer {
-  margin-top: 25px;
+  margin-top: var(--spacing-2xl);
   text-align: center;
 }
 
 .login-footer p {
   margin: 0;
-  color: #666;
-  font-size: 14px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
 }
 
 .login-footer a {
-  color: #667eea;
+  color: var(--color-primary-light);
   text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s;
+  font-weight: var(--font-weight-semibold);
+  transition: color var(--transition-normal);
 }
 
 .login-footer a:hover {
@@ -558,7 +558,7 @@ export default {
 /* Fade 过渡动画 */
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
 }
 
 .fade-enter-from,
@@ -575,7 +575,7 @@ export default {
   }
   
   .login-brand {
-    padding: 40px 30px;
+    padding: var(--spacing-4xl) var(--spacing-3xl);
     min-height: auto;
   }
   
@@ -584,7 +584,7 @@ export default {
   }
   
   .brand-content h1 {
-    font-size: 26px;
+    font-size: var(--font-size-4xl);
   }
   
   .brand-features {
@@ -592,25 +592,25 @@ export default {
   }
   
   .feature-item {
-    padding: 10px 15px;
+    padding: var(--spacing-lg) var(--spacing-lg);
   }
   
   .feature-icon {
-    font-size: 24px;
+    font-size: var(--font-size-4xl);
   }
   
   .feature-item span:last-child {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
   }
   
   .login-form-section {
-    padding: 40px 30px;
+    padding: var(--spacing-4xl) var(--spacing-3xl);
   }
 }
 
 @media (max-width: 500px) {
   .login-page {
-    padding: 10px;
+    padding: var(--spacing-lg);
   }
   
   .brand-features {
@@ -618,7 +618,7 @@ export default {
   }
   
   .form-title-section h1 {
-    font-size: 26px;
+    font-size: var(--font-size-4xl);
   }
   
   .form-options {

@@ -239,19 +239,19 @@ export default {
 <style scoped>
 .chatbot {
   display: flex;
-  gap: 20px;
+  gap: var(--spacing-2xl);
   height: calc(100vh - 140px);
-  max-width: 1400px;
+  max-width: var(--container-max-width-lg);
 }
 
 .chatbot-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--glass-border);
   overflow: hidden;
 }
 
@@ -265,15 +265,15 @@ export default {
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: var(--spacing-2xl);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacing-lg);
 }
 
 .message {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-lg);
   max-width: 80%;
 }
 
@@ -285,47 +285,47 @@ export default {
 .message-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  background: var(--glass-border-hover);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: var(--font-size-2xl);
   flex-shrink: 0;
 }
 
 .message-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--spacing-xs);
 }
 
 .message-bubble {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 12px 16px;
-  border-radius: 12px;
-  border-top-left-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg);
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  border-radius: var(--radius-xl);
+  border-top-left-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
 }
 
 .message-bubble p {
   margin: 0;
   white-space: pre-wrap;
-  line-height: 1.5;
-  color: white;
+  line-height: var(--line-height-normal);
+  color: var(--color-white);
 }
 
 .message.user .message-bubble {
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
-  border-radius: 12px;
-  border-top-right-radius: 4px;
+  background: var(--glass-bg-hover);
+  color: var(--color-white);
+  border-radius: var(--radius-xl);
+  border-top-right-radius: var(--radius-sm);
 }
 
 .message-time {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
-  padding: 0 4px;
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
+  padding: 0 var(--spacing-xs);
 }
 
 .message.user .message-time {
@@ -335,15 +335,15 @@ export default {
 /* 输入指示器 */
 .typing-indicator {
   display: flex;
-  gap: 4px;
-  padding: 12px 16px;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-lg) var(--spacing-2xl);
 }
 
 .typing-indicator span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  width: var(--spacing-sm);
+  height: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--text-on-gradient-placeholder);
   animation: typing 1.4s infinite;
 }
 
@@ -368,86 +368,86 @@ export default {
 .quick-questions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.1);
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: var(--glass-bg-light);
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .quick-label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-secondary);
   display: flex;
   align-items: center;
 }
 
 .quick-btn {
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  border-radius: 16px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-hover);
+  color: var(--color-white);
+  border-radius: var(--radius-2xl);
   cursor: pointer;
-  font-size: 13px;
-  transition: all 0.3s;
+  font-size: var(--font-size-xs);
+  transition: all var(--transition-normal);
 }
 
 .quick-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--glass-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* 输入区域 */
 .chat-input-area {
-  padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.1);
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: var(--glass-bg-light);
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .input-wrapper {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-lg);
 }
 
 .input-wrapper input {
   flex: 1;
-  padding: 12px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 24px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  transition: all 0.3s;
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-md);
+  background: var(--input-bg);
+  color: var(--color-white);
+  transition: all var(--transition-normal);
 }
 
 .input-wrapper input:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--input-border-focus);
+  background: var(--input-bg-focus);
 }
 
 .input-wrapper input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--input-placeholder);
 }
 
 .send-btn {
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 24px;
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: var(--btn-glass-bg);
+  color: var(--color-white);
+  border: 1px solid var(--btn-glass-border);
+  border-radius: var(--radius-full);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.3s;
+  gap: var(--spacing-xs);
+  transition: all var(--transition-normal);
 }
 
 .send-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--btn-glass-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
@@ -460,93 +460,93 @@ export default {
 /* 侧边栏 */
 .chat-sidebar {
   width: 300px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--glass-border);
   overflow-y: auto;
-  padding: 20px;
+  padding: var(--spacing-2xl);
 }
 
 .sidebar-header {
-  margin-bottom: 16px;
-  padding-bottom: 12px;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .sidebar-header h3 {
   margin: 0;
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .faq-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-2xl);
 }
 
 .faq-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--glass-bg-light);
+  border-radius: var(--radius-xl);
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all var(--transition-normal);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .faq-item:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-border-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .faq-icon {
-  font-size: 18px;
+  font-size: var(--font-size-2xl);
 }
 
 .faq-question {
-  font-size: 14px;
-  color: white;
+  font-size: var(--font-size-md);
+  color: var(--color-white);
 }
 
 .contact-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacing-lg);
 }
 
 .contact-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--glass-bg-light);
+  border-radius: var(--radius-xl);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .contact-icon {
-  font-size: 20px;
+  font-size: var(--font-size-3xl);
 }
 
 .contact-label {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
 }
 
 .contact-value {
-  font-size: 14px;
-  color: white;
-  font-weight: 500;
+  font-size: var(--font-size-md);
+  color: var(--color-white);
+  font-weight: var(--font-weight-medium);
 }
 
 .contact-info {
-  margin-top: 24px;
+  margin-top: var(--spacing-2xl);
 }
 </style>

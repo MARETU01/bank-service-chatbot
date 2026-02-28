@@ -206,7 +206,7 @@ export default {
 
 <style scoped>
 .accounts {
-  max-width: 1200px;
+  max-width: var(--container-max-width);
   margin: 0 auto;
 }
 
@@ -214,33 +214,33 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: var(--spacing-3xl);
 }
 
 .accounts-header h2 {
   margin: 0;
-  color: white;
-  font-size: 28px;
-  font-weight: 600;
+  color: var(--color-white);
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 .add-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: var(--glass-bg);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border-hover);
+  border-radius: var(--radius-full);
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
 }
 
 .add-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--glass-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
@@ -248,22 +248,22 @@ export default {
 .accounts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
-  margin-bottom: 30px;
+  gap: var(--spacing-2xl);
+  margin-bottom: var(--spacing-3xl);
 }
 
 .account-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  padding: var(--spacing-2xl);
+  border: 1px solid var(--glass-border);
+  transition: all var(--transition-normal);
 }
 
 .account-card:hover {
   transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--glass-bg-hover);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
@@ -271,150 +271,150 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacing-lg);
 }
 
 .account-type {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .type-icon {
-  font-size: 28px;
+  font-size: var(--font-size-5xl);
 }
 
 .type-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
 }
 
 .account-status {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .account-status.active {
-  background: rgba(56, 239, 125, 0.2);
-  color: #38ef7d;
+  background: var(--status-success-bg);
+  color: var(--status-success);
 }
 
 .account-status.frozen {
-  background: rgba(255, 215, 0, 0.2);
-  color: #ffd700;
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
 }
 
 .account-number {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 16px;
+  font-size: var(--font-size-xl);
+  color: var(--text-on-gradient-secondary);
+  margin-bottom: var(--spacing-lg);
   letter-spacing: 2px;
 }
 
 .account-balance {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-2xl);
 }
 
 .balance-label {
   display: block;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
+  margin-bottom: var(--spacing-xs);
 }
 
 .balance-amount {
-  font-size: 28px;
-  font-weight: 700;
-  color: white;
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .account-actions {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-lg);
 }
 
 .action-btn {
   flex: 1;
-  padding: 10px;
+  padding: var(--spacing-lg);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
 }
 
 .action-btn.primary {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--btn-glass-bg);
+  color: var(--color-white);
+  border: 1px solid var(--btn-glass-border);
 }
 
 .action-btn.primary:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--btn-glass-hover);
   transform: translateY(-2px);
 }
 
 .action-btn.secondary {
   background: transparent;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border-hover);
 }
 
 .action-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-bg-light);
   transform: translateY(-2px);
 }
 
 .account-detail-section {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  padding: var(--spacing-2xl);
+  border: 1px solid var(--glass-border);
 }
 
 .account-detail-section h2 {
-  margin: 0 0 20px 0;
-  color: white;
-  font-size: 24px;
-  font-weight: 600;
+  margin: 0 0 var(--spacing-2xl) 0;
+  color: var(--color-white);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 .detail-card {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  gap: var(--spacing-lg);
 }
 
 .detail-row {
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  padding: var(--spacing-lg);
+  background: var(--glass-bg-light);
+  border-radius: var(--radius-xl);
 }
 
 .detail-label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 8px;
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
+  margin-bottom: var(--spacing-sm);
 }
 
 .detail-value {
-  font-size: 16px;
-  color: white;
-  font-weight: 500;
+  font-size: var(--font-size-xl);
+  color: var(--color-white);
+  font-weight: var(--font-weight-medium);
 }
 
 .detail-value.amount {
-  font-size: 20px;
-  color: #ffd700;
-  font-weight: 700;
+  font-size: var(--font-size-3xl);
+  color: var(--status-warning);
+  font-weight: var(--font-weight-bold);
 }
 
 /* 弹窗样式 */
@@ -429,129 +429,129 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal);
 }
 
 .modal {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-3xl);
   width: 100%;
   max-width: 400px;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: var(--spacing-2xl);
+  border: 1px solid var(--glass-border);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-2xl);
 }
 
 .modal-header h3 {
   margin: 0;
-  color: white;
-  font-size: 20px;
-  font-weight: 600;
+  color: var(--color-white);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 .close-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 20px;
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border);
+  font-size: var(--font-size-2xl);
   cursor: pointer;
-  color: white;
+  color: var(--color-white);
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
+  transition: all var(--transition-normal);
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-border-hover);
 }
 
 .modal-body {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-2xl);
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: var(--spacing-lg);
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-on-gradient);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
 }
 
 .form-group select,
 .form-group input {
   width: 100%;
-  padding: 12px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  font-size: 14px;
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-md);
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--input-bg);
+  color: var(--color-white);
 }
 
 .form-group select option {
   background: #667eea;
-  color: white;
+  color: var(--color-white);
 }
 
 .form-group select:focus,
 .form-group input:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--input-border-focus);
+  background: var(--input-bg-focus);
 }
 
 .form-group input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--input-placeholder);
 }
 
 .modal-footer {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-lg);
   justify-content: flex-end;
 }
 
 .btn {
-  padding: 10px 24px;
+  padding: var(--spacing-lg) var(--spacing-2xl);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
 }
 
 .btn.cancel {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--glass-bg-light);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border-hover);
 }
 
 .btn.cancel:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-border-hover);
 }
 
 .btn.primary {
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: var(--glass-bg-hover);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border-active);
 }
 
 .btn.primary:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--glass-bg-active);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }

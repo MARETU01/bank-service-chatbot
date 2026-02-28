@@ -450,7 +450,7 @@ export default {
 
 <style scoped>
 .transactions {
-  max-width: 1400px;
+  max-width: var(--container-max-width-lg);
   margin: 0 auto;
 }
 
@@ -458,55 +458,55 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: var(--spacing-3xl);
 }
 
 .page-header h2 {
   margin: 0;
-  color: white;
-  font-size: 28px;
-  font-weight: 600;
+  color: var(--color-white);
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 .header-actions {
   display: flex;
-  gap: 15px;
+  gap: var(--spacing-lg);
 }
 
 .export-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: var(--glass-bg);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border-hover);
+  border-radius: var(--radius-full);
   cursor: pointer;
-  transition: all 0.3s;
-  font-size: 14px;
-  font-weight: 500;
+  transition: all var(--transition-normal);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
 }
 
 .export-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--glass-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .filter-section {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  padding: 20px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 25px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--glass-border);
+  margin-bottom: var(--spacing-2xl);
 }
 
 .filter-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--spacing-lg);
 }
 
 .filter-group {
@@ -516,32 +516,32 @@ export default {
 }
 
 .filter-group label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 6px;
-  font-weight: 500;
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-secondary);
+  margin-bottom: var(--spacing-xs);
+  font-weight: var(--font-weight-medium);
 }
 
 .filter-group select,
 .filter-group input {
-  padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  padding: var(--spacing-lg) var(--spacing-lg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-md);
+  background: var(--input-bg);
+  color: var(--color-white);
 }
 
 .filter-group select option {
   background: #667eea;
-  color: white;
+  color: var(--color-white);
 }
 
 .filter-group select:focus,
 .filter-group input:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--input-border-focus);
+  background: var(--input-bg-focus);
 }
 
 .filter-group input[type="date"]::-webkit-calendar-picker-indicator {
@@ -550,31 +550,31 @@ export default {
 }
 
 .search-btn {
-  padding: 10px 24px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: var(--btn-glass-bg);
+  color: var(--color-white);
+  border: 1px solid var(--btn-glass-border);
+  border-radius: var(--radius-xl);
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
   align-self: flex-end;
-  transition: all 0.3s;
+  transition: all var(--transition-normal);
 }
 
 .search-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--btn-glass-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .transactions-table {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--glass-border);
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-2xl);
 }
 
 table {
@@ -583,45 +583,45 @@ table {
 }
 
 thead {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-bg-light);
 }
 
 th {
-  padding: 18px 16px;
+  padding: 18px var(--spacing-lg);
   text-align: left;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 600;
+  font-size: var(--font-size-md);
+  color: var(--text-on-gradient-secondary);
+  font-weight: var(--font-weight-semibold);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 td {
-  padding: 16px;
-  font-size: 14px;
-  color: white;
+  padding: var(--spacing-lg);
+  font-size: var(--font-size-md);
+  color: var(--color-white);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 tbody tr:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-bg-light);
 }
 
 .type-badge {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .type-badge.income {
-  background: rgba(56, 239, 125, 0.2);
-  color: #38ef7d;
+  background: var(--transaction-income-bg);
+  color: var(--transaction-income);
 }
 
 .type-badge.expense {
-  background: rgba(244, 92, 67, 0.2);
-  color: #f45c43;
+  background: var(--transaction-expense-bg);
+  color: var(--transaction-expense);
 }
 
 .type-badge.transfer {
@@ -630,59 +630,59 @@ tbody tr:hover {
 }
 
 .type-badge.payment {
-  background: rgba(255, 215, 0, 0.2);
-  color: #ffd700;
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
 }
 
 td.income {
-  color: #38ef7d;
-  font-weight: 700;
+  color: var(--transaction-income);
+  font-weight: var(--font-weight-bold);
 }
 
 td.expense,
 td.transfer,
 td.payment {
-  color: #f45c43;
-  font-weight: 700;
+  color: var(--transaction-expense);
+  font-weight: var(--font-weight-bold);
 }
 
 .status-badge {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .status-badge.success {
-  background: rgba(56, 239, 125, 0.2);
-  color: #38ef7d;
+  background: var(--status-success-bg);
+  color: var(--status-success);
 }
 
 .status-badge.pending {
-  background: rgba(255, 215, 0, 0.2);
-  color: #ffd700;
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
 }
 
 .status-badge.failed {
-  background: rgba(244, 92, 67, 0.2);
-  color: #f45c43;
+  background: var(--status-danger-bg);
+  color: var(--status-danger);
 }
 
 .detail-btn {
-  padding: 6px 16px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
+  padding: var(--spacing-xs) var(--spacing-lg);
+  background: var(--btn-glass-bg);
+  color: var(--color-white);
+  border: 1px solid var(--btn-glass-border);
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.3s;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
 }
 
 .detail-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--btn-glass-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
@@ -691,28 +691,28 @@ td.payment {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  gap: var(--spacing-lg);
+  padding: var(--spacing-2xl);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--glass-border);
 }
 
 .pagination button {
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: var(--btn-glass-bg);
+  color: var(--color-white);
+  border: 1px solid var(--btn-glass-border);
+  border-radius: var(--radius-xl);
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
 }
 
 .pagination button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--btn-glass-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
@@ -724,9 +724,9 @@ td.payment {
 }
 
 .page-info {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
+  font-size: var(--font-size-md);
+  color: var(--text-on-gradient-secondary);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 弹窗样式 */
@@ -741,65 +741,65 @@ td.payment {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal);
 }
 
 .modal {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-3xl);
   width: 100%;
   max-width: 600px;
   max-height: 80vh;
   overflow-y: auto;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: var(--spacing-2xl);
+  border: 1px solid var(--glass-border);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-lg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .modal-header h3 {
   margin: 0;
-  color: white;
-  font-size: 20px;
-  font-weight: 600;
+  color: var(--color-white);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 .close-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 20px;
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border);
+  font-size: var(--font-size-2xl);
   cursor: pointer;
-  color: white;
+  color: var(--color-white);
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
+  transition: all var(--transition-normal);
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-border-hover);
 }
 
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: var(--spacing-lg);
 }
 
 .detail-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--spacing-xs);
 }
 
 .detail-item.full-width {
@@ -807,66 +807,66 @@ td.payment {
 }
 
 .detail-item .label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
 }
 
 .detail-item .value {
-  font-size: 15px;
-  color: white;
-  font-weight: 500;
+  font-size: var(--font-size-lg);
+  color: var(--color-white);
+  font-weight: var(--font-weight-medium);
 }
 
 .detail-item .value.amount {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
 }
 
 .detail-item .value.amount.income {
-  color: #38ef7d;
+  color: var(--transaction-income);
 }
 
 .detail-item .value.amount:not(.income) {
-  color: #f45c43;
+  color: var(--transaction-expense);
 }
 
 .modal-footer {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-lg);
   justify-content: flex-end;
-  margin-top: 24px;
-  padding-top: 16px;
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-lg);
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .btn {
-  padding: 10px 24px;
+  padding: var(--spacing-lg) var(--spacing-2xl);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
 }
 
 .btn.cancel {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--glass-bg-light);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border-hover);
 }
 
 .btn.cancel:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-border-hover);
 }
 
 .btn.primary {
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: var(--glass-bg-hover);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border-active);
 }
 
 .btn.primary:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--glass-bg-active);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }

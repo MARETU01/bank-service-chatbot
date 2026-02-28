@@ -127,7 +127,7 @@ export default {
 
 <style scoped>
 .dashboard {
-  max-width: 1400px;
+  max-width: var(--container-max-width-lg);
   margin: 0 auto;
 }
 
@@ -135,179 +135,179 @@ export default {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 25px;
-  margin-bottom: 30px;
+  gap: var(--spacing-2xl);
+  margin-bottom: var(--spacing-3xl);
 }
 
 .stat-card {
   display: flex;
   align-items: center;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s;
+  padding: var(--spacing-2xl);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--glass-border);
+  transition: all var(--transition-normal);
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--glass-bg-hover);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .stat-icon {
   width: 70px;
   height: 70px;
-  border-radius: 20px;
+  border-radius: var(--radius-3xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
-  margin-right: 20px;
+  font-size: var(--font-size-6xl);
+  margin-right: var(--spacing-2xl);
   flex-shrink: 0;
 }
 
 .stat-icon.balance {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: var(--gradient-balance);
 }
 
 .stat-icon.income {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: var(--gradient-income);
 }
 
 .stat-icon.expense {
-  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  background: var(--gradient-expense);
 }
 
 .stat-icon.transfer {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-transfer);
 }
 
 .stat-info h3 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-xl);
+  color: var(--text-on-gradient);
+  font-weight: var(--font-weight-medium);
 }
 
 .stat-value {
   margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: white;
+  font-size: var(--font-size-6xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
 }
 
 /* 快捷操作 */
 .quick-actions {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 30px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  padding: var(--spacing-2xl);
+  border: 1px solid var(--glass-border);
+  margin-bottom: var(--spacing-3xl);
 }
 
 .quick-actions h2 {
-  margin: 0 0 25px 0;
-  font-size: 24px;
-  color: white;
-  font-weight: 600;
+  margin: 0 0 var(--spacing-2xl) 0;
+  font-size: var(--font-size-4xl);
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
 }
 
 .actions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 20px;
+  gap: var(--spacing-2xl);
 }
 
 .action-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 25px 20px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
+  padding: 25px var(--spacing-2xl);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-hover);
+  border-radius: var(--radius-3xl);
   cursor: pointer;
-  transition: all 0.3s;
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
+  transition: all var(--transition-normal);
+  color: var(--color-white);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
 }
 
 .action-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--glass-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: var(--glass-border-active);
 }
 
 .action-icon {
   font-size: 40px;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-lg);
 }
 
 /* 最近交易 */
 .recent-transactions {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 30px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  padding: var(--spacing-2xl);
+  border: 1px solid var(--glass-border);
+  margin-bottom: var(--spacing-3xl);
 }
 
 .recent-transactions h2 {
-  margin: 0 0 25px 0;
-  font-size: 24px;
-  color: white;
-  font-weight: 600;
+  margin: 0 0 var(--spacing-2xl) 0;
+  font-size: var(--font-size-4xl);
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
 }
 
 .transaction-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--spacing-lg);
 }
 
 .transaction-item {
   display: flex;
   align-items: center;
-  padding: 18px 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  transition: all 0.3s;
+  padding: 18px var(--spacing-2xl);
+  background: var(--glass-bg-light);
+  border-radius: var(--radius-2xl);
+  transition: all var(--transition-normal);
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .transaction-item:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--glass-bg);
   transform: translateX(5px);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--glass-border);
 }
 
 .transaction-icon {
   width: 45px;
   height: 45px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
-  margin-right: 15px;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin-right: var(--spacing-lg);
   flex-shrink: 0;
 }
 
 .transaction-icon.income {
-  background: rgba(56, 239, 125, 0.2);
-  color: #38ef7d;
+  background: var(--transaction-income-bg);
+  color: var(--transaction-income);
 }
 
 .transaction-icon.expense {
-  background: rgba(244, 92, 67, 0.2);
-  color: #f45c43;
+  background: var(--transaction-expense-bg);
+  color: var(--transaction-expense);
 }
 
 .transaction-info {
@@ -315,110 +315,110 @@ export default {
 }
 
 .transaction-info h4 {
-  margin: 0 0 5px 0;
-  font-size: 16px;
-  color: white;
-  font-weight: 500;
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-xl);
+  color: var(--color-white);
+  font-weight: var(--font-weight-medium);
 }
 
 .transaction-date {
   margin: 0;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
 }
 
 .transaction-amount {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
   flex-shrink: 0;
 }
 
 .transaction-amount.income {
-  color: #38ef7d;
+  color: var(--transaction-income);
 }
 
 .transaction-amount.expense {
-  color: #f45c43;
+  color: var(--transaction-expense);
 }
 
 /* 通知公告 */
 .notices {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-3xl);
+  padding: var(--spacing-2xl);
+  border: 1px solid var(--glass-border);
 }
 
 .notices h2 {
-  margin: 0 0 25px 0;
-  font-size: 24px;
-  color: white;
-  font-weight: 600;
+  margin: 0 0 var(--spacing-2xl) 0;
+  font-size: var(--font-size-4xl);
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
 }
 
 .notice-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacing-md);
 }
 
 .notice-item {
   display: flex;
   align-items: center;
-  padding: 15px 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  gap: 15px;
-  transition: all 0.3s;
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: var(--glass-bg-light);
+  border-radius: var(--radius-xl);
+  gap: var(--spacing-lg);
+  transition: all var(--transition-normal);
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .notice-item:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--glass-bg);
   transform: translateX(5px);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--glass-border);
 }
 
 .notice-tag {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
 }
 
 .notice-tag.important {
-  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
-  color: white;
+  background: var(--gradient-important);
+  color: var(--color-white);
 }
 
 .notice-tag.normal {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: var(--glass-border-hover);
+  color: var(--color-white);
 }
 
 .notice-tag.activity {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-  color: white;
+  background: var(--gradient-activity);
+  color: var(--color-white);
 }
 
 .notice-title {
   flex: 1;
-  font-size: 15px;
-  color: white;
+  font-size: var(--font-size-lg);
+  color: var(--color-white);
 }
 
 .notice-date {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
   flex-shrink: 0;
 }
 
 /* 响应式设计 */
 @media (max-width: 992px) {
   .dashboard {
-    padding: 0 20px;
+    padding: 0 var(--spacing-2xl);
   }
 
   .stats-grid {
@@ -426,13 +426,13 @@ export default {
   }
 
   .stat-value {
-    font-size: 24px;
+    font-size: var(--font-size-4xl);
   }
 }
 
 @media (max-width: 576px) {
   .dashboard {
-    padding: 0 15px;
+    padding: 0 var(--spacing-lg);
   }
 
   .stats-grid {
@@ -446,7 +446,7 @@ export default {
   .quick-actions h2,
   .recent-transactions h2,
   .notices h2 {
-    font-size: 20px;
+    font-size: var(--font-size-3xl);
   }
 }
 </style>

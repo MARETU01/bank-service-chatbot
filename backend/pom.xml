@@ -27,7 +27,7 @@
         <spring-boot-dependencies.version>3.4.4</spring-boot-dependencies.version>
 
         <!-- Spring AI Version -->
-        <spring-ai.version>1.0.0-M6</spring-ai.version>
+        <spring-ai.version>1.1.2</spring-ai.version>
         
         <jwt.version>0.12.6</jwt.version>
         <mysql.version>8.0.28</mysql.version>

@@ -184,11 +184,11 @@ export default {
           const redirect = this.$route.query.redirect || '/dashboard';
           this.$router.push(redirect);
         } else {
-          alert(result.message || '登录失败，请重试');
+          this.$message.error(result.message || '登录失败，请重试');
         }
       } catch (error) {
         console.error('Login error:', error);
-        alert('网络错误，请稍后重试');
+        this.$message.error('网络错误，请稍后重试');
       }
     }
   }

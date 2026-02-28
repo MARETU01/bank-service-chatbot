@@ -281,14 +281,14 @@ export default {
           }
         });
         if (response.data.code === 1) {
-          alert(response.data.message || '验证码发送成功');
+          this.$message.success(response.data.message || '验证码发送成功');
           this.startCountdown();
         } else {
-          alert(response.data.message || '验证码发送失败');
+          this.$message.error(response.data.message || '验证码发送失败');
         }
       } catch (error) {
         console.error('验证码请求错误:', error);
-        alert('网络错误，请稍后重试');
+        this.$message.error('网络错误，请稍后重试');
       } finally {
         this.isLoading = false;
       }
@@ -314,12 +314,12 @@ export default {
       }
 
       if (!this.resetForm.email || !this.verification) {
-        alert('请填写邮箱和验证码');
+        this.$message.warning('请填写邮箱和验证码');
         return;
       }
 
       if (this.resetForm.password.length < 6) {
-        alert('密码长度不能少于 6 位');
+        this.$message.warning('密码长度不能少于 6 位');
         return;
       }
 
@@ -338,12 +338,13 @@ export default {
         console.log('重置密码返回数据:', response.data);
         if (response.data.code === 1) {
           this.isSuccess = true;
+          this.$message.success('密码重置成功！');
         } else {
-          alert(response.data.message || '重置失败');
+          this.$message.error(response.data.message || '重置失败');
         }
       } catch (error) {
         console.error('重置密码请求错误:', error);
-        alert(error.response?.data?.message || '重置失败，请检查网络后重试');
+        this.$message.error(error.response?.data?.message || '重置失败，请检查网络后重试');
       } finally {
         this.isLoading = false;
       }

@@ -248,11 +248,12 @@
 </template>
 
 <script>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, getCurrentInstance } from 'vue'
 
 export default {
   name: 'Transfers',
   setup() {
+    const { proxy } = getCurrentInstance()
     const showConfirm = ref(false)
     const showAddPayee = ref(false)
     const showSuccess = ref(false)
@@ -408,7 +409,7 @@ export default {
     }
 
     const viewAllHistory = () => {
-      alert('查看完整历史记录功能待实现')
+      proxy.$message.info('查看完整历史记录功能待实现')
     }
 
     return {

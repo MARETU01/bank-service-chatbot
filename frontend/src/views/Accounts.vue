@@ -94,12 +94,13 @@
 </template>
 
 <script>
-import { ref, reactive } from 'vue'
+import { ref, reactive, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
 
 export default {
   name: 'Accounts',
   setup() {
+    const { proxy } = getCurrentInstance()
     const router = useRouter()
     const showAddModal = ref(false)
     const selectedAccount = ref(null)
@@ -185,7 +186,7 @@ export default {
     }
 
     const addAccount = () => {
-      alert('添加账户功能待实现')
+      proxy.$message.info('添加账户功能待实现')
       showAddModal.value = false
     }
 

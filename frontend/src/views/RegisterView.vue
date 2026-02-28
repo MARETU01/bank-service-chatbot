@@ -342,14 +342,14 @@ export default {
           }
         });
         if (response.data.code === 1) {
-          alert(response.data.message || '验证码发送成功');
+          this.$message.success(response.data.message || '验证码发送成功');
           this.startCountdown();
         } else {
-          alert(response.data.message || '验证码发送失败');
+          this.$message.error(response.data.message || '验证码发送失败');
         }
       } catch (error) {
         console.error('验证码请求错误:', error);
-        alert('网络错误，请稍后重试');
+        this.$message.error('网络错误，请稍后重试');
       } finally {
         this.isLoading = false;
       }
@@ -375,7 +375,7 @@ export default {
       }
 
       if (!this.agreeTerms) {
-        alert('请先同意服务条款和隐私政策');
+        this.$message.warning('请先同意服务条款和隐私政策');
         return;
       }
 
@@ -397,15 +397,16 @@ export default {
         });
         console.log('注册返回数据:', response.data);
         if (response.data.code === 1) {
-          if (confirm(response.data.message || '注册成功，请登录')) {
+          this.$message.success(response.data.message || '注册成功，请登录');
+          setTimeout(() => {
             this.$router.push('/login');
-          }
+          }, 1500);
         } else {
-          alert(response.data.message || '注册失败');
+          this.$message.error(response.data.message || '注册失败');
         }
       } catch (error) {
         console.error('注册请求错误:', error);
-        alert(error.response?.data?.message || '注册失败，请检查网络后重试');
+        this.$message.error(error.response?.data?.message || '注册失败，请检查网络后重试');
       } finally {
         this.isLoading = false;
       }

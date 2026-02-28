@@ -171,11 +171,12 @@
 </template>
 
 <script>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, getCurrentInstance } from 'vue'
 
 export default {
   name: 'Profile',
   setup() {
+    const { proxy } = getCurrentInstance()
     const isEditing = ref(false)
     const showChangePassword = ref(false)
 
@@ -212,18 +213,18 @@ export default {
 
     function changePassword() {
       if (!passwordForm.oldPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
-        alert('请填写所有密码字段')
+        proxy.$message.warning('请填写所有密码字段')
         return
       }
       if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-        alert('两次输入的新密码不一致')
+        proxy.$message.error('两次输入的新密码不一致')
         return
       }
       if (passwordForm.newPassword.length < 6) {
-        alert('密码长度不能少于 6 位')
+        proxy.$message.warning('密码长度不能少于 6 位')
         return
       }
-      alert('密码修改成功！')
+      proxy.$message.success('密码修改成功！')
       showChangePassword.value = false
       passwordForm.oldPassword = ''
       passwordForm.newPassword = ''
@@ -235,7 +236,7 @@ export default {
       user.email = editForm.email
       user.address = editForm.address
       isEditing.value = false
-      alert('个人信息保存成功！')
+      proxy.$message.success('个人信息保存成功！')
     }
 
     return {

@@ -163,11 +163,12 @@
 </template>
 
 <script>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, getCurrentInstance } from 'vue'
 
 export default {
   name: 'Transactions',
   setup() {
+    const { proxy } = getCurrentInstance()
     const selectedTransaction = ref(null)
     const currentPage = ref(1)
     const pageSize = 10
@@ -423,11 +424,11 @@ export default {
     }
 
     const exportTransactions = () => {
-      alert('导出功能待实现')
+      proxy.$message.info('导出功能待实现')
     }
 
     const printReceipt = () => {
-      alert('打印回单功能待实现')
+      proxy.$message.info('打印回单功能待实现')
     }
 
     return {

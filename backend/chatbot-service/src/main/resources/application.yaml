@@ -17,7 +17,7 @@ spring:
   ai:
     openai:
       api-key: "ms-2cc7452c-4482-4a2f-9788-c692b8811aaf"
-      base-url: "https://api-inference.modelscope.cn/v1/"
+      base-url: "https://api-inference.modelscope.cn"
       chat:
         options:
           model: "Qwen/Qwen3.5-397B-A17B"

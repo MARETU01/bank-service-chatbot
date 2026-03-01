@@ -12,7 +12,7 @@ import com.maretu.user.service.IUsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.user.utils.HashUtil;
 import com.maretu.user.utils.MailUtil;
-import org.springframework.context.annotation.Lazy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -30,20 +30,13 @@ import java.time.LocalDateTime;
  * @author maretu
  * @since 2026-02-16
  */
+@RequiredArgsConstructor
 @Service
 public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements IUsersService {
 
     private final StringRedisTemplate stringRedisTemplate;
     private final MailUtil mailUtil;
     private final UsersServiceImpl self;
-
-    public UsersServiceImpl(StringRedisTemplate stringRedisTemplate,
-                            MailUtil mailUtil1,
-                            @Lazy UsersServiceImpl self) {
-        this.stringRedisTemplate = stringRedisTemplate;
-        this.mailUtil = mailUtil1;
-        this.self = self;
-    }
 
     @Override
     public String login(Users user, String ip) {

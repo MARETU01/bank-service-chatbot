@@ -7,19 +7,16 @@ import com.maretu.user.dto.ResetPasswordReq;
 import com.maretu.user.dto.UpdateProfileReq;
 import com.maretu.user.pojo.Users;
 import com.maretu.user.service.IUsersService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UsersController {
 
     private final IUsersService usersService;
     private final ObjectMapper jacksonObjectMapper;
-
-    public UsersController(IUsersService usersService, ObjectMapper jacksonObjectMapper) {
-        this.usersService = usersService;
-        this.jacksonObjectMapper = jacksonObjectMapper;
-    }
 
     @PostMapping("/login")
     public Result<String> login(@RequestHeader("X-Client-IP") String ip,

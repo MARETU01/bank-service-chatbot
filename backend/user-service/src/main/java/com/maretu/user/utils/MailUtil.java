@@ -2,18 +2,16 @@ package com.maretu.user.utils;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class MailUtil {
 
     private final JavaMailSender javaMailSender;
-
-    public MailUtil(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-    }
 
     public void sendVerificationCodeMail(String toEmail, String verificationCode) {
         try {

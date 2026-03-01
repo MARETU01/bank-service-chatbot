@@ -5,6 +5,7 @@ import com.maretu.common.dto.Context;
 import com.maretu.common.utils.JwtUtils;
 import com.maretu.gateway.config.AuthProperties;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -21,17 +22,13 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 
+@RequiredArgsConstructor
 @Component
 public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     private final AuthProperties authProperties;
     private final ObjectMapper jacksonObjectMapper;
     private final PathMatcher pathMatcher = new AntPathMatcher();
-
-    public AuthGlobalFilter(AuthProperties authProperties, ObjectMapper jacksonObjectMapper) {
-        this.authProperties = authProperties;
-        this.jacksonObjectMapper = jacksonObjectMapper;
-    }
 
     @SneakyThrows
     @Override

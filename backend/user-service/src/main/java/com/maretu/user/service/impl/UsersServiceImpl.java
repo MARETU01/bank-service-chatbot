@@ -13,6 +13,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.user.utils.HashUtil;
 import com.maretu.user.utils.MailUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,9 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     private final StringRedisTemplate stringRedisTemplate;
     private final MailUtil mailUtil;
-    private final UsersServiceImpl self;
+    @Lazy
+    @Autowired
+    private UsersServiceImpl self;
 
     @Override
     public String login(Users user, String ip) {

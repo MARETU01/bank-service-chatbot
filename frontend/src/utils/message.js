@@ -23,6 +23,9 @@ const createMessage = ({ message, type = 'info', duration = 3000 }) => {
   container.className = 'message-container'
   document.body.appendChild(container)
 
+  // 用于防止重复关闭的标志
+  let isClosing = false
+
   // 创建消息元素
   const messageApp = createApp({
     data() {
@@ -45,10 +48,17 @@ const createMessage = ({ message, type = 'info', duration = 3000 }) => {
     },
     methods: {
       close() {
+        // 防止重复关闭
+        if (isClosing) return
+        isClosing = true
+
         this.visible = false
         setTimeout(() => {
           messageApp.unmount()
-          document.body.removeChild(container)
+          // 使用 remove() 方法更安全，即使节点已不在 DOM 中也不会报错
+          if (container.parentNode) {
+            container.parentNode.removeChild(container)
+          }
         }, 300)
       }
     },

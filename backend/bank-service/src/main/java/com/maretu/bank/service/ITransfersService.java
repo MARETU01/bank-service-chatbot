@@ -1,5 +1,6 @@
 package com.maretu.bank.service;
 
+import com.maretu.bank.dto.TransferReq;
 import com.maretu.bank.pojo.Transfers;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ITransfersService extends IService<Transfers> {
 
+    /**
+     * 执行转账
+     */
+    Transfers transfer(Long userId, TransferReq req) throws Exception;
+
+    /**
+     * 获取转账记录
+     */
+    Transfers getTransferDetail(Long userId, String transferId);
 }

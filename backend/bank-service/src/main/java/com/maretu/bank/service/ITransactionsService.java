@@ -1,7 +1,10 @@
 package com.maretu.bank.service;
 
-import com.maretu.bank.pojo.Transactions;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.maretu.bank.dto.TransactionQueryReq;
+import com.maretu.bank.pojo.Transactions;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ITransactionsService extends IService<Transactions> {
 
+    /**
+     * 查询交易记录
+     */
+    List<Transactions> queryTransactions(TransactionQueryReq req);
 }

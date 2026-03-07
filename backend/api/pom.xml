@@ -16,6 +16,13 @@
     <description>Api Module</description>
 
     <dependencies>
+        <!-- Common Module -->
+        <dependency>
+            <groupId>com.maretu</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Open Feign -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -26,6 +33,13 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

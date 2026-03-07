@@ -1,7 +1,10 @@
 package com.maretu.bank.service;
 
-import com.maretu.bank.pojo.Transfers;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.maretu.bank.dto.TransferReq;
+import com.maretu.bank.pojo.Transfers;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ITransfersService extends IService<Transfers> {
 
+    /**
+     * 执行转账
+     */
+    Transfers executeTransfer(TransferReq req);
+
+    /**
+     * 根据账户ID获取转账记录
+     */
+    List<Transfers> getTransfersByAccountId(Long accountId, Integer page, Integer size);
 }

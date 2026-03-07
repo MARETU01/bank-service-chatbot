@@ -13,23 +13,32 @@
     <div class="filter-section">
       <div class="filter-row">
         <div class="filter-group">
-          <label>交易类型</label>
-          <select v-model="filters.type">
-            <option value="">全部</option>
-            <option value="income">收入</option>
-            <option value="expense">支出</option>
-            <option value="transfer">转账</option>
-            <option value="payment">支付</option>
+          <label>账户</label>
+          <select v-model="filters.accountId" @change="onAccountChange">
+            <option value="">全部账户</option>
+            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
+              {{ acc.accountName || '账户' }} (****{{ formatAccountLastFour(acc.accountNumber) }})
+            </option>
           </select>
         </div>
         <div class="filter-group">
-          <label>账户</label>
-          <select v-model="filters.account">
-            <option value="">全部账户</option>
-            <option value="1">储蓄账户 (7890)</option>
-            <option value="2">支票账户 (1234)</option>
-            <option value="3">定期存款 (5678)</option>
-            <option value="4">理财账户 (9012)</option>
+          <label>交易类型</label>
+          <select v-model="filters.type">
+            <option value="">全部</option>
+            <option value="DEPOSIT">存款</option>
+            <option value="WITHDRAW">取款</option>
+            <option value="TRANSFER_IN">转入</option>
+            <option value="TRANSFER_OUT">转出</option>
+            <option value="PAYMENT">支付</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>状态</label>
+          <select v-model="filters.status">
+            <option value="">全部</option>
+            <option value="1">成功</option>
+            <option value="0">失败</option>
+            <option value="2">处理中</option>
           </select>
         </div>
         <div class="filter-group">
@@ -48,7 +57,7 @@
     </div>
 
     <!-- 交易列表 -->
-    <div class="transactions-table">
+    <div class="transactions-table" v-if="transactions.length > 0">
       <table>
         <thead>
           <tr>
@@ -57,28 +66,26 @@
             <th>对方账户/商户</th>
             <th>摘要</th>
             <th>金额</th>
-            <th>账户</th>
             <th>状态</th>
             <th>操作</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in filteredTransactions" :key="item.id" :class="item.type">
-            <td>{{ item.time }}</td>
+          <tr v-for="item in transactions" :key="item.id">
+            <td>{{ formatDateTime(item.transactionTime) }}</td>
             <td>
-              <span class="type-badge" :class="item.type">
-                {{ item.typeName }}
+              <span class="type-badge" :class="getTypeClass(item.transactionType)">
+                {{ getTypeText(item.transactionType) }}
               </span>
             </td>
-            <td>{{ item.counterparty }}</td>
-            <td>{{ item.description }}</td>
-            <td :class="item.type">
-              {{ item.type === 'income' ? '+' : '-' }}¥{{ formatNumber(item.amount) }}
+            <td>{{ item.counterpartyName || item.counterpartyAccount || '-' }}</td>
+            <td>{{ item.description || '-' }}</td>
+            <td :class="getAmountClass(item.transactionType)">
+              {{ isIncomeType(item.transactionType) ? '+' : '-' }}¥{{ formatNumber(item.amount) }}
             </td>
-            <td>{{ item.accountName }}</td>
             <td>
-              <span class="status-badge" :class="item.status">
-                {{ item.statusText }}
+              <span class="status-badge" :class="getStatusClass(item.status)">
+                {{ getStatusText(item.status) }}
               </span>
             </td>
             <td>
@@ -88,9 +95,12 @@
         </tbody>
       </table>
     </div>
+    <div class="empty-state" v-else>
+      <p>暂无交易记录</p>
+    </div>
 
     <!-- 分页 -->
-    <div class="pagination">
+    <div class="pagination" v-if="transactions.length > 0">
       <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)">上一页</button>
       <span class="page-info">第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
       <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">下一页</button>
@@ -106,50 +116,50 @@
         <div class="modal-body">
           <div class="detail-grid">
             <div class="detail-item">
+              <span class="label">交易 ID</span>
+              <span class="value">{{ selectedTransaction.id }}</span>
+            </div>
+            <div class="detail-item">
               <span class="label">交易流水号</span>
               <span class="value">{{ selectedTransaction.transactionId }}</span>
             </div>
             <div class="detail-item">
               <span class="label">交易时间</span>
-              <span class="value">{{ selectedTransaction.time }}</span>
+              <span class="value">{{ formatDateTime(selectedTransaction.transactionTime) }}</span>
             </div>
             <div class="detail-item">
               <span class="label">交易类型</span>
-              <span class="value">{{ selectedTransaction.typeName }}</span>
+              <span class="value">{{ getTypeText(selectedTransaction.transactionType) }}</span>
             </div>
             <div class="detail-item">
               <span class="label">交易金额</span>
-              <span class="value amount" :class="selectedTransaction.type">
-                {{ selectedTransaction.type === 'income' ? '+' : '-' }}¥{{ formatNumber(selectedTransaction.amount) }}
+              <span class="value amount" :class="getAmountClass(selectedTransaction.transactionType)">
+                {{ isIncomeType(selectedTransaction.transactionType) ? '+' : '-' }}¥{{ formatNumber(selectedTransaction.amount) }}
               </span>
             </div>
             <div class="detail-item">
-              <span class="label">对方账户/商户</span>
-              <span class="value">{{ selectedTransaction.counterparty }}</span>
+              <span class="label">交易后余额</span>
+              <span class="value">¥ {{ formatNumber(selectedTransaction.balanceAfter) }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">对方账号</span>
-              <span class="value">{{ selectedTransaction.counterpartyAccount }}</span>
+              <span class="label">对方账户</span>
+              <span class="value">{{ selectedTransaction.counterpartyAccount || '-' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">对方名称</span>
+              <span class="value">{{ selectedTransaction.counterpartyName || '-' }}</span>
             </div>
             <div class="detail-item">
               <span class="label">摘要</span>
-              <span class="value">{{ selectedTransaction.description }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">交易账户</span>
-              <span class="value">{{ selectedTransaction.accountName }} (****{{ selectedTransaction.accountLastFour }})</span>
+              <span class="value">{{ selectedTransaction.description || '-' }}</span>
             </div>
             <div class="detail-item">
               <span class="label">交易状态</span>
               <span class="value">
-                <span class="status-badge" :class="selectedTransaction.status">
-                  {{ selectedTransaction.statusText }}
+                <span class="status-badge" :class="getStatusClass(selectedTransaction.status)">
+                  {{ getStatusText(selectedTransaction.status) }}
                 </span>
               </span>
-            </div>
-            <div class="detail-item full-width">
-              <span class="label">备注</span>
-              <span class="value">{{ selectedTransaction.remark || '无' }}</span>
             </div>
           </div>
         </div>
@@ -163,7 +173,8 @@
 </template>
 
 <script>
-import { ref, reactive, computed, getCurrentInstance } from 'vue'
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
+import { accountApi, transactionApi } from '@/api/api'
 
 export default {
   name: 'Transactions',
@@ -172,250 +183,157 @@ export default {
     const selectedTransaction = ref(null)
     const currentPage = ref(1)
     const pageSize = 10
+    const total = ref(0)
+    const accounts = ref([])
+    const transactions = ref([])
+    const loading = ref(false)
 
     const filters = reactive({
+      accountId: '',
       type: '',
-      account: '',
+      status: '',
       startDate: '',
-      endDate: ''
-    })
-
-    // 模拟交易数据
-    const allTransactions = ref([
-      {
-        id: 1,
-        transactionId: 'TRX202401150930001',
-        time: '2024-01-15 09:30:25',
-        type: 'income',
-        typeName: '工资收入',
-        counterparty: 'XX 科技有限公司',
-        counterpartyAccount: '对公账户',
-        description: '2024 年 1 月工资',
-        amount: 15200.00,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'success',
-        statusText: '交易成功',
-        remark: ''
-      },
-      {
-        id: 2,
-        transactionId: 'TRX202401141420002',
-        time: '2024-01-14 14:20:15',
-        type: 'transfer',
-        typeName: '转账支出',
-        counterparty: '张三',
-        counterpartyAccount: '6222 **** **** 5678',
-        description: '借款归还',
-        amount: 2500.00,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'success',
-        statusText: '交易成功',
-        remark: '新年快乐'
-      },
-      {
-        id: 3,
-        transactionId: 'TRX202401131845003',
-        time: '2024-01-13 18:45:30',
-        type: 'payment',
-        typeName: '微信支付',
-        counterparty: 'XX 餐厅',
-        counterpartyAccount: '商户',
-        description: '餐饮消费',
-        amount: 358.00,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'success',
-        statusText: '交易成功',
-        remark: ''
-      },
-      {
-        id: 4,
-        transactionId: 'TRX202401121000004',
-        time: '2024-01-12 10:00:00',
-        type: 'income',
-        typeName: '理财收益',
-        counterparty: 'XX 理财',
-        counterpartyAccount: '理财产品',
-        description: '理财到期收益',
-        amount: 1280.00,
-        accountName: '理财账户',
-        accountLastFour: '9012',
-        status: 'success',
-        statusText: '交易成功',
-        remark: ''
-      },
-      {
-        id: 5,
-        transactionId: 'TRX202401101630005',
-        time: '2024-01-10 16:30:45',
-        type: 'payment',
-        typeName: '信用卡还款',
-        counterparty: 'XX 银行',
-        counterpartyAccount: '信用卡',
-        description: '信用卡自动还款',
-        amount: 5600.00,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'success',
-        statusText: '交易成功',
-        remark: ''
-      },
-      {
-        id: 6,
-        transactionId: 'TRX202401091200006',
-        time: '2024-01-09 12:15:20',
-        type: 'expense',
-        typeName: 'ATM 取款',
-        counterparty: 'XX 银行 ATM',
-        counterpartyAccount: 'ATM001234',
-        description: 'ATM 现金取款',
-        amount: 2000.00,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'success',
-        statusText: '交易成功',
-        remark: ''
-      },
-      {
-        id: 7,
-        transactionId: 'TRX202401080930007',
-        time: '2024-01-08 09:30:00',
-        type: 'income',
-        typeName: '转账收入',
-        counterparty: '李四',
-        counterpartyAccount: '6222 **** **** 9876',
-        description: '货款',
-        amount: 8000.00,
-        accountName: '支票账户',
-        accountLastFour: '1234',
-        status: 'success',
-        statusText: '交易成功',
-        remark: '12 月货款'
-      },
-      {
-        id: 8,
-        transactionId: 'TRX202401071545008',
-        time: '2024-01-07 15:45:10',
-        type: 'payment',
-        typeName: '支付宝',
-        counterparty: 'XX 电商平台',
-        counterpartyAccount: '商户',
-        description: '网上购物',
-        amount: 1599.00,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'success',
-        statusText: '交易成功',
-        remark: ''
-      },
-      {
-        id: 9,
-        transactionId: 'TRX202401061000009',
-        time: '2024-01-06 10:00:00',
-        type: 'transfer',
-        typeName: '定期存入',
-        counterparty: '本人定期账户',
-        counterpartyAccount: '6222 **** **** 5678',
-        description: '定期存款',
-        amount: 50000.00,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'pending',
-        statusText: '处理中',
-        remark: '1 年期定期'
-      },
-      {
-        id: 10,
-        transactionId: 'TRX202401051820010',
-        time: '2024-01-05 18:20:30',
-        type: 'payment',
-        typeName: '银联支付',
-        counterparty: 'XX 超市',
-        counterpartyAccount: '商户',
-        description: '日常购物',
-        amount: 456.80,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'success',
-        statusText: '交易成功',
-        remark: ''
-      },
-      {
-        id: 11,
-        transactionId: 'TRX202401041130011',
-        time: '2024-01-04 11:30:00',
-        type: 'expense',
-        typeName: '手续费',
-        counterparty: 'XX 银行',
-        counterpartyAccount: '银行',
-        description: '跨行转账手续费',
-        amount: 5.00,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'success',
-        statusText: '交易成功',
-        remark: ''
-      },
-      {
-        id: 12,
-        transactionId: 'TRX202401030900012',
-        time: '2024-01-03 09:00:00',
-        type: 'income',
-        typeName: '利息收入',
-        counterparty: 'XX 银行',
-        counterpartyAccount: '银行',
-        description: '季度利息',
-        amount: 320.50,
-        accountName: '储蓄账户',
-        accountLastFour: '7890',
-        status: 'success',
-        statusText: '交易成功',
-        remark: ''
-      }
-    ])
-
-    const filteredTransactions = computed(() => {
-      let result = allTransactions.value
-
-      if (filters.type) {
-        result = result.filter(item => item.type === filters.type)
-      }
-
-      if (filters.account) {
-        result = result.filter(item => item.accountLastFour === filters.account)
-      }
-
-      if (filters.startDate) {
-        result = result.filter(item => item.time >= filters.startDate)
-      }
-
-      if (filters.endDate) {
-        result = result.filter(item => item.time <= filters.endDate + ' 23:59:59')
-      }
-
-      return result
-    })
-
-    const totalPages = computed(() => {
-      return Math.ceil(filteredTransactions.value.length / pageSize)
+      endDate: '',
+      page: 1,
+      size: 10
     })
 
     const formatNumber = (num) => {
+      if (!num) return '0.00'
       return Number(num).toLocaleString('zh-CN', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       })
     }
 
+    const formatDateTime = (dateTime) => {
+      if (!dateTime) return '-'
+      const date = new Date(dateTime)
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+
+    const formatAccountLastFour = (accountNumber) => {
+      if (!accountNumber) return '****'
+      const cleanNumber = accountNumber.replace(/\s/g, '')
+      return cleanNumber.slice(-4)
+    }
+
+    const getTypeClass = (type) => {
+      const typeMap = {
+        'DEPOSIT': 'income',
+        'WITHDRAW': 'expense',
+        'TRANSFER_IN': 'transfer',
+        'TRANSFER_OUT': 'transfer',
+        'PAYMENT': 'payment'
+      }
+      return typeMap[type] || 'expense'
+    }
+
+    const getTypeText = (type) => {
+      const typeMap = {
+        'DEPOSIT': '存款',
+        'WITHDRAW': '取款',
+        'TRANSFER_IN': '转入',
+        'TRANSFER_OUT': '转出',
+        'PAYMENT': '支付'
+      }
+      return typeMap[type] || type
+    }
+
+    const isIncomeType = (type) => {
+      return type === 'DEPOSIT' || type === 'TRANSFER_IN'
+    }
+
+    const getAmountClass = (type) => {
+      return isIncomeType(type) ? 'income' : 'expense'
+    }
+
+    const getStatusClass = (status) => {
+      const statusMap = {
+        0: 'failed',
+        1: 'success',
+        2: 'pending'
+      }
+      return statusMap[status] || 'pending'
+    }
+
+    const getStatusText = (status) => {
+      const statusMap = {
+        0: '失败',
+        1: '成功',
+        2: '处理中'
+      }
+      return statusMap[status] || '未知'
+    }
+
+    const loadAccounts = async () => {
+      try {
+        const response = await accountApi.getAccounts()
+        const { code, data } = response.data
+        if (code === 1 || code === 200) {
+          accounts.value = data || []
+          // 如果有账户，默认选择第一个
+          if (data && data.length > 0) {
+            filters.accountId = data[0].id
+            loadTransactions()
+          }
+        }
+      } catch (error) {
+        console.error('Load accounts error:', error)
+      }
+    }
+
+    const loadTransactions = async () => {
+      if (!filters.accountId) {
+        transactions.value = []
+        return
+      }
+
+      loading.value = true
+      try {
+        const params = {
+          page: currentPage.value,
+          size: pageSize
+        }
+        if (filters.type) params.type = filters.type
+        if (filters.status !== '') params.status = filters.status
+        if (filters.startDate) params.startDate = filters.startDate
+        if (filters.endDate) params.endDate = filters.endDate
+
+        const response = await transactionApi.getTransactions(filters.accountId, params)
+        const { code, data } = response.data
+        if (code === 1 || code === 200) {
+          transactions.value = data || []
+          total.value = data ? data.length : 0
+        }
+      } catch (error) {
+        console.error('Load transactions error:', error)
+        proxy.$message.error('获取交易记录失败')
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const onAccountChange = () => {
+      currentPage.value = 1
+      loadTransactions()
+    }
+
     const searchTransactions = () => {
       currentPage.value = 1
+      loadTransactions()
     }
 
     const changePage = (page) => {
       if (page >= 1 && page <= totalPages.value) {
         currentPage.value = page
+        loadTransactions()
       }
     }
 
@@ -431,13 +349,31 @@ export default {
       proxy.$message.info('打印回单功能待实现')
     }
 
+    const totalPages = computed(() => {
+      return Math.ceil(total.value / pageSize)
+    })
+
+    onMounted(() => {
+      loadAccounts()
+    })
+
     return {
       filters,
-      filteredTransactions,
+      accounts,
+      transactions,
       currentPage,
       totalPages,
       selectedTransaction,
       formatNumber,
+      formatDateTime,
+      formatAccountLastFour,
+      getTypeClass,
+      getTypeText,
+      isIncomeType,
+      getAmountClass,
+      getStatusClass,
+      getStatusText,
+      onAccountChange,
       searchTransactions,
       changePage,
       viewDetail,
@@ -639,9 +575,7 @@ td.income {
   font-weight: var(--font-weight-bold);
 }
 
-td.expense,
-td.transfer,
-td.payment {
+td.expense {
   color: var(--transaction-expense);
   font-weight: var(--font-weight-bold);
 }
@@ -729,6 +663,15 @@ td.payment {
   font-weight: var(--font-weight-medium);
 }
 
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-5xl);
+  color: var(--text-on-gradient-muted);
+  background: var(--glass-bg);
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--glass-border);
+}
+
 /* 弹窗样式 */
 .modal-overlay {
   position: fixed;
@@ -802,10 +745,6 @@ td.payment {
   gap: var(--spacing-xs);
 }
 
-.detail-item.full-width {
-  grid-column: 1 / -1;
-}
-
 .detail-item .label {
   font-size: var(--font-size-xs);
   color: var(--text-on-gradient-muted);
@@ -820,14 +759,6 @@ td.payment {
 .detail-item .value.amount {
   font-size: var(--font-size-4xl);
   font-weight: var(--font-weight-bold);
-}
-
-.detail-item .value.amount.income {
-  color: var(--transaction-income);
-}
-
-.detail-item .value.amount:not(.income) {
-  color: var(--transaction-expense);
 }
 
 .modal-footer {
@@ -869,5 +800,23 @@ td.payment {
   background: var(--glass-bg-active);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .filter-row {
+    flex-direction: column;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  table {
+    font-size: var(--font-size-sm);
+  }
+
+  th, td {
+    padding: var(--spacing-md);
+  }
 }
 </style>

@@ -6,28 +6,28 @@
         <div class="stat-icon balance">💰</div>
         <div class="stat-info">
           <h3>总余额</h3>
-          <p class="stat-value">¥ 125,680.00</p>
+          <p class="stat-value">¥ {{ formatNumber(stats.totalBalance) }}</p>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon income">📈</div>
         <div class="stat-info">
-          <h3>本月收入</h3>
-          <p class="stat-value">¥ 15,200.00</p>
+          <h3>总收入</h3>
+          <p class="stat-value">¥ {{ formatNumber(stats.income) }}</p>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon expense">📉</div>
         <div class="stat-info">
-          <h3>本月支出</h3>
-          <p class="stat-value">¥ 8,450.00</p>
+          <h3>总支出</h3>
+          <p class="stat-value">¥ {{ formatNumber(stats.expense) }}</p>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon transfer">💸</div>
         <div class="stat-info">
-          <h3>待处理转账</h3>
-          <p class="stat-value">3 笔</p>
+          <h3>账户数量</h3>
+          <p class="stat-value">{{ stats.accountCount }} 个</p>
         </div>
       </div>
     </div>
@@ -58,19 +58,22 @@
     <!-- 最近交易 -->
     <div class="recent-transactions">
       <h2>最近交易</h2>
-      <div class="transaction-list">
+      <div class="transaction-list" v-if="recentTransactions.length > 0">
         <div class="transaction-item" v-for="item in recentTransactions" :key="item.id">
           <div class="transaction-icon" :class="item.type">
             {{ item.type === 'income' ? '↓' : '↑' }}
           </div>
           <div class="transaction-info">
-            <h4>{{ item.title }}</h4>
-            <p class="transaction-date">{{ item.date }}</p>
+            <h4>{{ item.description }}</h4>
+            <p class="transaction-date">{{ formatDateTime(item.transactionTime) }}</p>
           </div>
           <div class="transaction-amount" :class="item.type">
-            {{ item.type === 'income' ? '+' : '-' }}¥{{ item.amount }}
+            {{ item.type === 'income' ? '+' : '-' }}¥{{ formatNumber(item.amount) }}
           </div>
         </div>
+      </div>
+      <div class="empty-state" v-else>
+        <p>暂无交易记录</p>
       </div>
     </div>
 
@@ -89,36 +92,111 @@
 </template>
 
 <script>
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
+import { accountApi, transactionApi } from '@/api/api'
 
 export default {
   name: 'Dashboard',
   setup() {
     const router = useRouter()
+    const { proxy } = getCurrentInstance()
+
+    const stats = ref({
+      totalBalance: 0,
+      income: 0,
+      expense: 0,
+      accountCount: 0,
+      transactionCount: 0
+    })
+
+    const recentTransactions = ref([])
+    const loading = ref(false)
+
+    const notices = ref([
+      { id: 1, type: 'important', typeName: '重要', title: '关于系统升级维护的通知', date: '2024-01-15' },
+      { id: 2, type: 'normal', typeName: '公告', title: '2024 年第一季度理财产品推荐', date: '2024-01-14' },
+      { id: 3, type: 'normal', typeName: '公告', title: '防范电信诈骗温馨提示', date: '2024-01-12' },
+      { id: 4, type: 'activity', typeName: '活动', title: '新用户开户送好礼', date: '2024-01-10' }
+    ])
+
+    const formatNumber = (num) => {
+      if (!num) return '0.00'
+      return Number(num).toLocaleString('zh-CN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
+    }
+
+    const formatDateTime = (dateTime) => {
+      if (!dateTime) return ''
+      const date = new Date(dateTime)
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
 
     const navigateTo = (path) => {
       router.push(path)
     }
 
-    // 模拟数据
-    const recentTransactions = [
-      { id: 1, title: '工资收入', date: '2024-01-15 09:30', amount: '15,200.00', type: 'income' },
-      { id: 2, title: '支付宝转账', date: '2024-01-14 14:20', amount: '2,500.00', type: 'expense' },
-      { id: 3, title: '微信支付', date: '2024-01-13 18:45', amount: '358.00', type: 'expense' },
-      { id: 4, title: '理财收益', date: '2024-01-12 10:00', amount: '1,280.00', type: 'income' },
-      { id: 5, title: '信用卡还款', date: '2024-01-10 16:30', amount: '5,600.00', type: 'expense' }
-    ]
+    const loadDashboardStats = async () => {
+      loading.value = true
+      try {
+        const response = await accountApi.getDashboardStats()
+        const { code, data, message } = response.data
+        if (code === 1 || code === 200) {
+          stats.value = data
+        } else {
+          proxy.$message.error(message || '获取统计数据失败')
+        }
+      } catch (error) {
+        console.error('Load dashboard stats error:', error)
+        proxy.$message.error('获取统计数据失败')
+      } finally {
+        loading.value = false
+      }
+    }
 
-    const notices = [
-      { id: 1, type: 'important', typeName: '重要', title: '关于系统升级维护的通知', date: '2024-01-15' },
-      { id: 2, type: 'normal', typeName: '公告', title: '2024 年第一季度理财产品推荐', date: '2024-01-14' },
-      { id: 3, type: 'normal', typeName: '公告', title: '防范电信诈骗温馨提示', date: '2024-01-12' },
-      { id: 4, type: 'activity', typeName: '活动', title: '新用户开户送好礼', date: '2024-01-10' }
-    ]
+    const loadRecentTransactions = async () => {
+      try {
+        // 获取第一个账户的最近交易
+        const accountsResponse = await accountApi.getAccounts()
+        const { code, data } = accountsResponse.data
+        if (code === 1 || code === 200) {
+          const accounts = data
+          if (accounts && accounts.length > 0) {
+            const firstAccountId = accounts[0].id
+            const response = await transactionApi.getTransactions(firstAccountId, { page: 1, size: 5 })
+            const { code: txCode, data: txData } = response.data
+            if (txCode === 1 || txCode === 200) {
+              recentTransactions.value = txData.map(tx => ({
+                ...tx,
+                type: tx.transactionType === 'DEPOSIT' || tx.transactionType === 'TRANSFER_IN' || tx.transactionType === 'INCOME' ? 'income' : 'expense'
+              }))
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Load recent transactions error:', error)
+      }
+    }
+
+    onMounted(() => {
+      loadDashboardStats()
+      loadRecentTransactions()
+    })
 
     return {
+      stats,
       recentTransactions,
       notices,
+      formatNumber,
+      formatDateTime,
       navigateTo
     }
   }
@@ -339,6 +417,12 @@ export default {
 
 .transaction-amount.expense {
   color: var(--transaction-expense);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-3xl);
+  color: var(--text-on-gradient-muted);
 }
 
 /* 通知公告 */

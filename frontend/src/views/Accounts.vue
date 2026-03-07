@@ -3,26 +3,33 @@
     <!-- 账户列表 -->
     <div class="accounts-header">
       <h2>我的账户</h2>
-      <button class="add-btn" @click="showAddModal = true">
-        <span>+</span> 添加账户
-      </button>
     </div>
 
-    <div class="accounts-grid">
+    <div class="accounts-grid" v-if="accounts.length > 0">
       <div class="account-card" v-for="account in accounts" :key="account.id">
         <div class="account-header">
           <div class="account-type">
-            <span class="type-icon">{{ account.typeIcon }}</span>
-            <span class="type-name">{{ account.typeName }}</span>
+            <span class="type-icon">💳</span>
+            <span class="type-name">{{ account.accountName || '银行账户' }}</span>
           </div>
-          <span class="account-status" :class="account.status">{{ account.statusText }}</span>
+          <span class="account-status" :class="getStatusClass(account.status)">{{ getStatusText(account.status) }}</span>
         </div>
         <div class="account-number">
-          <span>**** **** **** {{ account.lastFourDigits }}</span>
+          <span>{{ formatAccountNumber(account.accountNumber) }}</span>
         </div>
         <div class="account-balance">
           <span class="balance-label">可用余额</span>
           <span class="balance-amount">¥ {{ formatNumber(account.balance) }}</span>
+        </div>
+        <div class="account-info">
+          <div class="info-item">
+            <span class="info-label">币种</span>
+            <span class="info-value">{{ account.currency || 'CNY' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">日限额</span>
+            <span class="info-value">¥ {{ formatNumber(account.dailyLimit) }}</span>
+          </div>
         </div>
         <div class="account-actions">
           <button class="action-btn primary" @click="viewDetail(account)">详情</button>
@@ -30,63 +37,60 @@
         </div>
       </div>
     </div>
-
-    <!-- 账户详情 -->
-    <div class="account-detail-section" v-if="selectedAccount">
-      <h2>账户详情</h2>
-      <div class="detail-card">
-        <div class="detail-row">
-          <span class="detail-label">账户类型</span>
-          <span class="detail-value">{{ selectedAccount.typeName }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">账户号码</span>
-          <span class="detail-value">{{ selectedAccount.accountNumber }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">开户日期</span>
-          <span class="detail-value">{{ selectedAccount.openDate }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">币种</span>
-          <span class="detail-value">{{ selectedAccount.currency }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">可用余额</span>
-          <span class="detail-value amount">¥ {{ formatNumber(selectedAccount.balance) }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">冻结金额</span>
-          <span class="detail-value">¥ {{ formatNumber(selectedAccount.frozenAmount || 0) }}</span>
-        </div>
-      </div>
+    <div class="empty-state" v-else>
+      <p>暂无账户信息</p>
     </div>
 
-    <!-- 添加账户弹窗 -->
-    <div class="modal-overlay" v-if="showAddModal" @click="showAddModal = false">
+    <!-- 账户详情弹窗 -->
+    <div class="modal-overlay" v-if="selectedAccount" @click="selectedAccount = null">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>添加新账户</h3>
-          <button class="close-btn" @click="showAddModal = false">×</button>
+          <h3>账户详情</h3>
+          <button class="close-btn" @click="selectedAccount = null">×</button>
         </div>
         <div class="modal-body">
-          <div class="form-group">
-            <label>账户类型</label>
-            <select v-model="newAccount.type">
-              <option value="savings">储蓄账户</option>
-              <option value="checking">支票账户</option>
-              <option value="time">定期存款</option>
-              <option value="investment">理财账户</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>初始存款金额</label>
-            <input type="number" v-model="newAccount.initialDeposit" placeholder="请输入金额" />
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="label">账户 ID</span>
+              <span class="value">{{ selectedAccount.id }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">账户号码</span>
+              <span class="value">{{ selectedAccount.accountNumber }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">账户名称</span>
+              <span class="value">{{ selectedAccount.accountName || '银行账户' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">账户状态</span>
+              <span class="value">
+                <span class="status-badge" :class="getStatusClass(selectedAccount.status)">
+                  {{ getStatusText(selectedAccount.status) }}
+                </span>
+              </span>
+            </div>
+            <div class="detail-item">
+              <span class="label">账户余额</span>
+              <span class="value amount">¥ {{ formatNumber(selectedAccount.balance) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">币种</span>
+              <span class="value">{{ selectedAccount.currency || 'CNY' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">单日交易限额</span>
+              <span class="value">¥ {{ formatNumber(selectedAccount.dailyLimit) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">创建时间</span>
+              <span class="value">{{ formatDateTime(selectedAccount.createdAt) }}</span>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn cancel" @click="showAddModal = false">取消</button>
-          <button class="btn primary" @click="addAccount">确认添加</button>
+          <button class="btn cancel" @click="selectedAccount = null">关闭</button>
+          <button class="btn primary" @click="transfer(selectedAccount)">转账</button>
         </div>
       </div>
     </div>
@@ -94,87 +98,84 @@
 </template>
 
 <script>
-import { ref, reactive, getCurrentInstance } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
+import { accountApi } from '@/api/api'
 
 export default {
   name: 'Accounts',
   setup() {
-    const { proxy } = getCurrentInstance()
     const router = useRouter()
-    const showAddModal = ref(false)
+    const { proxy } = getCurrentInstance()
     const selectedAccount = ref(null)
-
-    // 模拟账户数据
-    const accounts = ref([
-      {
-        id: 1,
-        type: 'savings',
-        typeName: '储蓄账户',
-        typeIcon: '💰',
-        accountNumber: '6222 0212 3456 7890',
-        lastFourDigits: '7890',
-        balance: 125680.00,
-        frozenAmount: 0,
-        status: 'active',
-        statusText: '正常',
-        openDate: '2020-05-15',
-        currency: 'CNY'
-      },
-      {
-        id: 2,
-        type: 'checking',
-        typeName: '支票账户',
-        typeIcon: '📋',
-        accountNumber: '6222 0212 3456 1234',
-        lastFourDigits: '1234',
-        balance: 45200.50,
-        frozenAmount: 5000,
-        status: 'active',
-        statusText: '正常',
-        openDate: '2021-08-20',
-        currency: 'CNY'
-      },
-      {
-        id: 3,
-        type: 'time',
-        typeName: '定期存款',
-        typeIcon: '📅',
-        accountNumber: '6222 0212 3456 5678',
-        lastFourDigits: '5678',
-        balance: 100000.00,
-        frozenAmount: 100000,
-        status: 'frozen',
-        statusText: '定期中',
-        openDate: '2023-01-10',
-        currency: 'CNY'
-      },
-      {
-        id: 4,
-        type: 'investment',
-        typeName: '理财账户',
-        typeIcon: '📈',
-        accountNumber: '6222 0212 3456 9012',
-        lastFourDigits: '9012',
-        balance: 78500.00,
-        frozenAmount: 0,
-        status: 'active',
-        statusText: '正常',
-        openDate: '2022-03-25',
-        currency: 'CNY'
-      }
-    ])
-
-    const newAccount = reactive({
-      type: 'savings',
-      initialDeposit: ''
-    })
+    const accounts = ref([])
+    const loading = ref(false)
 
     const formatNumber = (num) => {
+      if (!num) return '0.00'
       return Number(num).toLocaleString('zh-CN', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       })
+    }
+
+    const formatAccountNumber = (accountNumber) => {
+      if (!accountNumber) return '**** **** **** ****'
+      // 将账号格式化为每 4 位一组
+      const cleanNumber = accountNumber.replace(/\s/g, '')
+      if (cleanNumber.length >= 4) {
+        const lastFour = cleanNumber.slice(-4)
+        return `**** **** **** ${lastFour}`
+      }
+      return accountNumber
+    }
+
+    const formatDateTime = (dateTime) => {
+      if (!dateTime) return '-'
+      const date = new Date(dateTime)
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+
+    const getStatusClass = (status) => {
+      const statusMap = {
+        0: 'frozen',
+        1: 'active',
+        2: 'closed'
+      }
+      return statusMap[status] || 'active'
+    }
+
+    const getStatusText = (status) => {
+      const statusMap = {
+        0: '冻结',
+        1: '正常',
+        2: '关闭'
+      }
+      return statusMap[status] || '未知'
+    }
+
+    const loadAccounts = async () => {
+      loading.value = true
+      try {
+        const response = await accountApi.getAccounts()
+        const { code, data, message } = response.data
+        if (code === 1 || code === 200) {
+          accounts.value = data || []
+        } else {
+          proxy.$message.error(message || '获取账户列表失败')
+        }
+      } catch (error) {
+        console.error('Load accounts error:', error)
+        proxy.$message.error('获取账户列表失败')
+      } finally {
+        loading.value = false
+      }
     }
 
     const viewDetail = (account) => {
@@ -182,23 +183,23 @@ export default {
     }
 
     const transfer = (account) => {
-      router.push('/transfers?accountId=' + account.id)
+      router.push(`/transfers?accountId=${account.id}`)
     }
 
-    const addAccount = () => {
-      proxy.$message.info('添加账户功能待实现')
-      showAddModal.value = false
-    }
+    onMounted(() => {
+      loadAccounts()
+    })
 
     return {
       accounts,
-      showAddModal,
       selectedAccount,
-      newAccount,
       formatNumber,
+      formatAccountNumber,
+      formatDateTime,
+      getStatusClass,
+      getStatusText,
       viewDetail,
-      transfer,
-      addAccount
+      transfer
     }
   }
 }
@@ -247,7 +248,7 @@ export default {
 
 .accounts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--spacing-2xl);
   margin-bottom: var(--spacing-3xl);
 }
@@ -307,6 +308,11 @@ export default {
   color: var(--status-warning);
 }
 
+.account-status.closed {
+  background: var(--status-danger-bg);
+  color: var(--status-danger);
+}
+
 .account-number {
   font-size: var(--font-size-xl);
   color: var(--text-on-gradient-secondary);
@@ -315,7 +321,7 @@ export default {
 }
 
 .account-balance {
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl);
 }
 
 .balance-label {
@@ -330,6 +336,32 @@ export default {
   font-weight: var(--font-weight-bold);
   color: var(--color-white);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.account-info {
+  display: flex;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-xl);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.info-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
+}
+
+.info-value {
+  font-size: var(--font-size-md);
+  color: var(--color-white);
+  font-weight: var(--font-weight-medium);
 }
 
 .account-actions {
@@ -370,51 +402,13 @@ export default {
   transform: translateY(-2px);
 }
 
-.account-detail-section {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border-radius: var(--radius-3xl);
-  padding: var(--spacing-2xl);
-  border: 1px solid var(--glass-border);
-}
-
-.account-detail-section h2 {
-  margin: 0 0 var(--spacing-2xl) 0;
-  color: var(--color-white);
-  font-size: var(--font-size-4xl);
-  font-weight: var(--font-weight-semibold);
-}
-
-.detail-card {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-lg);
-}
-
-.detail-row {
-  display: flex;
-  flex-direction: column;
-  padding: var(--spacing-lg);
-  background: var(--glass-bg-light);
-  border-radius: var(--radius-xl);
-}
-
-.detail-label {
-  font-size: var(--font-size-xs);
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-5xl);
   color: var(--text-on-gradient-muted);
-  margin-bottom: var(--spacing-sm);
-}
-
-.detail-value {
-  font-size: var(--font-size-xl);
-  color: var(--color-white);
-  font-weight: var(--font-weight-medium);
-}
-
-.detail-value.amount {
-  font-size: var(--font-size-3xl);
-  color: var(--status-warning);
-  font-weight: var(--font-weight-bold);
+  background: var(--glass-bg);
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--glass-border);
 }
 
 /* 弹窗样式 */
@@ -436,7 +430,9 @@ export default {
   background: var(--gradient-primary);
   border-radius: var(--radius-3xl);
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
   padding: var(--spacing-2xl);
   border: 1px solid var(--glass-border);
 }
@@ -446,6 +442,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .modal-header h3 {
@@ -474,54 +472,65 @@ export default {
   background: var(--glass-border-hover);
 }
 
-.modal-body {
-  margin-bottom: var(--spacing-2xl);
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
 }
 
-.form-group {
-  margin-bottom: var(--spacing-lg);
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: var(--spacing-sm);
-  color: var(--text-on-gradient);
-  font-size: var(--font-size-md);
+.detail-item .label {
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
+}
+
+.detail-item .value {
+  font-size: var(--font-size-lg);
+  color: var(--color-white);
   font-weight: var(--font-weight-medium);
 }
 
-.form-group select,
-.form-group input {
-  width: 100%;
-  padding: var(--spacing-lg) var(--spacing-2xl);
-  border: 1px solid var(--input-border);
-  border-radius: var(--radius-xl);
-  font-size: var(--font-size-md);
-  box-sizing: border-box;
-  background: var(--input-bg);
-  color: var(--color-white);
+.detail-item .value.amount {
+  font-size: var(--font-size-3xl);
+  color: var(--status-warning);
+  font-weight: var(--font-weight-bold);
 }
 
-.form-group select option {
-  background: #667eea;
-  color: var(--color-white);
+.status-badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
-.form-group select:focus,
-.form-group input:focus {
-  outline: none;
-  border-color: var(--input-border-focus);
-  background: var(--input-bg-focus);
+.status-badge.active {
+  background: var(--status-success-bg);
+  color: var(--status-success);
 }
 
-.form-group input::placeholder {
-  color: var(--input-placeholder);
+.status-badge.frozen {
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+}
+
+.status-badge.closed {
+  background: var(--status-danger-bg);
+  color: var(--status-danger);
 }
 
 .modal-footer {
   display: flex;
   gap: var(--spacing-lg);
   justify-content: flex-end;
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .btn {
@@ -554,5 +563,21 @@ export default {
   background: var(--glass-bg-active);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .accounts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-info {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

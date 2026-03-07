@@ -15,40 +15,38 @@
               <select v-model="transfer.fromAccount" required>
                 <option value="">请选择付款账户</option>
                 <option v-for="account in accounts" :key="account.id" :value="account.id">
-                  {{ account.name }} (****{{ account.lastFour }}) - 余额：¥{{ formatNumber(account.balance) }}
+                  {{ account.accountName || '账户' }} (****{{ formatAccountLastFour(account.accountNumber) }}) - 余额：¥{{ formatNumber(account.balance) }}
                 </option>
               </select>
-            </div>
-
-            <div class="form-group">
-              <label>收款人姓名 <span class="required">*</span></label>
-              <input 
-                type="text" 
-                v-model="transfer.payeeName" 
-                placeholder="请输入收款人姓名"
-                required
-              />
             </div>
 
             <div class="form-group">
               <label>收款人账号 <span class="required">*</span></label>
               <input 
                 type="text" 
-                v-model="transfer.payeeAccount" 
+                v-model="transfer.toAccountNumber" 
                 placeholder="请输入收款人账号"
                 required
               />
             </div>
 
             <div class="form-group">
-              <label>确认账号 <span class="required">*</span></label>
+              <label>收款人姓名 <span class="required">*</span></label>
               <input 
                 type="text" 
-                v-model="transfer.confirmAccount" 
-                placeholder="请再次输入收款人账号"
+                v-model="transfer.toAccountName" 
+                placeholder="请输入收款人姓名"
                 required
               />
-              <span class="error-msg" v-if="accountMismatch">两次输入的账号不一致</span>
+            </div>
+
+            <div class="form-group">
+              <label>收款银行</label>
+              <input 
+                type="text" 
+                v-model="transfer.toBankName" 
+                placeholder="请输入开户行名称（选填）"
+              />
             </div>
 
             <div class="form-group">
@@ -68,35 +66,14 @@
             </div>
 
             <div class="form-group">
-              <label>转账类型</label>
-              <div class="transfer-type-options">
-                <label class="type-option">
-                  <input type="radio" v-model="transfer.transferType" value="normal" />
-                  <div class="option-content">
-                    <span class="option-name">普通转账</span>
-                    <span class="option-desc">2 小时内到账</span>
-                  </div>
-                </label>
-                <label class="type-option">
-                  <input type="radio" v-model="transfer.transferType" value="fast" />
-                  <div class="option-content">
-                    <span class="option-name">快速转账</span>
-                    <span class="option-desc">实时到账</span>
-                  </div>
-                </label>
-                <label class="type-option">
-                  <input type="radio" v-model="transfer.transferType" value="scheduled" />
-                  <div class="option-content">
-                    <span class="option-name">预约转账</span>
-                    <span class="option-desc">指定时间到账</span>
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            <div class="form-group" v-if="transfer.transferType === 'scheduled'">
-              <label>预约时间</label>
-              <input type="datetime-local" v-model="transfer.scheduledTime" />
+              <label>支付密码 <span class="required">*</span></label>
+              <input 
+                type="password" 
+                v-model="transfer.payPassword" 
+                placeholder="请输入支付密码"
+                maxlength="6"
+                required
+              />
             </div>
 
             <div class="form-group">
@@ -110,54 +87,34 @@
 
             <div class="form-actions">
               <button type="button" class="btn reset" @click="resetForm">重置</button>
-              <button type="submit" class="btn primary" :disabled="!canSubmit">确认转账</button>
+              <button type="submit" class="btn primary" :disabled="!canSubmit || loading">
+                {{ loading ? '处理中...' : '确认转账' }}
+              </button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- 常用收款人 -->
+      <!-- 右侧区域 -->
       <div class="payees-section">
-        <div class="payees-card">
-          <div class="card-header">
-            <h3>常用收款人</h3>
-            <button class="add-payee-btn" @click="showAddPayee = true">
-              <span>+</span> 添加
-            </button>
-          </div>
-          <div class="payees-list">
-            <div 
-              class="payee-item" 
-              v-for="payee in payees" 
-              :key="payee.id"
-              @click="selectPayee(payee)"
-            >
-              <div class="payee-avatar">{{ payee.name.charAt(0) }}</div>
-              <div class="payee-info">
-                <div class="payee-name">{{ payee.name }}</div>
-                <div class="payee-account">{{ payee.account }}</div>
-              </div>
-              <div class="payee-bank">{{ payee.bank }}</div>
-            </div>
-          </div>
-        </div>
-
         <!-- 转账记录 -->
         <div class="history-card">
           <div class="card-header">
             <h3>最近转账记录</h3>
-            <button class="view-all-btn" @click="viewAllHistory">查看全部</button>
           </div>
-          <div class="history-list">
+          <div class="history-list" v-if="recentTransfers.length > 0">
             <div class="history-item" v-for="item in recentTransfers" :key="item.id">
               <div class="history-info">
-                <div class="history-name">{{ item.payeeName }}</div>
-                <div class="history-time">{{ item.time }}</div>
+                <div class="history-name">{{ item.toAccountName || '收款人' }}</div>
+                <div class="history-time">{{ formatDateTime(item.createdAt) }}</div>
               </div>
-              <div class="history-amount" :class="item.status">
+              <div class="history-amount" :class="getStatusClass(item.status)">
                 -¥{{ formatNumber(item.amount) }}
               </div>
             </div>
+          </div>
+          <div class="empty-state" v-else>
+            <p>暂无转账记录</p>
           </div>
         </div>
       </div>
@@ -178,57 +135,31 @@
             </div>
             <div class="info-row">
               <span class="label">收款人</span>
-              <span class="value">{{ transfer.payeeName }}</span>
+              <span class="value">{{ transfer.toAccountName }}</span>
             </div>
             <div class="info-row">
               <span class="label">收款账号</span>
-              <span class="value">{{ transfer.payeeAccount }}</span>
+              <span class="value">{{ transfer.toAccountNumber }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">收款银行</span>
+              <span class="value">{{ transfer.toBankName || '-' }}</span>
             </div>
             <div class="info-row highlight">
               <span class="label">转账金额</span>
               <span class="value amount">¥{{ formatNumber(transfer.amount) }}</span>
             </div>
             <div class="info-row">
-              <span class="label">转账类型</span>
-              <span class="value">{{ transferTypeName }}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">手续费</span>
-              <span class="value">{{ transferFee === 0 ? '免费' : '¥' + formatNumber(transferFee) }}</span>
+              <span class="label">备注</span>
+              <span class="value">{{ transfer.remark || '无' }}</span>
             </div>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn cancel" @click="showConfirm = false">返回修改</button>
-          <button class="btn primary" @click="confirmTransfer">确认转账</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 添加收款人弹窗 -->
-    <div class="modal-overlay" v-if="showAddPayee" @click="showAddPayee = false">
-      <div class="modal" @click.stop>
-        <div class="modal-header">
-          <h3>添加收款人</h3>
-          <button class="close-btn" @click="showAddPayee = false">×</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>姓名</label>
-            <input type="text" v-model="newPayee.name" placeholder="请输入姓名" />
-          </div>
-          <div class="form-group">
-            <label>账号</label>
-            <input type="text" v-model="newPayee.account" placeholder="请输入账号" />
-          </div>
-          <div class="form-group">
-            <label>银行</label>
-            <input type="text" v-model="newPayee.bank" placeholder="请输入开户行" />
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn cancel" @click="showAddPayee = false">取消</button>
-          <button class="btn primary" @click="addPayee">确认添加</button>
+          <button class="btn primary" @click="confirmTransfer" :disabled="confirmLoading">
+            {{ confirmLoading ? '处理中...' : '确认转账' }}
+          </button>
         </div>
       </div>
     </div>
@@ -238,7 +169,7 @@
       <div class="modal success-modal" @click.stop>
         <div class="success-icon">✓</div>
         <h3>转账成功</h3>
-        <p>已向 {{ transfer.payeeName }} 转账 ¥{{ formatNumber(transfer.amount) }}</p>
+        <p>已向 {{ transfer.toAccountName }} 转账 ¥{{ formatNumber(transfer.amount) }}</p>
         <div class="modal-footer">
           <button class="btn primary" @click="showSuccess = false; resetForm()">完成</button>
         </div>
@@ -248,58 +179,31 @@
 </template>
 
 <script>
-import { ref, reactive, computed, getCurrentInstance } from 'vue'
+import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
+import { useRoute } from 'vue-router'
+import { accountApi, transferApi } from '@/api/api'
 
 export default {
   name: 'Transfers',
   setup() {
+    const route = useRoute()
     const { proxy } = getCurrentInstance()
     const showConfirm = ref(false)
-    const showAddPayee = ref(false)
     const showSuccess = ref(false)
+    const loading = ref(false)
+    const confirmLoading = ref(false)
 
-    // 模拟账户数据
-    const accounts = ref([
-      { id: 1, name: '储蓄账户', lastFour: '7890', balance: 125680.00 },
-      { id: 2, name: '支票账户', lastFour: '1234', balance: 45200.50 },
-      { id: 4, name: '理财账户', lastFour: '9012', balance: 78500.00 }
-    ])
-
-    // 模拟常用收款人
-    const payees = ref([
-      { id: 1, name: '张三', account: '6222 0212 3456 7891', bank: '工商银行' },
-      { id: 2, name: '李四', account: '6222 0212 3456 7892', bank: '建设银行' },
-      { id: 3, name: '王五', account: '6222 0212 3456 7893', bank: '农业银行' },
-      { id: 4, name: '赵六', account: '6222 0212 3456 7894', bank: '中国银行' }
-    ])
-
-    // 模拟最近转账记录
-    const allTransfers = ref([
-      { id: 1, payeeName: '张三', amount: 1000, time: '2024-01-15 10:30', status: 'success' },
-      { id: 2, payeeName: '李四', amount: 2500, time: '2024-01-14 15:20', status: 'success' },
-      { id: 3, payeeName: '王五', amount: 500, time: '2024-01-13 09:15', status: 'pending' },
-      { id: 4, payeeName: '赵六', amount: 3000, time: '2024-01-12 16:45', status: 'success' }
-    ])
+    const accounts = ref([])
+    const recentTransfers = ref([])
 
     const transfer = reactive({
       fromAccount: '',
-      payeeName: '',
-      payeeAccount: '',
-      confirmAccount: '',
+      toAccountNumber: '',
+      toAccountName: '',
+      toBankName: '',
       amount: '',
-      transferType: 'normal',
-      scheduledTime: '',
+      payPassword: '',
       remark: ''
-    })
-
-    const newPayee = reactive({
-      name: '',
-      account: '',
-      bank: ''
-    })
-
-    const accountMismatch = computed(() => {
-      return transfer.confirmAccount && transfer.payeeAccount !== transfer.confirmAccount
     })
 
     const selectedAccount = computed(() => {
@@ -307,7 +211,7 @@ export default {
     })
 
     const selectedAccountName = computed(() => {
-      return selectedAccount.value ? selectedAccount.value.name : ''
+      return selectedAccount.value ? (selectedAccount.value.accountName || '账户') : ''
     })
 
     const insufficientBalance = computed(() => {
@@ -317,56 +221,87 @@ export default {
 
     const canSubmit = computed(() => {
       return transfer.fromAccount && 
-             transfer.payeeName && 
-             transfer.payeeAccount && 
-             transfer.confirmAccount && 
+             transfer.toAccountNumber && 
+             transfer.toAccountName && 
              transfer.amount &&
-             !accountMismatch.value &&
+             transfer.payPassword &&
              !insufficientBalance.value
     })
 
-    const transferTypeName = computed(() => {
-      const types = {
-        normal: '普通转账（2 小时内到账）',
-        fast: '快速转账（实时到账）',
-        scheduled: '预约转账'
-      }
-      return types[transfer.transferType] || ''
-    })
-
-    const transferFee = computed(() => {
-      const amount = parseFloat(transfer.amount) || 0
-      if (transfer.transferType === 'normal') return 0
-      if (transfer.transferType === 'fast') return amount > 5000 ? amount * 0.001 : 0
-      return 0
-    })
-
-    const recentTransfers = computed(() => {
-      return allTransfers.value.slice(0, 5)
-    })
-
     const formatNumber = (num) => {
+      if (!num) return '0.00'
       return Number(num).toLocaleString('zh-CN', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       })
     }
 
-    const resetForm = () => {
-      transfer.fromAccount = ''
-      transfer.payeeName = ''
-      transfer.payeeAccount = ''
-      transfer.confirmAccount = ''
-      transfer.amount = ''
-      transfer.transferType = 'normal'
-      transfer.scheduledTime = ''
-      transfer.remark = ''
+    const formatDateTime = (dateTime) => {
+      if (!dateTime) return '-'
+      const date = new Date(dateTime)
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
     }
 
-    const selectPayee = (payee) => {
-      transfer.payeeName = payee.name
-      transfer.payeeAccount = payee.account.replace(/\s/g, '')
-      transfer.confirmAccount = transfer.payeeAccount
+    const formatAccountLastFour = (accountNumber) => {
+      if (!accountNumber) return '****'
+      const cleanNumber = accountNumber.replace(/\s/g, '')
+      return cleanNumber.slice(-4)
+    }
+
+    const getStatusClass = (status) => {
+      const statusMap = {
+        0: 'failed',
+        1: 'success',
+        2: 'pending'
+      }
+      return statusMap[status] || 'pending'
+    }
+
+    const loadAccounts = async () => {
+      try {
+        const response = await accountApi.getAccounts()
+        const { code, data } = response.data
+        if (code === 1 || code === 200) {
+          accounts.value = data || []
+          // 如果 URL 中有 accountId 参数，默认选中
+          if (route.query.accountId) {
+            transfer.fromAccount = parseInt(route.query.accountId)
+          } else if (data && data.length > 0) {
+            transfer.fromAccount = data[0].id
+          }
+        }
+      } catch (error) {
+        console.error('Load accounts error:', error)
+      }
+    }
+
+    const loadRecentTransfers = async () => {
+      if (!transfer.fromAccount) return
+      try {
+        const response = await transferApi.getTransfers(transfer.fromAccount, { page: 1, size: 5 })
+        const { code, data } = response.data
+        if (code === 1 || code === 200) {
+          recentTransfers.value = data || []
+        }
+      } catch (error) {
+        console.error('Load transfers error:', error)
+      }
+    }
+
+    const resetForm = () => {
+      transfer.fromAccount = ''
+      transfer.toAccountNumber = ''
+      transfer.toAccountName = ''
+      transfer.toBankName = ''
+      transfer.amount = ''
+      transfer.payPassword = ''
+      transfer.remark = ''
     }
 
     const submitTransfer = () => {
@@ -374,66 +309,69 @@ export default {
       showConfirm.value = true
     }
 
-    const confirmTransfer = () => {
-      // 模拟转账操作
-      allTransfers.value.unshift({
-        id: Date.now(),
-        payeeName: transfer.payeeName,
-        amount: parseFloat(transfer.amount),
-        time: new Date().toLocaleString('zh-CN', { 
-          year: 'numeric', 
-          month: '2-digit', 
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit'
-        }),
-        status: 'success'
-      })
-      showConfirm.value = false
-      showSuccess.value = true
-    }
+    const confirmTransfer = async () => {
+      if (!selectedAccount.value) return
+      
+      confirmLoading.value = true
+      try {
+        const transferData = {
+          fromAccountId: transfer.fromAccount,
+          toAccountNumber: transfer.toAccountNumber,
+          toAccountName: transfer.toAccountName,
+          toBankName: transfer.toBankName || '',
+          amount: parseFloat(transfer.amount),
+          remark: transfer.remark || '',
+          payPassword: transfer.payPassword
+        }
 
-    const addPayee = () => {
-      if (newPayee.name && newPayee.account && newPayee.bank) {
-        payees.value.push({
-          id: Date.now(),
-          name: newPayee.name,
-          account: newPayee.account,
-          bank: newPayee.bank
-        })
-        showAddPayee.value = false
-        newPayee.name = ''
-        newPayee.account = ''
-        newPayee.bank = ''
+        const response = await transferApi.executeTransfer(transferData)
+        const { code, data, message } = response.data
+        
+        if (code === 1 || code === 200) {
+          showConfirm.value = false
+          showSuccess.value = true
+          // 刷新转账记录
+          await loadRecentTransfers()
+        } else {
+          proxy.$message.error(message || '转账失败')
+        }
+      } catch (error) {
+        console.error('Transfer error:', error)
+        const message = error.response?.data?.message || '转账失败，请检查密码是否正确'
+        proxy.$message.error(message)
+      } finally {
+        confirmLoading.value = false
       }
     }
 
-    const viewAllHistory = () => {
-      proxy.$message.info('查看完整历史记录功能待实现')
-    }
+    onMounted(() => {
+      loadAccounts()
+    })
+
+    // 监听账户变化，加载转账记录
+    const watch = require('vue').watch
+    watch(() => transfer.fromAccount, () => {
+      loadRecentTransfers()
+    })
 
     return {
       accounts,
-      payees,
       recentTransfers,
       transfer,
-      newPayee,
       showConfirm,
-      showAddPayee,
       showSuccess,
-      accountMismatch,
+      loading,
+      confirmLoading,
       selectedAccountName,
       insufficientBalance,
       canSubmit,
-      transferTypeName,
-      transferFee,
       formatNumber,
+      formatDateTime,
+      formatAccountLastFour,
+      getStatusClass,
       resetForm,
-      selectPayee,
       submitTransfer,
-      confirmTransfer,
-      addPayee,
-      viewAllHistory
+      confirmTransfer
     }
   }
 }
@@ -462,7 +400,7 @@ export default {
   gap: var(--spacing-2xl);
 }
 
-.form-card, .payees-card, .history-card {
+.form-card, .history-card {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-3xl);
@@ -546,51 +484,6 @@ export default {
   font-weight: var(--font-weight-semibold);
 }
 
-.transfer-type-options {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.type-option {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.type-option:hover {
-  border-color: var(--glass-border-hover);
-  background: var(--glass-bg-light);
-}
-
-.type-option input[type="radio"]:checked + .option-content {
-  color: var(--color-white);
-}
-
-.type-option input[type="radio"]:checked ~ .option-content .option-name {
-  color: var(--status-warning);
-}
-
-.option-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.option-name {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-white);
-}
-
-.option-desc {
-  font-size: var(--font-size-xs);
-  color: var(--text-on-gradient-muted);
-}
-
 .form-actions {
   display: flex;
   gap: var(--spacing-lg);
@@ -635,7 +528,7 @@ export default {
   cursor: not-allowed;
 }
 
-/* 收款人列表 */
+/* 历史记录 */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -648,82 +541,6 @@ export default {
   color: var(--color-white);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-}
-
-.add-payee-btn, .view-all-btn {
-  background: var(--glass-bg-light);
-  border: 1px solid var(--glass-border-hover);
-  color: var(--color-white);
-  cursor: pointer;
-  font-size: var(--font-size-xs);
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-xl);
-  transition: all var(--transition-normal);
-}
-
-.add-payee-btn:hover, .view-all-btn:hover {
-  background: var(--glass-border-hover);
-  transform: translateY(-2px);
-}
-
-.payees-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.payee-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xl);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.payee-item:hover {
-  border-color: var(--glass-border-hover);
-  background: var(--glass-bg-light);
-}
-
-.payee-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background: var(--glass-border-hover);
-  color: var(--color-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: var(--font-weight-semibold);
-}
-
-.payee-info {
-  flex: 1;
-}
-
-.payee-name {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-white);
-}
-
-.payee-account {
-  font-size: var(--font-size-xs);
-  color: var(--text-on-gradient-muted);
-}
-
-.payee-bank {
-  font-size: var(--font-size-xs);
-  color: var(--text-on-gradient-secondary);
-}
-
-/* 历史记录 */
-.history-card {
-  margin-top: var(--spacing-2xl);
 }
 
 .history-list {
@@ -766,6 +583,16 @@ export default {
 
 .history-amount.pending {
   color: var(--status-warning);
+}
+
+.history-amount.failed {
+  color: var(--status-danger);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-on-gradient-muted);
 }
 
 /* 弹窗 */

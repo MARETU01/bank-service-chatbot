@@ -8,10 +8,11 @@ import com.maretu.bank.service.IAccountsService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.bank.service.ITransactionsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,10 +24,11 @@ import java.util.List;
  * @since 2026-02-16
  */
 @Service
-@RequiredArgsConstructor
 public class AccountsServiceImpl extends ServiceImpl<AccountsMapper, Accounts> implements IAccountsService {
 
-    private final ITransactionsService transactionsService;
+    @Lazy
+    @Autowired
+    private ITransactionsService transactionsService;
 
     @Override
     public List<Accounts> getAccountsByUserId(Long userId) {

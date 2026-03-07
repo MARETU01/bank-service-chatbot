@@ -1,8 +1,6 @@
 package com.maretu.bank.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.maretu.bank.dto.TransactionQueryReq;
 import com.maretu.bank.pojo.Accounts;
 import com.maretu.bank.pojo.Transactions;
@@ -10,7 +8,8 @@ import com.maretu.bank.mapper.TransactionsMapper;
 import com.maretu.bank.service.IAccountsService;
 import com.maretu.bank.service.ITransactionsService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,10 +25,11 @@ import java.util.List;
  * @since 2026-02-16
  */
 @Service
-@RequiredArgsConstructor
 public class TransactionsServiceImpl extends ServiceImpl<TransactionsMapper, Transactions> implements ITransactionsService {
 
-    private final IAccountsService accountsService;
+    @Lazy
+    @Autowired
+    private IAccountsService accountsService;
 
     @Override
     public Page<Transactions> queryTransactions(Long userId, TransactionQueryReq req) {

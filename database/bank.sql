@@ -9,7 +9,7 @@ CREATE DATABASE IF NOT EXISTS bank_service DEFAULT CHARACTER SET utf8mb4 COLLATE
 USE bank_service;
 
 -- ========================================
--- 账户表 (简化版 - 只保留储蓄账户)
+-- 账户表
 -- ========================================
 CREATE TABLE accounts (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '账户ID',
@@ -26,6 +26,22 @@ CREATE TABLE accounts (
     INDEX idx_user_id (user_id),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='账户表';
+
+-- ========================================
+-- 账户日限额使用表
+-- ========================================
+CREATE TABLE account_daily_limits (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    account_id BIGINT NOT NULL COMMENT '账户ID',
+    limit_date DATE NOT NULL COMMENT '限额日期',
+    daily_limit DECIMAL(15, 2) NOT NULL COMMENT '当日限额快照(来自accounts.daily_limit)',
+    used_amount DECIMAL(15, 2) NOT NULL DEFAULT 0.00 COMMENT '当日已用额度(支出累计)',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_account_date (account_id, limit_date),
+    INDEX idx_limit_date (limit_date),
+    INDEX idx_account_id (account_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='账户日限额使用表';
 
 -- ========================================
 -- 交易记录表

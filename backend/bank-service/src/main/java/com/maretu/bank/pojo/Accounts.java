@@ -63,14 +63,24 @@ public class Accounts implements Serializable {
     private Integer status;
 
     /**
-     * 透支限额
+     * 日转账限额
      */
-    private BigDecimal overdraftLimit;
+    private BigDecimal dailyTransferLimit;
 
     /**
-     * 可用余额
+     * 日取现限额
      */
-    private BigDecimal availableBalance;
+    private BigDecimal dailyWithdrawLimit;
+
+    /**
+     * 单笔转账限额
+     */
+    private BigDecimal singleTransferLimit;
+
+    /**
+     * 单笔取现限额
+     */
+    private BigDecimal singleWithdrawLimit;
 
     /**
      * 创建时间
@@ -81,6 +91,5 @@ public class Accounts implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedAt;
-
 
 }

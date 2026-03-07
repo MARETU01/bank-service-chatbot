@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author maretu
- * @since 2026-02-16
+ * @since 2026-03-07
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -33,7 +33,7 @@ public class Transfers implements Serializable {
     private Long id;
 
     /**
-     * 转账ID
+     * 转账流水号
      */
     private String transferId;
 
@@ -43,29 +43,14 @@ public class Transfers implements Serializable {
     private Long fromAccountId;
 
     /**
-     * 转入账户ID
-     */
-    private Long toAccountId;
-
-    /**
-     * 转出账号
-     */
-    private String fromAccountNumber;
-
-    /**
      * 转入账号
      */
     private String toAccountNumber;
 
     /**
-     * 转入账户名称
+     * 转入账户名
      */
     private String toAccountName;
-
-    /**
-     * 转入银行名称
-     */
-    private String toBankName;
 
     /**
      * 转账金额
@@ -78,17 +63,7 @@ public class Transfers implements Serializable {
     private BigDecimal fee;
 
     /**
-     * 货币类型
-     */
-    private String currency;
-
-    /**
-     * 转账类型: 1-行内转账, 2-跨行转账
-     */
-    private Integer transferType;
-
-    /**
-     * 转账备注
+     * 备注
      */
     private String remark;
 
@@ -96,11 +71,6 @@ public class Transfers implements Serializable {
      * 状态: 0-失败, 1-成功, 2-处理中
      */
     private Integer status;
-
-    /**
-     * 转账时间
-     */
-    private LocalDateTime transferTime;
 
     /**
      * 创建时间

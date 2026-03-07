@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author maretu
- * @since 2026-02-16
+ * @since 2026-03-07
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -43,9 +43,9 @@ public class Accounts implements Serializable {
     private Long userId;
 
     /**
-     * 账户类型: 1-储蓄账户, 2-支票账户, 3-信用卡
+     * 账户名称
      */
-    private Integer accountType;
+    private String accountName;
 
     /**
      * 账户余额
@@ -63,24 +63,9 @@ public class Accounts implements Serializable {
     private Integer status;
 
     /**
-     * 日转账限额
+     * 单日交易限额
      */
-    private BigDecimal dailyTransferLimit;
-
-    /**
-     * 日取现限额
-     */
-    private BigDecimal dailyWithdrawLimit;
-
-    /**
-     * 单笔转账限额
-     */
-    private BigDecimal singleTransferLimit;
-
-    /**
-     * 单笔取现限额
-     */
-    private BigDecimal singleWithdrawLimit;
+    private BigDecimal dailyLimit;
 
     /**
      * 创建时间
@@ -91,5 +76,6 @@ public class Accounts implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedAt;
+
 
 }

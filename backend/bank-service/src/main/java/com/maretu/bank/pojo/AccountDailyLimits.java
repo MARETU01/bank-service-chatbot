@@ -13,22 +13,22 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 账单表
+ * 账户日限额使用表
  * </p>
  *
  * @author maretu
- * @since 2026-02-16
+ * @since 2026-03-07
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("bills")
-public class Bills implements Serializable {
+@TableName("account_daily_limits")
+public class AccountDailyLimits implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 账单ID
+     * 主键
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
@@ -39,49 +39,19 @@ public class Bills implements Serializable {
     private Long accountId;
 
     /**
-     * 账单类型: CREDIT_CARD-信用卡, LOAN-贷款, SERVICE-服务费
+     * 限额日期
      */
-    private String billType;
+    private LocalDate limitDate;
 
     /**
-     * 账单编号
+     * 当日限额快照(来自accounts.daily_limit)
      */
-    private String billNumber;
+    private BigDecimal dailyLimit;
 
     /**
-     * 账单金额
+     * 当日已用额度(支出累计)
      */
-    private BigDecimal billAmount;
-
-    /**
-     * 已付金额
-     */
-    private BigDecimal paidAmount;
-
-    /**
-     * 未付金额
-     */
-    private BigDecimal outstandingAmount;
-
-    /**
-     * 到期日期
-     */
-    private LocalDate dueDate;
-
-    /**
-     * 账单日期
-     */
-    private LocalDate billDate;
-
-    /**
-     * 状态: 0-未付, 1-部分支付, 2-已付, 3-逾期
-     */
-    private Integer status;
-
-    /**
-     * 账单描述
-     */
-    private String description;
+    private BigDecimal usedAmount;
 
     /**
      * 创建时间

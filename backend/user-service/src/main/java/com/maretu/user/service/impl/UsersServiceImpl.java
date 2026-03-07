@@ -161,8 +161,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     @Override
-    public String refresh(Users user, String ip) {
-        Users userInfo = lambdaQuery().eq(Users::getId, user.getId()).one();
+    public String refresh(Integer userId, String ip) {
+        Users userInfo = lambdaQuery().eq(Users::getId, userId).one();
         if (userInfo == null) {
             throw new RuntimeException("user not found");
         }
@@ -179,8 +179,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     @Override
-    public Users getCurrentUser(Users user) {
-        Users userInfo = lambdaQuery().eq(Users::getId, user.getId()).one();
+    public Users getCurrentUser(Integer userId) {
+        Users userInfo = lambdaQuery().eq(Users::getId, userId).one();
         if (userInfo == null) {
             throw new RuntimeException("user not found");
         }
@@ -188,12 +188,12 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     @Override
-    public Users updateProfile(Users currentUser, UpdateProfileReq req) {
-        if (currentUser == null || currentUser.getId() == null) {
+    public Users updateProfile(Integer currentUserId, UpdateProfileReq req) {
+        if (currentUserId == null) {
             throw new RuntimeException("user not found");
         }
 
-        Users userInfo = lambdaQuery().eq(Users::getId, currentUser.getId()).one();
+        Users userInfo = lambdaQuery().eq(Users::getId, currentUserId).one();
         if (userInfo == null) {
             throw new RuntimeException("user not found");
         }

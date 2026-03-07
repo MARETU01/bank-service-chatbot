@@ -57,7 +57,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             }
             String userJson = jacksonObjectMapper.writeValueAsString(context);
             ServerWebExchange newExchange = exchange.mutate()
-                    .request(builder -> builder.header("context-info", userJson))
+                    .request(builder -> builder.header("user-info", userJson))
                     .build();
             return chain.filter(newExchange);
         }

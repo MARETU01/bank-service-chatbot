@@ -22,6 +22,7 @@ public class JwtUtils {
         claims.put("username", context.getUsername());
         claims.put("userId", context.getUserId());
         claims.put("email", context.getEmail());
+        claims.put("ip", context.getIp());
         return claims;
     }
 

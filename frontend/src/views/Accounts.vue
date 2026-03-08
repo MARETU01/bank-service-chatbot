@@ -176,7 +176,7 @@
               <input type="text" v-model="editAccountData.accountName" placeholder="请输入账户名称" required />
             </div>
             <div class="form-group">
-              <label>添加余额 <span class="test-hint">(测试用)</span></label>
+              <label>设置余额 <span class="test-hint">(测试用)</span></label>
               <div class="amount-input">
                 <span class="currency">¥</span>
                 <input type="number" v-model="editAccountData.balance" placeholder="请输入余额" step="0.01" min="0" />

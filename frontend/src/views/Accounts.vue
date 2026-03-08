@@ -3,6 +3,9 @@
     <!-- 账户列表 -->
     <div class="accounts-header">
       <h2>我的账户</h2>
+      <button class="add-btn" @click="showCreateModal = true">
+        <span>+</span> 新建账户
+      </button>
     </div>
 
     <div class="accounts-grid" v-if="accounts.length > 0">
@@ -90,7 +93,80 @@
         </div>
         <div class="modal-footer">
           <button class="btn cancel" @click="selectedAccount = null">关闭</button>
-          <button class="btn primary" @click="transfer(selectedAccount)">转账</button>
+          <button class="btn warning" @click="editAccount(selectedAccount)" v-if="selectedAccount.status === 1">编辑</button>
+          <button class="btn danger" @click="freezeAccount(selectedAccount)" v-if="selectedAccount.status === 1">冻结</button>
+          <button class="btn success" @click="unfreezeAccount(selectedAccount)" v-if="selectedAccount.status === 0">解冻</button>
+          <button class="btn primary" @click="transfer(selectedAccount)" v-if="selectedAccount.status === 1">转账</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 创建账户弹窗 -->
+    <div class="modal-overlay" v-if="showCreateModal" @click="showCreateModal = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>新建账户</h3>
+          <button class="close-btn" @click="showCreateModal = false">×</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="createAccount">
+            <div class="form-group">
+              <label>账户名称 <span class="required">*</span></label>
+              <input type="text" v-model="newAccount.accountName" placeholder="请输入账户名称" required />
+            </div>
+            <div class="form-group">
+              <label>币种</label>
+              <select v-model="newAccount.currency">
+                <option value="CNY">人民币 (CNY)</option>
+                <option value="USD">美元 (USD)</option>
+                <option value="EUR">欧元 (EUR)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>单日交易限额</label>
+              <div class="amount-input">
+                <span class="currency">¥</span>
+                <input type="number" v-model="newAccount.dailyLimit" placeholder="请输入限额" step="0.01" min="0" />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn cancel" @click="showCreateModal = false">取消</button>
+          <button class="btn primary" @click="createAccount" :disabled="createLoading">
+            {{ createLoading ? '创建中...' : '确认创建' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 编辑账户弹窗 -->
+    <div class="modal-overlay" v-if="showEditModal" @click="showEditModal = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>编辑账户</h3>
+          <button class="close-btn" @click="showEditModal = false">×</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="updateAccount">
+            <div class="form-group">
+              <label>账户名称 <span class="required">*</span></label>
+              <input type="text" v-model="editAccountData.accountName" placeholder="请输入账户名称" required />
+            </div>
+            <div class="form-group">
+              <label>单日交易限额</label>
+              <div class="amount-input">
+                <span class="currency">¥</span>
+                <input type="number" v-model="editAccountData.dailyLimit" placeholder="请输入限额" step="0.01" min="0" />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn cancel" @click="showEditModal = false">取消</button>
+          <button class="btn primary" @click="updateAccount" :disabled="editLoading">
+            {{ editLoading ? '保存中...' : '保存' }}
+          </button>
         </div>
       </div>
     </div>
@@ -98,7 +174,7 @@
 </template>
 
 <script>
-import { ref, onMounted, getCurrentInstance } from 'vue'
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
 import { accountApi } from '@/api/api'
 
@@ -110,6 +186,24 @@ export default {
     const selectedAccount = ref(null)
     const accounts = ref([])
     const loading = ref(false)
+    
+    // 创建账户相关
+    const showCreateModal = ref(false)
+    const createLoading = ref(false)
+    const newAccount = reactive({
+      accountName: '',
+      currency: 'CNY',
+      dailyLimit: 50000
+    })
+    
+    // 编辑账户相关
+    const showEditModal = ref(false)
+    const editLoading = ref(false)
+    const editAccountData = reactive({
+      id: null,
+      accountName: '',
+      dailyLimit: 0
+    })
 
     const formatNumber = (num) => {
       if (!num) return '0.00'
@@ -185,6 +279,120 @@ export default {
     const transfer = (account) => {
       router.push(`/transfers?accountId=${account.id}`)
     }
+    
+    // 创建账户
+    const createAccount = async () => {
+      if (!newAccount.accountName) {
+        proxy.$message.error('请输入账户名称')
+        return
+      }
+      
+      createLoading.value = true
+      try {
+        const response = await accountApi.createAccount({
+          accountName: newAccount.accountName,
+          currency: newAccount.currency,
+          dailyLimit: newAccount.dailyLimit
+        })
+        const { code, data, message } = response.data
+        if (code === 1 || code === 200) {
+          proxy.$message.success('账户创建成功')
+          showCreateModal.value = false
+          // 重置表单
+          newAccount.accountName = ''
+          newAccount.currency = 'CNY'
+          newAccount.dailyLimit = 50000
+          // 刷新列表
+          await loadAccounts()
+        } else {
+          proxy.$message.error(message || '创建账户失败')
+        }
+      } catch (error) {
+        console.error('Create account error:', error)
+        proxy.$message.error('创建账户失败')
+      } finally {
+        createLoading.value = false
+      }
+    }
+    
+    // 编辑账户
+    const editAccount = (account) => {
+      editAccountData.id = account.id
+      editAccountData.accountName = account.accountName || ''
+      editAccountData.dailyLimit = account.dailyLimit || 0
+      selectedAccount.value = null
+      showEditModal.value = true
+    }
+    
+    // 更新账户
+    const updateAccount = async () => {
+      if (!editAccountData.accountName) {
+        proxy.$message.error('请输入账户名称')
+        return
+      }
+      
+      editLoading.value = true
+      try {
+        const response = await accountApi.updateAccount(editAccountData.id, {
+          accountName: editAccountData.accountName,
+          dailyLimit: editAccountData.dailyLimit
+        })
+        const { code, data, message } = response.data
+        if (code === 1 || code === 200) {
+          proxy.$message.success('账户更新成功')
+          showEditModal.value = false
+          // 刷新列表
+          await loadAccounts()
+        } else {
+          proxy.$message.error(message || '更新账户失败')
+        }
+      } catch (error) {
+        console.error('Update account error:', error)
+        proxy.$message.error('更新账户失败')
+      } finally {
+        editLoading.value = false
+      }
+    }
+    
+    // 冻结账户
+    const freezeAccount = async (account) => {
+      if (!confirm('确定要冻结该账户吗？冻结后将无法进行交易。')) {
+        return
+      }
+      
+      try {
+        const response = await accountApi.updateStatus(account.id, 0)
+        const { code, message } = response.data
+        if (code === 1 || code === 200) {
+          proxy.$message.success('账户已冻结')
+          selectedAccount.value = null
+          await loadAccounts()
+        } else {
+          proxy.$message.error(message || '冻结账户失败')
+        }
+      } catch (error) {
+        console.error('Freeze account error:', error)
+        proxy.$message.error('冻结账户失败')
+      }
+    }
+    
+    // 解冻账户
+    const unfreezeAccount = async (account) => {
+      try {
+        const response = await accountApi.updateStatus(account.id, 1)
+        const { code, message } = response.data
+        if (code === 1 || code === 200) {
+          proxy.$message.success('账户已解冻')
+          selectedAccount.value = null
+          await loadAccounts()
+        } else {
+          proxy.$message.error(message || '解冻账户失败')
+        }
+      } catch (error) {
+        console.error('Unfreeze account error:', error)
+        proxy.$message.error('解冻账户失败')
+      }
+    }
 
     onMounted(() => {
       loadAccounts()
@@ -193,13 +401,24 @@ export default {
     return {
       accounts,
       selectedAccount,
+      showCreateModal,
+      createLoading,
+      newAccount,
+      showEditModal,
+      editLoading,
+      editAccountData,
       formatNumber,
       formatAccountNumber,
       formatDateTime,
       getStatusClass,
       getStatusText,
       viewDetail,
-      transfer
+      transfer,
+      createAccount,
+      editAccount,
+      updateAccount,
+      freezeAccount,
+      unfreezeAccount
     }
   }
 }
@@ -563,6 +782,98 @@ export default {
   background: var(--glass-bg-active);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn.warning {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.btn.warning:hover {
+  background: rgba(255, 193, 7, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn.danger {
+  background: rgba(239, 83, 80, 0.2);
+  color: #ef5350;
+  border: 1px solid rgba(239, 83, 80, 0.3);
+}
+
+.btn.danger:hover {
+  background: rgba(239, 83, 80, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn.success {
+  background: rgba(56, 239, 125, 0.2);
+  color: #38ef7d;
+  border: 1px solid rgba(56, 239, 125, 0.3);
+}
+
+.btn.success:hover {
+  background: rgba(56, 239, 125, 0.3);
+  transform: translateY(-2px);
+}
+
+/* 表单样式 */
+.form-group {
+  margin-bottom: var(--spacing-xl);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-on-gradient);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.form-group label .required {
+  color: var(--status-danger);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-md);
+  box-sizing: border-box;
+  background: var(--input-bg);
+  color: var(--color-white);
+  transition: all var(--transition-normal);
+}
+
+.form-group select option {
+  background: #667eea;
+  color: var(--color-white);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--input-border-focus);
+  background: var(--input-bg-focus);
+}
+
+.amount-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.amount-input .currency {
+  position: absolute;
+  left: var(--spacing-lg);
+  color: var(--text-on-gradient-muted);
+  font-size: var(--font-size-lg);
+}
+
+.amount-input input {
+  padding-left: 30px;
 }
 
 /* 响应式设计 */

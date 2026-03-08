@@ -179,7 +179,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
+import { ref, reactive, computed, onMounted, getCurrentInstance, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { accountApi, transferApi } from '@/api/api'
 
@@ -349,7 +349,6 @@ export default {
     })
 
     // 监听账户变化，加载转账记录
-    const watch = require('vue').watch
     watch(() => transfer.fromAccount, () => {
       loadRecentTransfers()
     })

@@ -1,7 +1,6 @@
 package com.maretu.user.service.impl;
 
 import com.maretu.common.dto.Context;
-import com.maretu.common.utils.DesensitizeUtils;
 import com.maretu.common.utils.JwtUtils;
 import com.maretu.common.utils.RedisConstants;
 import com.maretu.user.dto.ResetPasswordReq;
@@ -184,7 +183,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         if (userInfo == null) {
             throw new RuntimeException("user not found");
         }
-        return maskUserForResponse(userInfo);
+        return userInfo.setPassword(null);
     }
 
     @Override
@@ -228,13 +227,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         }
 
         if (!needUpdate) {
-            return maskUserForResponse(userInfo);
+            return userInfo.setPassword(null);
         }
 
         updateById(userInfo);
 
         Users updated = lambdaQuery().eq(Users::getId, userInfo.getId()).one();
-        return maskUserForResponse(updated);
+        return updated.setPassword(null);
     }
 
     @Async("virtualThreadPoolExecutor")
@@ -253,13 +252,4 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         updateById(user);
     }
 
-    private Users maskUserForResponse(Users user) {
-        if (user == null) {
-            return null;
-        }
-        return user.setPassword(null)
-                .setRealName(DesensitizeUtils.maskRealName(user.getRealName()))
-                .setPhone(DesensitizeUtils.maskPhone(user.getPhone()))
-                .setEmail(DesensitizeUtils.maskEmail(user.getEmail()));
-    }
 }

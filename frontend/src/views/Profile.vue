@@ -33,21 +33,34 @@
             <div class="info-item">
               <label>📝 真实姓名</label>
               <div class="info-value">
-                <span v-if="!isEditing">{{ userInfo.realName || '未设置' }}</span>
+                <template v-if="!isEditing">
+                  <span>{{ getMaskedRealName() || '未设置' }}</span>
+                  <button class="eye-btn" @click="showRealName = !showRealName" :title="showRealName ? '隐藏' : '显示'" v-if="userInfo.realName">
+                    {{ showRealName ? '👁️' : '👁️‍🗨️' }}
+                  </button>
+                </template>
                 <input v-if="isEditing" v-model="editForm.realName" type="text" class="edit-input" />
               </div>
             </div>
             <div class="info-item">
               <label>📱 手机号码</label>
               <div class="info-value">
-                <span v-if="!isEditing">{{ formatPhone(userInfo.phone) }}</span>
+                <template v-if="!isEditing">
+                  <span>{{ getMaskedPhone() || '未设置' }}</span>
+                  <button class="eye-btn" @click="showPhone = !showPhone" :title="showPhone ? '隐藏' : '显示'" v-if="userInfo.phone">
+                    {{ showPhone ? '👁️' : '👁️‍🗨️' }}
+                  </button>
+                </template>
                 <input v-if="isEditing" v-model="editForm.phone" type="text" class="edit-input" />
               </div>
             </div>
             <div class="info-item">
               <label>📧 电子邮箱</label>
               <div class="info-value">
-                <span>{{ userInfo.email }}</span>
+                <span>{{ getMaskedEmail() }}</span>
+                <button class="eye-btn" @click="showEmail = !showEmail" :title="showEmail ? '隐藏' : '显示'" v-if="userInfo.email">
+                  {{ showEmail ? '👁️' : '👁️‍🗨️' }}
+                </button>
               </div>
             </div>
             <div class="info-item">
@@ -252,6 +265,7 @@
 import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
 import { useStore } from 'vuex'
 import { accountApi, userApi } from '@/api/api'
+import { maskRealName, maskPhone, maskEmail } from '@/utils/desensitize'
 
 export default {
   name: 'Profile',
@@ -267,6 +281,11 @@ export default {
     const verifyEmailLoading = ref(false)
     const countdown = ref(0)
     const emailCountdown = ref(0)
+    
+    // 敏感信息显示状态
+    const showRealName = ref(false)
+    const showPhone = ref(false)
+    const showEmail = ref(false)
 
     const userInfo = ref({
       id: '',
@@ -332,6 +351,21 @@ export default {
         return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
       }
       return phone
+    }
+    
+    // 获取脱敏后的真实姓名
+    const getMaskedRealName = () => {
+      return showRealName.value ? userInfo.value.realName : maskRealName(userInfo.value.realName)
+    }
+    
+    // 获取脱敏后的手机号
+    const getMaskedPhone = () => {
+      return showPhone.value ? userInfo.value.phone : maskPhone(userInfo.value.phone)
+    }
+    
+    // 获取脱敏后的邮箱
+    const getMaskedEmail = () => {
+      return showEmail.value ? userInfo.value.email : maskEmail(userInfo.value.email)
     }
 
     const formatDateTime = (dateTime) => {
@@ -625,6 +659,12 @@ export default {
       formatDateTime,
       getStatusClass,
       getStatusText,
+      showRealName,
+      showPhone,
+      showEmail,
+      getMaskedRealName,
+      getMaskedPhone,
+      getMaskedEmail,
       toggleEdit,
       saveProfile,
       sendPhoneCode,
@@ -750,6 +790,27 @@ export default {
   font-size: 16px;
   color: var(--color-white);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 小眼睛按钮样式 */
+.eye-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all var(--transition-normal);
+  opacity: 0.7;
+}
+
+.eye-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
 }
 
 .status-success {

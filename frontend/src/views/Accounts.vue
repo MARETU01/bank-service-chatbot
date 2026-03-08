@@ -18,11 +18,23 @@
           <span class="account-status" :class="getStatusClass(account.status)">{{ getStatusText(account.status) }}</span>
         </div>
         <div class="account-number">
-          <span>{{ formatAccountNumber(account.accountNumber) }}</span>
+          <div class="account-number-row">
+            <span>{{ getDisplayAccountNumber(account) }}</span>
+            <button class="eye-btn" @click.stop="toggleAccountNumber(account.id)" :title="showAccountNumber[account.id] ? '隐藏' : '显示'">
+              {{ showAccountNumber[account.id] ? '👁️' : '👁️‍🗨️' }}
+            </button>
+          </div>
         </div>
         <div class="account-balance">
-          <span class="balance-label">可用余额</span>
-          <span class="balance-amount">¥ {{ formatNumber(account.balance) }}</span>
+          <div class="balance-row">
+            <div class="balance-label-row">
+              <span class="balance-label">可用余额</span>
+              <button class="eye-btn" @click.stop="toggleBalance(account.id)" :title="showBalance[account.id] ? '隐藏' : '显示'">
+                {{ showBalance[account.id] ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
+            <span class="balance-amount">¥ {{ getDisplayBalance(account) }}</span>
+          </div>
         </div>
         <div class="account-info">
           <div class="info-item">
@@ -624,8 +636,26 @@ export default {
   letter-spacing: 2px;
 }
 
+.account-number-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
 .account-balance {
   margin-bottom: var(--spacing-xl);
+}
+
+.balance-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.balance-label-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .balance-label {

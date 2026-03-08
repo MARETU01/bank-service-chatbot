@@ -59,6 +59,16 @@ public class AccountsServiceImpl extends ServiceImpl<AccountsMapper, Accounts> i
     }
 
     @Override
+    public List<Long> getAccountIdsByUserId(Long userId) {
+        return lambdaQuery()
+                .eq(Accounts::getUserId, userId)
+                .list()
+                .stream()
+                .map(Accounts::getId)
+                .toList();
+    }
+
+    @Override
     public Accounts getAccountByIdAndUserId(Long accountId, Long userId) {
         return lambdaQuery()
                 .eq(Accounts::getId, accountId)

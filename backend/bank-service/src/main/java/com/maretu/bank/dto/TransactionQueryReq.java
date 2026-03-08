@@ -44,4 +44,14 @@ public class TransactionQueryReq {
      * 每页数量
      */
     private Integer size = 10;
+
+    /**
+     * 是否查询所有账户的交易记录
+     */
+    private Boolean allAccounts = false;
+
+    /**
+     * 用户 ID（当 allAccounts=true 时使用）
+     */
+    private Long userId;
 }

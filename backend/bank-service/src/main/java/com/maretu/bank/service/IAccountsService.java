@@ -22,12 +22,17 @@ public interface IAccountsService extends IService<Accounts> {
     Accounts createAccount(Long userId, Accounts req);
 
     /**
-     * 根据用户ID获取账户列表
+     * 根据用户 ID 获取账户列表
      */
     List<Accounts> getAccountsByUserId(Long userId);
 
     /**
-     * 根据账户ID和用户ID获取账户（验证归属）
+     * 根据用户 ID 获取账户 ID 列表
+     */
+    List<Long> getAccountIdsByUserId(Long userId);
+
+    /**
+     * 根据账户 ID 和用户 ID 获取账户（验证归属）
      */
     Accounts getAccountByIdAndUserId(Long accountId, Long userId);
 

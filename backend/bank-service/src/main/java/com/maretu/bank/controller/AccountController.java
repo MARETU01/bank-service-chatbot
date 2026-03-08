@@ -88,13 +88,16 @@ public class AccountController {
                                                       @RequestParam(value = "startDate", required = false) String startDate,
                                                       @RequestParam(value = "endDate", required = false) String endDate,
                                                       @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                      @RequestParam(value = "size", defaultValue = "10") Integer size) throws JsonProcessingException {
+                                                      @RequestParam(value = "size", defaultValue = "10") Integer size,
+                                                      @RequestParam(value = "allAccounts", defaultValue = "false") Boolean allAccounts) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
-            // 验证账户归属
-            Accounts account = accountsService.getAccountByIdAndUserId(accountId, context.getUserId().longValue());
-            if (account == null) {
-                return Result.failure("账户不存在或无权访问");
+            if (!allAccounts) {
+                // 验证账户归属
+                Accounts account = accountsService.getAccountByIdAndUserId(accountId, context.getUserId().longValue());
+                if (account == null) {
+                    return Result.failure("账户不存在或无权访问");
+                }
             }
             
             TransactionQueryReq req = new TransactionQueryReq()
@@ -104,7 +107,13 @@ public class AccountController {
                     .setStartDate(startDate)
                     .setEndDate(endDate)
                     .setPage(page)
-                    .setSize(size);
+                    .setSize(size)
+                    .setAllAccounts(allAccounts);
+            
+            // 如果查询所有账户，传入 userId
+            if (allAccounts) {
+                req.setUserId(context.getUserId().longValue());
+            }
             
             return Result.success(transactionsService.queryTransactions(req));
         } catch (Exception e) {

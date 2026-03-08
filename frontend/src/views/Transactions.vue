@@ -173,7 +173,7 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
+import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
 import { accountApi, transactionApi } from '@/api/api'
 
 export default {

@@ -24,6 +24,20 @@
           
           <div class="info-grid">
             <div class="info-item">
+              <label>👤 用户名</label>
+              <div class="info-value">
+                <span v-if="!isEditing">{{ userInfo.username }}</span>
+                <input v-if="isEditing" v-model="editForm.username" type="text" class="edit-input" />
+              </div>
+            </div>
+            <div class="info-item">
+              <label>📝 真实姓名</label>
+              <div class="info-value">
+                <span v-if="!isEditing">{{ userInfo.realName || '未设置' }}</span>
+                <input v-if="isEditing" v-model="editForm.realName" type="text" class="edit-input" />
+              </div>
+            </div>
+            <div class="info-item">
               <label>📱 手机号码</label>
               <div class="info-value">
                 <span v-if="!isEditing">{{ formatPhone(userInfo.phone) }}</span>
@@ -33,8 +47,7 @@
             <div class="info-item">
               <label>📧 电子邮箱</label>
               <div class="info-value">
-                <span v-if="!isEditing">{{ userInfo.email }}</span>
-                <input v-if="isEditing" v-model="editForm.email" type="email" class="edit-input" />
+                <span>{{ userInfo.email }}</span>
               </div>
             </div>
             <div class="info-item">
@@ -77,7 +90,7 @@
                 <p>{{ userInfo.phoneVerified ? '已验证：' + formatPhone(userInfo.phone) : '未验证' }}</p>
               </div>
             </div>
-            <button class="action-btn" v-if="!userInfo.phoneVerified" @click="verifyPhone">验证</button>
+            <button class="action-btn" v-if="!userInfo.phoneVerified" @click="showVerifyPhone = true">验证</button>
             <span class="verified-badge" v-else>✓ 已验证</span>
           </div>
           <div class="security-item">
@@ -88,7 +101,7 @@
                 <p>{{ userInfo.emailVerified ? '已验证：' + userInfo.email : '未验证' }}</p>
               </div>
             </div>
-            <button class="action-btn" v-if="!userInfo.emailVerified" @click="verifyEmail">验证</button>
+            <button class="action-btn" v-if="!userInfo.emailVerified" @click="showVerifyEmail = true">验证</button>
             <span class="verified-badge" v-else>✓ 已验证</span>
           </div>
         </div>
@@ -170,14 +183,75 @@
         </div>
       </div>
     </div>
+
+    <!-- 手机验证弹窗 -->
+    <div class="modal-overlay" v-if="showVerifyPhone" @click="showVerifyPhone = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>📱 手机验证</h3>
+          <button class="close-btn" @click="showVerifyPhone = false">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>手机号码</label>
+            <input type="text" v-model="verifyPhoneForm.phone" placeholder="请输入手机号码" />
+          </div>
+          <div class="form-group">
+            <label>验证码</label>
+            <div class="code-input-group">
+              <input type="text" v-model="verifyPhoneForm.code" placeholder="请输入验证码" maxlength="6" />
+              <button class="send-code-btn" @click="sendPhoneCode" :disabled="countdown > 0">
+                {{ countdown > 0 ? countdown + 's' : '发送验证码' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" @click="showVerifyPhone = false">取消</button>
+          <button class="confirm-btn" @click="submitPhoneVerify" :disabled="verifyPhoneLoading">
+            {{ verifyPhoneLoading ? '验证中...' : '确认验证' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 邮箱验证弹窗 -->
+    <div class="modal-overlay" v-if="showVerifyEmail" @click="showVerifyEmail = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>📧 邮箱验证</h3>
+          <button class="close-btn" @click="showVerifyEmail = false">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>邮箱地址</label>
+            <input type="email" v-model="verifyEmailForm.email" placeholder="请输入邮箱地址" />
+          </div>
+          <div class="form-group">
+            <label>验证码</label>
+            <div class="code-input-group">
+              <input type="text" v-model="verifyEmailForm.code" placeholder="请输入验证码" maxlength="6" />
+              <button class="send-code-btn" @click="sendEmailCode" :disabled="emailCountdown > 0">
+                {{ emailCountdown > 0 ? emailCountdown + 's' : '发送验证码' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" @click="showVerifyEmail = false">取消</button>
+          <button class="confirm-btn" @click="submitEmailVerify" :disabled="verifyEmailLoading">
+            {{ verifyEmailLoading ? '验证中...' : '确认验证' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
 import { useStore } from 'vuex'
-import { accountApi } from '@/api/api'
-import http from '@/http'
+import { accountApi, userApi } from '@/api/api'
 
 export default {
   name: 'Profile',
@@ -186,7 +260,13 @@ export default {
     const store = useStore()
     const isEditing = ref(false)
     const showChangePassword = ref(false)
+    const showVerifyPhone = ref(false)
+    const showVerifyEmail = ref(false)
     const changePasswordLoading = ref(false)
+    const verifyPhoneLoading = ref(false)
+    const verifyEmailLoading = ref(false)
+    const countdown = ref(0)
+    const emailCountdown = ref(0)
 
     const userInfo = ref({
       id: '',
@@ -202,15 +282,27 @@ export default {
 
     const accounts = ref([])
 
+    // 编辑表单 - 对应 UpdateProfileReq {username, phone, realName}
     const editForm = reactive({
+      username: '',
       phone: '',
-      email: ''
+      realName: ''
     })
 
     const passwordForm = reactive({
       oldPassword: '',
       newPassword: '',
       confirmPassword: ''
+    })
+
+    const verifyPhoneForm = reactive({
+      phone: '',
+      code: ''
+    })
+
+    const verifyEmailForm = reactive({
+      email: '',
+      code: ''
     })
 
     const userAvatar = computed(() => {
@@ -262,6 +354,33 @@ export default {
       return status === 1 ? '正常' : '异常'
     }
 
+    // 倒计时定时器
+    let countdownTimer = null
+
+    const startCountdown = () => {
+      countdown.value = 60
+      if (countdownTimer) clearInterval(countdownTimer)
+      countdownTimer = setInterval(() => {
+        if (countdown.value > 0) {
+          countdown.value--
+        } else {
+          clearInterval(countdownTimer)
+        }
+      }, 1000)
+    }
+
+    const startEmailCountdown = () => {
+      emailCountdown.value = 60
+      if (countdownTimer) clearInterval(countdownTimer)
+      countdownTimer = setInterval(() => {
+        if (emailCountdown.value > 0) {
+          emailCountdown.value--
+        } else {
+          clearInterval(countdownTimer)
+        }
+      }, 1000)
+    }
+
     const loadUserInfo = async () => {
       try {
         // 从 Vuex 获取用户信息
@@ -280,8 +399,12 @@ export default {
             createdAt: user.createdAt
           }
           // 同步编辑表单
+          editForm.username = user.username || ''
           editForm.phone = user.phone || ''
-          editForm.email = user.email || ''
+          editForm.realName = user.realName || ''
+          // 同步验证表单
+          verifyPhoneForm.phone = user.phone || ''
+          verifyEmailForm.email = user.email || ''
         }
       } catch (error) {
         console.error('Load user info error:', error)
@@ -308,58 +431,126 @@ export default {
       }
     }
 
+    // 保存个人资料 - 调用后端 /users/profile 接口
     const saveProfile = async () => {
+      // 验证必填字段
+      if (!editForm.username) {
+        proxy.$message.warning('用户名不能为空')
+        return
+      }
+
       try {
-        const response = await http.put('/users/profile', {
+        // 使用 userApi.updateProfile 调用后端接口
+        // UpdateProfileReq: {username, phone, realName}
+        const response = await userApi.updateProfile({
+          username: editForm.username,
           phone: editForm.phone,
-          email: editForm.email
+          realName: editForm.realName
         })
         const { code, data, message } = response.data
         if (code === 1 || code === 200) {
+          // 更新本地用户信息
+          userInfo.value.username = editForm.username
           userInfo.value.phone = editForm.phone
-          userInfo.value.email = editForm.email
+          userInfo.value.realName = editForm.realName
+          // 更新 Vuex 中的用户信息
+          store.commit('SET_USER', data)
           proxy.$message.success('个人信息保存成功！')
         } else {
           proxy.$message.error(message || '保存失败')
         }
       } catch (error) {
         console.error('Save profile error:', error)
-        proxy.$message.error('保存失败，请重试')
+        proxy.$message.error(error.response?.data?.message || '保存失败，请重试')
       } finally {
         isEditing.value = false
       }
     }
 
-    const verifyPhone = async () => {
+    // 发送手机验证码
+    const sendPhoneCode = async () => {
+      if (!verifyPhoneForm.phone) {
+        proxy.$message.warning('请输入手机号码')
+        return
+      }
       try {
-        const response = await http.post('/users/code', { type: 'phone' })
+        const response = await userApi.sendCode('phone', verifyPhoneForm.phone)
         const { code, message } = response.data
         if (code === 1 || code === 200) {
           proxy.$message.success('验证码已发送')
+          startCountdown()
         } else {
           proxy.$message.error(message || '发送失败')
         }
       } catch (error) {
-        console.error('Verify phone error:', error)
-        proxy.$message.error('发送验证码失败')
+        console.error('Send phone code error:', error)
+        proxy.$message.error(error.response?.data?.message || '发送验证码失败')
       }
     }
 
-    const verifyEmail = async () => {
+    // 发送邮箱验证码
+    const sendEmailCode = async () => {
+      if (!verifyEmailForm.email) {
+        proxy.$message.warning('请输入邮箱地址')
+        return
+      }
       try {
-        const response = await http.post('/users/code', { type: 'email' })
+        const response = await userApi.sendCode('email', null, verifyEmailForm.email)
         const { code, message } = response.data
         if (code === 1 || code === 200) {
           proxy.$message.success('验证码已发送到邮箱')
+          startEmailCountdown()
         } else {
           proxy.$message.error(message || '发送失败')
         }
       } catch (error) {
-        console.error('Verify email error:', error)
-        proxy.$message.error('发送验证码失败')
+        console.error('Send email code error:', error)
+        proxy.$message.error(error.response?.data?.message || '发送验证码失败')
       }
     }
 
+    // 提交手机验证
+    const submitPhoneVerify = async () => {
+      if (!verifyPhoneForm.phone || !verifyPhoneForm.code) {
+        proxy.$message.warning('请填写完整信息')
+        return
+      }
+      verifyPhoneLoading.value = true
+      try {
+        // 后端接口需要验证码参数
+        const response = await userApi.sendCode('phone', verifyPhoneForm.phone)
+        // 注意：这里需要后端提供验证验证码的接口
+        // 暂时调用发送验证码接口作为示例，实际应该调用验证接口
+        proxy.$message.success('手机验证功能待完善，请联系管理员')
+        showVerifyPhone.value = false
+      } catch (error) {
+        console.error('Phone verify error:', error)
+        proxy.$message.error(error.response?.data?.message || '验证失败')
+      } finally {
+        verifyPhoneLoading.value = false
+      }
+    }
+
+    // 提交邮箱验证
+    const submitEmailVerify = async () => {
+      if (!verifyEmailForm.email || !verifyEmailForm.code) {
+        proxy.$message.warning('请填写完整信息')
+        return
+      }
+      verifyEmailLoading.value = true
+      try {
+        const response = await userApi.sendCode('email', null, verifyEmailForm.email)
+        proxy.$message.success('邮箱验证功能待完善，请联系管理员')
+        showVerifyEmail.value = false
+      } catch (error) {
+        console.error('Email verify error:', error)
+        proxy.$message.error(error.response?.data?.message || '验证失败')
+      } finally {
+        verifyEmailLoading.value = false
+      }
+    }
+
+    // 修改密码 - 调用后端 /users/reset-password 接口
     const changePassword = async () => {
       if (!passwordForm.oldPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
         proxy.$message.warning('请填写所有密码字段')
@@ -376,7 +567,8 @@ export default {
 
       changePasswordLoading.value = true
       try {
-        const response = await http.post('/users/reset-password', {
+        // 根据后端接口，修改密码不需要验证码（已登录状态）
+        const response = await userApi.changePassword({
           oldPassword: passwordForm.oldPassword,
           newPassword: passwordForm.newPassword
         })
@@ -392,7 +584,7 @@ export default {
         }
       } catch (error) {
         console.error('Change password error:', error)
-        proxy.$message.error('修改失败，请检查当前密码是否正确')
+        proxy.$message.error(error.response?.data?.message || '修改失败，请检查当前密码是否正确')
       } finally {
         changePasswordLoading.value = false
       }
@@ -403,14 +595,29 @@ export default {
       loadAccounts()
     })
 
+    // 清理定时器
+    onMounted(() => {
+      return () => {
+        if (countdownTimer) clearInterval(countdownTimer)
+      }
+    })
+
     return {
       isEditing,
       showChangePassword,
+      showVerifyPhone,
+      showVerifyEmail,
       changePasswordLoading,
+      verifyPhoneLoading,
+      verifyEmailLoading,
+      countdown,
+      emailCountdown,
       userInfo,
       accounts,
       editForm,
       passwordForm,
+      verifyPhoneForm,
+      verifyEmailForm,
       userAvatar,
       totalAssets,
       formatNumber,
@@ -420,8 +627,10 @@ export default {
       getStatusText,
       toggleEdit,
       saveProfile,
-      verifyPhone,
-      verifyEmail,
+      sendPhoneCode,
+      sendEmailCode,
+      submitPhoneVerify,
+      submitEmailVerify,
       changePassword
     }
   }
@@ -834,6 +1043,39 @@ export default {
 
 .form-group input::placeholder {
   color: var(--text-on-gradient-muted);
+}
+
+.code-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.code-input-group input {
+  flex: 1;
+}
+
+.send-code-btn {
+  padding: 12px 16px;
+  background: var(--glass-bg-hover);
+  border: 1px solid var(--glass-border-hover);
+  color: var(--color-white);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all var(--transition-normal);
+}
+
+.send-code-btn:hover:not(:disabled) {
+  background: var(--glass-bg-active);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.send-code-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .modal-footer {

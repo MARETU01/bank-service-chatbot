@@ -68,10 +68,48 @@ export const userApi = {
   },
 
   /**
-   * 更新用户信息
+   * 更新用户资料
+   * @param {object} data - 更新数据 {username, phone, realName}
    */
-  updateUserInfo: async (data) => {
-    return await http.put('/users/me', data)
+  updateProfile: async (data) => {
+    return await http.put('/users/profile', data)
+  },
+
+  /**
+   * 发送验证码
+   * @param {string} type - 验证码类型：'phone' 或 'email'
+   * @param {string} phone - 手机号（可选）
+   * @param {string} email - 邮箱（可选）
+   */
+  sendCode: async (type, phone = null, email = null) => {
+    const body = {}
+    if (phone) body.phone = phone
+    if (email) body.email = email
+    return await http.post('/users/code', body, { params: { type } })
+  },
+
+  /**
+   * 重置密码（需要验证码）
+   * @param {object} data - 重置数据 {oldPassword, newPassword}
+   * @param {string} verifyCode - 验证码
+   */
+  resetPassword: async (data, verifyCode) => {
+    return await http.post('/users/reset-password', data, { params: { verifyCode } })
+  },
+
+  /**
+   * 修改密码（登录后）
+   * @param {object} data - 修改数据 {oldPassword, newPassword}
+   */
+  changePassword: async (data) => {
+    return await http.post('/users/reset-password', data)
+  },
+
+  /**
+   * 刷新 Token
+   */
+  refreshToken: async () => {
+    return await http.post('/users/refresh', {})
   }
 }
 

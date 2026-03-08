@@ -327,7 +327,7 @@ export default {
     const loadRecentTransfers = async () => {
       if (!transfer.fromAccount) return
       try {
-        const response = await transferApi.getTransfers(transfer.fromAccount, { page: 1, size: 5 })
+        const response = await transferApi.getTransfers({ accountId: transfer.fromAccount, page: 1, size: 5 })
         const { code, data } = response.data
         if (code === 1 || code === 200) {
           recentTransfers.value = data || []

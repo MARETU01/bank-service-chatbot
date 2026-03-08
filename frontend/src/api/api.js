@@ -56,11 +56,10 @@ export const accountApi = {
 export const transactionApi = {
   /**
    * 获取交易记录
-   * @param {number} accountId - 账户 ID
-   * @param {object} params - 查询参数 {type, status, startDate, endDate, page, size}
+   * @param {object} params - 查询参数 {accountId, type, status, startDate, endDate, page, size, allAccounts}
    */
-  getTransactions: async (accountId, params = {}) => {
-    return await http.get(`/accounts/${accountId}/transactions`, { params })
+  getTransactions: async (params = {}) => {
+    return await http.get('/transactions', { params })
   }
 }
 
@@ -68,11 +67,10 @@ export const transactionApi = {
 export const transferApi = {
   /**
    * 获取转账记录
-   * @param {number} accountId - 账户 ID
-   * @param {object} params - 查询参数 {page, size}
+   * @param {object} params - 查询参数 {accountId, page, size}
    */
-  getTransfers: async (accountId, params = {}) => {
-    return await http.get(`/accounts/${accountId}/transfers`, { params })
+  getTransfers: async (params = {}) => {
+    return await http.get('/transfers', { params })
   },
 
   /**
@@ -80,7 +78,7 @@ export const transferApi = {
    * @param {object} data - 转账数据 {fromAccountId, toAccountNumber, toAccountName, toBankName, amount, remark, payPassword}
    */
   executeTransfer: async (data) => {
-    return await http.post('/accounts/transfer', data)
+    return await http.post('/transfers', data)
   }
 }
 

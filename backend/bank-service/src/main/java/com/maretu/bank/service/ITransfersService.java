@@ -25,4 +25,9 @@ public interface ITransfersService extends IService<Transfers> {
      * 根据账户ID获取转账记录
      */
     List<Transfers> getTransfersByAccountId(Long accountId, Integer page, Integer size);
+
+    /**
+     * 根据多个账户ID获取转账记录
+     */
+    List<Transfers> getTransfersByAccountIds(List<Long> accountIds, Integer page, Integer size);
 }

@@ -148,6 +148,18 @@ public class TransfersServiceImpl extends ServiceImpl<TransfersMapper, Transfers
                 .getRecords();
     }
 
+    @Override
+    public List<Transfers> getTransfersByAccountIds(List<Long> accountIds, Integer page, Integer size) {
+        if (accountIds == null || accountIds.isEmpty()) {
+            return List.of();
+        }
+        return lambdaQuery()
+                .in(Transfers::getFromAccountId, accountIds)
+                .orderByDesc(Transfers::getCreatedAt)
+                .page(new Page<>(page, size))
+                .getRecords();
+    }
+
     /**
      * 检查日限额
      */

@@ -308,9 +308,12 @@ export default {
         if (filters.startDate) params.startDate = filters.startDate
         if (filters.endDate) params.endDate = filters.endDate
 
-        // 当查询所有账户时，使用第一个账户 ID 作为占位符
-        const accountId = filters.accountId === 'all' ? (accounts.value[0]?.id || 0) : filters.accountId
-        const response = await transactionApi.getTransactions(accountId, params)
+        // 当查询所有账户时，不传 accountId
+        if (filters.accountId !== 'all') {
+          params.accountId = filters.accountId
+        }
+        
+        const response = await transactionApi.getTransactions(params)
         const { code, data } = response.data
         if (code === 1 || code === 200) {
           transactions.value = data || []

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Random;
 
 /**
  * <p>
@@ -26,6 +27,28 @@ import java.util.List;
 public class AccountsServiceImpl extends ServiceImpl<AccountsMapper, Accounts> implements IAccountsService {
 
     private final ITransactionsService transactionsService;
+
+    @Override
+    public Accounts createAccount(Long userId, Accounts req) {
+        // 生成唯一账号 (16位数字)
+        String accountNumber = generateAccountNumber();
+
+        // 检查账号是否已存在
+        while (lambdaQuery().eq(Accounts::getAccountNumber, accountNumber).count() > 0) {
+            accountNumber = generateAccountNumber();
+        }
+
+        Accounts account = new Accounts()
+                .setUserId(userId)
+                .setAccountNumber(accountNumber)
+                .setAccountName(req.getAccountName() != null ? req.getAccountName() : "储蓄账户")
+                .setBalance(BigDecimal.ZERO)
+                .setCurrency(req.getCurrency() != null ? req.getCurrency() : "CNY")
+                .setStatus(1)
+                .setDailyLimit(req.getDailyLimit() != null ? req.getDailyLimit() : new BigDecimal("50000.00"));
+        save(account);
+        return account;
+    }
 
     @Override
     public List<Accounts> getAccountsByUserId(Long userId) {
@@ -92,5 +115,54 @@ public class AccountsServiceImpl extends ServiceImpl<AccountsMapper, Accounts> i
                 .setExpense(expense)
                 .setAccountCount(accounts.size())
                 .setTransactionCount(transactions.size());
+    }
+
+    @Override
+    public Accounts updateAccount(Long accountId, Long userId, Accounts req) {
+        Accounts account = getAccountByIdAndUserId(accountId, userId);
+        if (account == null) {
+            throw new RuntimeException("账户不存在或无权访问");
+        }
+
+        lambdaUpdate().eq(Accounts::getId, account.getId())
+                    .set(req.getAccountName() != null, Accounts::getAccountName, account.getAccountName())
+                    .set(req.getDailyLimit() != null, Accounts::getDailyLimit, account.getDailyLimit())
+                .update();
+
+        return getAccountByIdAndUserId(accountId, userId);
+    }
+
+    @Override
+    public Accounts updateStatus(Long accountId, Long userId, Integer status) {
+        Accounts account = getAccountByIdAndUserId(accountId, userId);
+        if (account == null) {
+            throw new RuntimeException("账户不存在或无权访问");
+        }
+        
+        // 验证状态值
+        if (status < 0 || status > 2) {
+            throw new RuntimeException("无效的状态值");
+        }
+        
+        // 不允许将状态改为关闭(2)，关闭需要单独的流程
+        if (status == 2) {
+            throw new RuntimeException("不支持直接关闭账户，请联系客服");
+        }
+        
+        account.setStatus(status);
+        updateById(account);
+        return account;
+    }
+
+    /**
+     * 生成16位随机账号
+     */
+    private String generateAccountNumber() {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder("62"); // 以62开头，模拟银行卡号
+        for (int i = 0; i < 14; i++) {
+            sb.append(random.nextInt(10));
+        }
+        return sb.toString();
     }
 }

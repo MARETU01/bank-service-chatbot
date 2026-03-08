@@ -23,6 +23,32 @@ export const accountApi = {
    */
   getDashboardStats: async () => {
     return await http.get('/accounts/dashboard/stats')
+  },
+
+  /**
+   * 创建新账户
+   * @param {object} data - 账户数据 {accountName, currency, dailyLimit}
+   */
+  createAccount: async (data) => {
+    return await http.post('/accounts', data)
+  },
+
+  /**
+   * 更新账户信息
+   * @param {number} id - 账户 ID
+   * @param {object} data - 更新数据 {accountName, dailyLimit}
+   */
+  updateAccount: async (id, data) => {
+    return await http.put(`/accounts/${id}`, data)
+  },
+
+  /**
+   * 更新账户状态（冻结/解冻）
+   * @param {number} id - 账户 ID
+   * @param {number} status - 状态: 0-冻结, 1-正常
+   */
+  updateStatus: async (id, status) => {
+    return await http.put(`/accounts/${id}/status`, { status })
   }
 }
 

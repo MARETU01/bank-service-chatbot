@@ -32,6 +32,21 @@ public class AccountController {
     private final ObjectMapper jacksonObjectMapper;
 
     /**
+     * 创建新账户
+     */
+    @PostMapping
+    public Result<Accounts> createAccount(@RequestHeader("user-info") String userJson,
+                                          @RequestBody Accounts req) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            Accounts account = accountsService.createAccount(context.getUserId().longValue(), req);
+            return Result.success(account);
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    /**
      * 获取当前用户的所有账户
      */
     @GetMapping
@@ -148,6 +163,38 @@ public class AccountController {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
             return Result.success(accountsService.getDashboardStats(context.getUserId().longValue()));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    /**
+     * 更新账户信息
+     */
+    @PutMapping("/{id}")
+    public Result<Accounts> updateAccount(@PathVariable("id") Long id,
+                                          @RequestHeader("user-info") String userJson,
+                                          @RequestBody Accounts req) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            Accounts account = accountsService.updateAccount(id, context.getUserId().longValue(), req);
+            return Result.success(account);
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    /**
+     * 更新账户状态（冻结/解冻）
+     */
+    @PutMapping("/{id}/status")
+    public Result<Accounts> updateStatus(@PathVariable("id") Long id,
+                                         @RequestHeader("user-info") String userJson,
+                                         @RequestBody Accounts req) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            Accounts account = accountsService.updateStatus(id, context.getUserId().longValue(), req.getStatus());
+            return Result.success(account);
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

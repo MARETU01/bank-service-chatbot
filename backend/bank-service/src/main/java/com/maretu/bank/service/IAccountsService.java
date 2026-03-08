@@ -17,6 +17,11 @@ import java.util.List;
 public interface IAccountsService extends IService<Accounts> {
 
     /**
+     * 创建新账户
+     */
+    Accounts createAccount(Long userId, Accounts req);
+
+    /**
      * 根据用户ID获取账户列表
      */
     List<Accounts> getAccountsByUserId(Long userId);
@@ -30,4 +35,14 @@ public interface IAccountsService extends IService<Accounts> {
      * 获取仪表盘统计数据
      */
     DashboardStats getDashboardStats(Long userId);
+
+    /**
+     * 更新账户信息
+     */
+    Accounts updateAccount(Long accountId, Long userId, Accounts req);
+
+    /**
+     * 更新账户状态（冻结/解冻/关闭）
+     */
+    Accounts updateStatus(Long accountId, Long userId, Integer status);
 }

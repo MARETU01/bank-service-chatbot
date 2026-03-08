@@ -17,7 +17,7 @@
           <select v-model="filters.accountId" @change="onAccountChange">
             <option value="all">全部账户</option>
             <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-              {{ acc.accountName || '账户' }} (****{{ formatAccountLastFour(acc.accountNumber) }})
+              {{ acc.accountName || '账户' }} ({{ acc.accountNumber }})
             </option>
           </select>
         </div>

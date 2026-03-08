@@ -101,7 +101,3 @@ INSERT INTO transactions (transaction_id, account_id, transaction_type, amount, 
 ('TXN20250106001', 1, 'PAYMENT', 1280.00, 149220.00, '餐饮消费', '商户', 'XX餐厅', 1, '2025-01-06 12:30:00'),
 ('TXN20250107001', 1, 'PAYMENT', 25000.00, 124220.00, '信用卡还款', '信用卡', 'XX银行', 1, '2025-01-07 10:00:00'),
 ('TXN20250108001', 1, 'DEPOSIT', 1500.00, 125720.00, '利息收入', '银行', 'XX银行', 1, '2025-01-08 00:00:00');
-
--- 示例转账记录
-INSERT INTO transfers (transfer_id, from_account_id, to_account_number, to_account_name, amount, fee, remark, status, created_at) VALUES
-('TRF20250103001', 1, '6222021234567891', '张三', 5000.00, 0.00, '借款归还', 1, '2025-01-03 10:00:00');

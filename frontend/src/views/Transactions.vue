@@ -15,17 +15,11 @@
         <div class="filter-group">
           <label>账户</label>
           <select v-model="filters.accountId" @change="onAccountChange">
-            <option value="">全部账户</option>
+            <option value="all">全部账户</option>
             <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
               {{ acc.accountName || '账户' }} (****{{ formatAccountLastFour(acc.accountNumber) }})
             </option>
           </select>
-        </div>
-        <div class="filter-group">
-          <label class="checkbox-label">
-            <input type="checkbox" v-model="filters.allAccounts" />
-            查询所有账户
-          </label>
         </div>
         <div class="filter-group">
           <label>交易类型</label>
@@ -196,7 +190,6 @@ export default {
 
     const filters = reactive({
       accountId: '',
-      allAccounts: false,
       type: '',
       status: '',
       startDate: '',
@@ -297,8 +290,8 @@ export default {
     }
 
     const loadTransactions = async () => {
-      // 当 allAccounts 为 true 时，使用第一个账户 ID 作为占位符
-      if (!filters.accountId && !filters.allAccounts) {
+      // 当 accountId 为空时，不加载数据
+      if (!filters.accountId) {
         transactions.value = []
         return
       }
@@ -308,15 +301,15 @@ export default {
         const params = {
           page: currentPage.value,
           size: pageSize,
-          allAccounts: filters.allAccounts
+          allAccounts: filters.accountId === 'all'
         }
         if (filters.type) params.type = filters.type
         if (filters.status !== '') params.status = filters.status
         if (filters.startDate) params.startDate = filters.startDate
         if (filters.endDate) params.endDate = filters.endDate
 
-        // 当查询所有账户时，accountId 可以传任意值（后端会忽略）
-        const accountId = filters.allAccounts ? (accounts.value[0]?.id || 0) : filters.accountId
+        // 当查询所有账户时，使用第一个账户 ID 作为占位符
+        const accountId = filters.accountId === 'all' ? (accounts.value[0]?.id || 0) : filters.accountId
         const response = await transactionApi.getTransactions(accountId, params)
         const { code, data } = response.data
         if (code === 1 || code === 200) {
@@ -332,10 +325,6 @@ export default {
     }
 
     const onAccountChange = () => {
-      // 当选择全部账户时，取消 allAccounts 勾选
-      if (filters.accountId === '') {
-        filters.allAccounts = false
-      }
       currentPage.value = 1
       loadTransactions()
     }
@@ -471,21 +460,6 @@ export default {
   color: var(--text-on-gradient-secondary);
   margin-bottom: var(--spacing-xs);
   font-weight: var(--font-weight-medium);
-}
-
-.filter-group .checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-lg) var(--spacing-lg);
-  cursor: pointer;
-}
-
-.filter-group .checkbox-label input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: #667eea;
 }
 
 .filter-group select,

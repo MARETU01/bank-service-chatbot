@@ -24,53 +24,61 @@
           
           <div class="info-grid">
             <div class="info-item">
-              <label>👤 用户名</label>
+              <div class="info-label-row">
+                <label>👤 用户名</label>
+              </div>
               <div class="info-value">
                 <span v-if="!isEditing">{{ userInfo.username }}</span>
                 <input v-if="isEditing" v-model="editForm.username" type="text" class="edit-input" />
               </div>
             </div>
             <div class="info-item">
-              <label>📝 真实姓名</label>
+              <div class="info-label-row">
+                <label>📝 真实姓名</label>
+                <button class="eye-btn" @click="showRealName = !showRealName" :title="showRealName ? '隐藏' : '显示'" v-if="userInfo.realName && !isEditing">
+                  {{ showRealName ? '👁️' : '👁️‍🗨️' }}
+                </button>
+              </div>
               <div class="info-value">
-                <template v-if="!isEditing">
-                  <span>{{ getMaskedRealName() || '未设置' }}</span>
-                  <button class="eye-btn" @click="showRealName = !showRealName" :title="showRealName ? '隐藏' : '显示'" v-if="userInfo.realName">
-                    {{ showRealName ? '👁️' : '👁️‍🗨️' }}
-                  </button>
-                </template>
+                <span v-if="!isEditing">{{ getMaskedRealName() || '未设置' }}</span>
                 <input v-if="isEditing" v-model="editForm.realName" type="text" class="edit-input" />
               </div>
             </div>
             <div class="info-item">
-              <label>📱 手机号码</label>
+              <div class="info-label-row">
+                <label>📱 手机号码</label>
+                <button class="eye-btn" @click="showPhone = !showPhone" :title="showPhone ? '隐藏' : '显示'" v-if="userInfo.phone && !isEditing">
+                  {{ showPhone ? '👁️' : '👁️‍🗨️' }}
+                </button>
+              </div>
               <div class="info-value">
-                <template v-if="!isEditing">
-                  <span>{{ getMaskedPhone() || '未设置' }}</span>
-                  <button class="eye-btn" @click="showPhone = !showPhone" :title="showPhone ? '隐藏' : '显示'" v-if="userInfo.phone">
-                    {{ showPhone ? '👁️' : '👁️‍🗨️' }}
-                  </button>
-                </template>
+                <span v-if="!isEditing">{{ getMaskedPhone() || '未设置' }}</span>
                 <input v-if="isEditing" v-model="editForm.phone" type="text" class="edit-input" />
               </div>
             </div>
             <div class="info-item">
-              <label>📧 电子邮箱</label>
-              <div class="info-value">
-                <span>{{ getMaskedEmail() }}</span>
-                <button class="eye-btn" @click="showEmail = !showEmail" :title="showEmail ? '隐藏' : '显示'" v-if="userInfo.email">
+              <div class="info-label-row">
+                <label>📧 电子邮箱</label>
+                <button class="eye-btn" @click="showEmail = !showEmail" :title="showEmail ? '隐藏' : '显示'" v-if="userInfo.email && !isEditing">
                   {{ showEmail ? '👁️' : '👁️‍🗨️' }}
                 </button>
               </div>
+              <div class="info-value">
+                <span>{{ getMaskedEmail() }}</span>
+              </div>
             </div>
             <div class="info-item">
-              <label>📅 注册时间</label>
+              <div class="info-label-row">
+                <label>📅 注册时间</label>
+              </div>
               <div class="info-value">
                 <span>{{ formatDateTime(userInfo.createdAt) }}</span>
               </div>
             </div>
             <div class="info-item">
-              <label>🔐 账号状态</label>
+              <div class="info-label-row">
+                <label>🔐 账号状态</label>
+              </div>
               <div class="info-value">
                 <span :class="getStatusClass(userInfo.status)">{{ getStatusText(userInfo.status) }}</span>
               </div>
@@ -786,13 +794,23 @@ export default {
   font-weight: 500;
 }
 
+/* label行 - 包含label和眼睛按钮 */
+.info-label-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 22px;
+}
+
+.info-label-row label {
+  margin: 0;
+  min-width: 85px;
+}
+
 .info-value {
   font-size: 16px;
   color: var(--color-white);
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 /* 小眼睛按钮样式 */

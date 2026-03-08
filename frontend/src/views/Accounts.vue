@@ -58,8 +58,13 @@
               <span class="value">{{ selectedAccount.id }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">账户号码</span>
-              <span class="value">{{ selectedAccount.accountNumber }}</span>
+              <div class="label-row">
+                <span class="label">账户号码</span>
+                <button class="eye-btn" @click="toggleDetailAccountNumber" :title="showAccountNumber[selectedAccount.id] ? '隐藏' : '显示'">
+                  {{ showAccountNumber[selectedAccount.id] ? '👁️' : '👁️‍🗨️' }}
+                </button>
+              </div>
+              <span class="value">{{ getDetailAccountNumber() }}</span>
             </div>
             <div class="detail-item">
               <span class="label">账户名称</span>
@@ -74,8 +79,13 @@
               </span>
             </div>
             <div class="detail-item">
-              <span class="label">账户余额</span>
-              <span class="value amount">¥ {{ formatNumber(selectedAccount.balance) }}</span>
+              <div class="label-row">
+                <span class="label">账户余额</span>
+                <button class="eye-btn" @click="toggleDetailBalance" :title="showBalance[selectedAccount.id] ? '隐藏' : '显示'">
+                  {{ showBalance[selectedAccount.id] ? '👁️' : '👁️‍🗨️' }}
+                </button>
+              </div>
+              <span class="value amount">¥ {{ getDetailBalance() }}</span>
             </div>
             <div class="detail-item">
               <span class="label">币种</span>
@@ -154,6 +164,13 @@
               <input type="text" v-model="editAccountData.accountName" placeholder="请输入账户名称" required />
             </div>
             <div class="form-group">
+              <label>添加余额 <span class="test-hint">(测试用)</span></label>
+              <div class="amount-input">
+                <span class="currency">¥</span>
+                <input type="number" v-model="editAccountData.balance" placeholder="请输入余额" step="0.01" min="0" />
+              </div>
+            </div>
+            <div class="form-group">
               <label>单日交易限额</label>
               <div class="amount-input">
                 <span class="currency">¥</span>
@@ -177,6 +194,7 @@
 import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
 import { accountApi } from '@/api/api'
+import { maskAccountNumber, maskBalance } from '@/utils/desensitize'
 
 export default {
   name: 'Accounts',
@@ -202,8 +220,13 @@ export default {
     const editAccountData = reactive({
       id: null,
       accountName: '',
-      dailyLimit: 0
+      dailyLimit: 0,
+      balance: 0
     })
+    
+    // 敏感信息显示状态
+    const showAccountNumber = ref({})
+    const showBalance = ref({})
 
     const formatNumber = (num) => {
       if (!num) return '0.00'
@@ -252,6 +275,56 @@ export default {
         2: '关闭'
       }
       return statusMap[status] || '未知'
+    }
+    
+    // 切换账号显示状态
+    const toggleAccountNumber = (accountId) => {
+      showAccountNumber.value[accountId] = !showAccountNumber.value[accountId]
+    }
+    
+    // 切换余额显示状态
+    const toggleBalance = (accountId) => {
+      showBalance.value[accountId] = !showBalance.value[accountId]
+    }
+    
+    // 获取显示的账号（脱敏或原始）
+    const getDisplayAccountNumber = (account) => {
+      const show = showAccountNumber.value[account.id]
+      return show ? account.accountNumber : maskAccountNumber(account.accountNumber)
+    }
+    
+    // 获取显示的余额（脱敏或原始）
+    const getDisplayBalance = (account) => {
+      const show = showBalance.value[account.id]
+      return show ? formatNumber(account.balance) : maskBalance(account.balance)
+    }
+    
+    // 切换详情弹窗中的账号显示
+    const toggleDetailAccountNumber = () => {
+      if (selectedAccount.value) {
+        toggleAccountNumber(selectedAccount.value.id)
+      }
+    }
+    
+    // 切换详情弹窗中的余额显示
+    const toggleDetailBalance = () => {
+      if (selectedAccount.value) {
+        toggleBalance(selectedAccount.value.id)
+      }
+    }
+    
+    // 获取详情弹窗中的账号显示
+    const getDetailAccountNumber = () => {
+      if (!selectedAccount.value) return ''
+      const show = showAccountNumber.value[selectedAccount.value.id]
+      return show ? selectedAccount.value.accountNumber : maskAccountNumber(selectedAccount.value.accountNumber)
+    }
+    
+    // 获取详情弹窗中的余额显示
+    const getDetailBalance = () => {
+      if (!selectedAccount.value) return '0.00'
+      const show = showBalance.value[selectedAccount.value.id]
+      return show ? formatNumber(selectedAccount.value.balance) : maskBalance(selectedAccount.value.balance)
     }
 
     const loadAccounts = async () => {
@@ -320,6 +393,7 @@ export default {
       editAccountData.id = account.id
       editAccountData.accountName = account.accountName || ''
       editAccountData.dailyLimit = account.dailyLimit || 0
+      editAccountData.balance = account.balance || 0
       selectedAccount.value = null
       showEditModal.value = true
     }
@@ -335,7 +409,8 @@ export default {
       try {
         const response = await accountApi.updateAccount(editAccountData.id, {
           accountName: editAccountData.accountName,
-          dailyLimit: editAccountData.dailyLimit
+          dailyLimit: editAccountData.dailyLimit,
+          balance: editAccountData.balance
         })
         const { code, data, message } = response.data
         if (code === 1 || code === 200) {
@@ -407,11 +482,21 @@ export default {
       showEditModal,
       editLoading,
       editAccountData,
+      showAccountNumber,
+      showBalance,
       formatNumber,
       formatAccountNumber,
       formatDateTime,
       getStatusClass,
       getStatusText,
+      toggleAccountNumber,
+      toggleBalance,
+      getDisplayAccountNumber,
+      getDisplayBalance,
+      toggleDetailAccountNumber,
+      toggleDetailBalance,
+      getDetailAccountNumber,
+      getDetailBalance,
       viewDetail,
       transfer,
       createAccount,
@@ -708,6 +793,36 @@ export default {
   color: var(--text-on-gradient-muted);
 }
 
+/* label行 - 包含label和眼睛按钮 */
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-height: 22px;
+}
+
+.label-row .label {
+  margin: 0;
+}
+
+/* 小眼睛按钮样式 */
+.eye-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all var(--transition-normal);
+  opacity: 0.7;
+}
+
+.eye-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
 .detail-item .value {
   font-size: var(--font-size-lg);
   color: var(--color-white);
@@ -832,6 +947,12 @@ export default {
 
 .form-group label .required {
   color: var(--status-danger);
+}
+
+.form-group label .test-hint {
+  color: var(--text-on-gradient-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
 }
 
 .form-group input,

@@ -127,7 +127,8 @@ public class AccountsServiceImpl extends ServiceImpl<AccountsMapper, Accounts> i
         lambdaUpdate().eq(Accounts::getId, account.getId())
                     .set(req.getAccountName() != null, Accounts::getAccountName, account.getAccountName())
                     .set(req.getDailyLimit() != null, Accounts::getDailyLimit, account.getDailyLimit())
-                .update();
+                    .set(req.getBalance() != null, Accounts::getBalance, req.getBalance())
+                    .update();
 
         return getAccountByIdAndUserId(accountId, userId);
     }

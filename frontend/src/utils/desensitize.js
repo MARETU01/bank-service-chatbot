@@ -109,3 +109,38 @@ export class DesensitizedValue {
 export function createDesensitizedValue(value, maskFn) {
   return new DesensitizedValue(value, maskFn(value))
 }
+
+/**
+ * 银行卡号脱敏
+ * @param {string} accountNumber 银行卡号
+ * @returns {string} 脱敏后的卡号
+ * - 例：6222021234567890 -> **** **** **** 7890
+ */
+export function maskAccountNumber(accountNumber) {
+  if (!accountNumber || !accountNumber.trim()) {
+    return accountNumber
+  }
+  const raw = accountNumber.trim().replace(/\s/g, '')
+  if (raw.length <= 4) {
+    return '*'.repeat(raw.length)
+  }
+  // 显示后4位
+  const lastFour = raw.slice(-4)
+  return `**** **** **** ${lastFour}`
+}
+
+/**
+ * 余额脱敏（隐藏实际金额）
+ * @param {number|string} balance 余额
+ * @returns {string} 脱敏后的余额
+ * - 例：125680.00 -> ***，***
+ */
+export function maskBalance(balance) {
+  if (balance === null || balance === undefined || balance === '') {
+    return '****'
+  }
+  // 将余额转换为字符串并隐藏
+  const str = String(balance)
+  // 返回星号，保持大致长度感
+  return '***'
+}

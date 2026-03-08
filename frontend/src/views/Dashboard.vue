@@ -171,7 +171,7 @@ export default {
           const accounts = data
           if (accounts && accounts.length > 0) {
             const firstAccountId = accounts[0].id
-            const response = await transactionApi.getTransactions(firstAccountId, { page: 1, size: 5 })
+            const response = await transactionApi.getTransactions({ accountId: firstAccountId, page: 1, size: 5 })
             const { code: txCode, data: txData } = response.data
             if (txCode === 1 || txCode === 200) {
               recentTransactions.value = txData.map(tx => ({

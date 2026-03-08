@@ -21,26 +21,58 @@
             </div>
 
             <div class="form-group">
+              <label>转账类型 <span class="required">*</span></label>
+              <div class="transfer-type-selector">
+                <button 
+                  type="button"
+                  class="type-btn" 
+                  :class="{ active: transferType === 'internal' }"
+                  @click="transferType = 'internal'"
+                >
+                  本人账户
+                </button>
+                <button 
+                  type="button"
+                  class="type-btn" 
+                  :class="{ active: transferType === 'external' }"
+                  @click="transferType = 'external'"
+                >
+                  他人账户
+                </button>
+              </div>
+            </div>
+
+            <!-- 本人账户转账 -->
+            <div class="form-group" v-if="transferType === 'internal'">
+              <label>收款账户 <span class="required">*</span></label>
+              <select v-model="selectedToAccount" required>
+                <option value="">请选择收款账户</option>
+                <option v-for="account in availableToAccounts" :key="account.id" :value="account">
+                  {{ account.accountName || '账户' }} ({{ account.accountNumber }}) - 余额：¥{{ formatNumber(account.balance) }}
+                </option>
+              </select>
+            </div>
+
+            <!-- 他人账户转账 -->
+            <div class="form-group" v-if="transferType === 'external'">
               <label>收款人账号 <span class="required">*</span></label>
               <input 
                 type="text" 
                 v-model="transfer.toAccountNumber" 
                 placeholder="请输入收款人账号"
-                required
               />
             </div>
 
-            <div class="form-group">
+            <div class="form-group" v-if="transferType === 'external'">
               <label>收款人姓名 <span class="required">*</span></label>
               <input 
                 type="text" 
                 v-model="transfer.toAccountName" 
                 placeholder="请输入收款人姓名"
-                required
               />
             </div>
 
-            <div class="form-group">
+            <div class="form-group" v-if="transferType === 'external'">
               <label>收款银行</label>
               <input 
                 type="text" 
@@ -196,6 +228,9 @@ export default {
     const accounts = ref([])
     const recentTransfers = ref([])
 
+    const transferType = ref('internal') // 'internal' 或 'external'
+    const selectedToAccount = ref(null) // 选中的目标账户对象
+
     const transfer = reactive({
       fromAccount: '',
       toAccountNumber: '',
@@ -214,18 +249,26 @@ export default {
       return selectedAccount.value ? (selectedAccount.value.accountName || '账户') : ''
     })
 
+    // 可用的目标账户列表（排除当前选中的付款账户）
+    const availableToAccounts = computed(() => {
+      return accounts.value.filter(a => a.id !== transfer.fromAccount)
+    })
+
     const insufficientBalance = computed(() => {
       if (!transfer.amount || !selectedAccount.value) return false
       return parseFloat(transfer.amount) > selectedAccount.value.balance
     })
 
     const canSubmit = computed(() => {
-      return transfer.fromAccount && 
-             transfer.toAccountNumber && 
-             transfer.toAccountName && 
-             transfer.amount &&
-             transfer.payPassword &&
-             !insufficientBalance.value
+      if (!transfer.fromAccount || !transfer.amount || !transfer.payPassword || insufficientBalance.value) {
+        return false
+      }
+      
+      if (transferType.value === 'internal') {
+        return selectedToAccount.value !== null
+      } else {
+        return transfer.toAccountNumber && transfer.toAccountName
+      }
     })
 
     const formatNumber = (num) => {
@@ -295,6 +338,7 @@ export default {
     }
 
     const resetForm = () => {
+      transferType.value = 'internal'
       transfer.fromAccount = ''
       transfer.toAccountNumber = ''
       transfer.toAccountName = ''
@@ -302,7 +346,30 @@ export default {
       transfer.amount = ''
       transfer.payPassword = ''
       transfer.remark = ''
+      selectedToAccount.value = null
     }
+
+    // 监听转账类型变化，同步更新表单数据
+    watch(() => transferType.value, (newType) => {
+      if (newType === 'internal') {
+        // 切换到本人账户，清空外部转账数据
+        transfer.toAccountNumber = ''
+        transfer.toAccountName = ''
+        transfer.toBankName = ''
+      } else {
+        // 切换到外部账户，清空内部选择
+        selectedToAccount.value = null
+      }
+    })
+
+    // 监听选中的目标账户，同步到 transfer 对象
+    watch(() => selectedToAccount.value, (newAccount) => {
+      if (newAccount) {
+        transfer.toAccountNumber = newAccount.accountNumber
+        transfer.toAccountName = newAccount.accountName || '本人账户'
+        transfer.toBankName = ''
+      }
+    })
 
     const submitTransfer = () => {
       if (!canSubmit.value) return
@@ -357,6 +424,9 @@ export default {
       accounts,
       recentTransfers,
       transfer,
+      transferType,
+      selectedToAccount,
+      availableToAccounts,
       showConfirm,
       showSuccess,
       loading,
@@ -525,6 +595,36 @@ export default {
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* 转账类型选择器 */
+.transfer-type-selector {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.type-btn {
+  flex: 1;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--glass-bg-light);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
+}
+
+.type-btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+}
+
+.type-btn.active {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-active);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
 }
 
 /* 历史记录 */

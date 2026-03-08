@@ -69,13 +69,13 @@ CREATE TABLE transactions (
 -- 转账记录表
 -- ========================================
 CREATE TABLE transfers (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '转账ID',
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '转账 ID',
     transfer_id VARCHAR(50) NOT NULL UNIQUE COMMENT '转账流水号',
-    from_account_id BIGINT NOT NULL COMMENT '转出账户ID',
+    from_account_id BIGINT NOT NULL COMMENT '转出账户 ID',
+    to_account_id BIGINT COMMENT '转入账户 ID',
     to_account_number VARCHAR(20) NOT NULL COMMENT '转入账号',
     to_account_name VARCHAR(100) COMMENT '转入账户名',
     amount DECIMAL(15, 2) NOT NULL COMMENT '转账金额',
-    fee DECIMAL(10, 2) DEFAULT 0.00 COMMENT '手续费',
     remark VARCHAR(200) COMMENT '备注',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-失败, 1-成功, 2-处理中',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

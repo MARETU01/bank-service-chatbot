@@ -147,12 +147,12 @@ public class UsersController {
 
     @PostMapping("/pay-password/verify")
     public Result<Boolean> verifyPayPassword(@RequestHeader("user-info") String userJson,
-                                             @RequestBody VerifyPayPasswordReq req) throws JsonProcessingException {
+                                             @RequestBody String payPassword) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
             return Result.success(userSecurityService.verifyPayPassword(
                     Long.valueOf(context.getUserId()),
-                    req.getPayPassword()
+                    payPassword
             ));
         } catch (Exception e) {
             return Result.failure(e.getMessage());

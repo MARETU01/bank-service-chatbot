@@ -1,20 +1,21 @@
 package com.maretu.common.utils;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Result<T> {
 
     private static final Integer SUCCESS_CODE = 1;
     private static final Integer FAILURE_CODE = 0;
 
-    private final Integer code;
-    private final String message;
-    private final T data;
-    private final Long timestamp;
+    public Integer code;
+    public String message;
+    public T data;
+    public Long timestamp;
 
     public static <T> Result<T> success() {
         return new Result<>(SUCCESS_CODE, "success", null, System.currentTimeMillis());

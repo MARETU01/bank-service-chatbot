@@ -41,7 +41,9 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
             throw new RuntimeException("支付密码必须为6位数字");
         }
 
-        UserSecurity userSecurity = getByUserId(userId);
+        UserSecurity userSecurity = lambdaQuery()
+                .eq(UserSecurity::getUserId, userId)
+                .one();
         String encodedPassword = HashUtil.encodePassword(payPassword);
 
         if (userSecurity == null) {
@@ -79,7 +81,9 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
             throw new RuntimeException("用户ID和支付密码不能为空");
         }
 
-        UserSecurity userSecurity = getByUserId(userId);
+        UserSecurity userSecurity = lambdaQuery()
+                .eq(UserSecurity::getUserId, userId)
+                .one();
         if (userSecurity == null || !StringUtils.hasText(userSecurity.getPayPassword())) {
             throw new RuntimeException("请先设置支付密码");
         }
@@ -124,17 +128,9 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
         if (userId == null) {
             return false;
         }
-        UserSecurity userSecurity = getByUserId(userId);
-        return userSecurity != null && StringUtils.hasText(userSecurity.getPayPassword());
-    }
-
-    @Override
-    public UserSecurity getByUserId(Long userId) {
-        if (userId == null) {
-            return null;
-        }
-        return lambdaQuery()
+        UserSecurity userSecurity = lambdaQuery()
                 .eq(UserSecurity::getUserId, userId)
                 .one();
+        return userSecurity != null && StringUtils.hasText(userSecurity.getPayPassword());
     }
 }

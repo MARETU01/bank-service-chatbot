@@ -142,6 +142,38 @@ export const userApi = {
    */
   refreshToken: async () => {
     return await http.post('/users/refresh', {})
+  },
+
+  /**
+   * 设置支付密码
+   * @param {string} payPassword - 6位数字支付密码
+   */
+  setPayPassword: async (payPassword) => {
+    return await http.post('/users/pay-password', { payPassword })
+  },
+
+  /**
+   * 修改支付密码
+   * @param {string} oldPayPassword - 原支付密码
+   * @param {string} payPassword - 新支付密码
+   */
+  updatePayPassword: async (oldPayPassword, payPassword) => {
+    return await http.put('/users/pay-password', { oldPayPassword, payPassword })
+  },
+
+  /**
+   * 验证支付密码
+   * @param {string} payPassword - 支付密码
+   */
+  verifyPayPassword: async (payPassword) => {
+    return await http.post('/users/pay-password/verify', { payPassword })
+  },
+
+  /**
+   * 检查是否已设置支付密码
+   */
+  getPayPasswordStatus: async () => {
+    return await http.get('/users/pay-password/status')
   }
 }
 

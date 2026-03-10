@@ -161,13 +161,10 @@ public class UsersController {
     }
 
     @GetMapping("/pay-password/status")
-    public Result<Map<String, Boolean>> getPayPasswordStatus(@RequestHeader("user-info") String userJson) throws JsonProcessingException {
+    public Result<Boolean> getPayPasswordStatus(@RequestHeader("user-info") String userJson) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
-            boolean hasPayPassword = userSecurityService.hasPayPassword(Long.valueOf(context.getUserId()));
-            Map<String, Boolean> result = new HashMap<>();
-            result.put("hasPayPassword", hasPayPassword);
-            return Result.success(result);
+            return Result.success(userSecurityService.hasPayPassword(Long.valueOf(context.getUserId())));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

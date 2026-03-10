@@ -20,6 +20,4 @@ public interface IUserSecurityService extends IService<UserSecurity> {
     boolean verifyPayPassword(Long userId, String payPassword);
 
     boolean hasPayPassword(Long userId);
-
-    UserSecurity getByUserId(Long userId);
 }

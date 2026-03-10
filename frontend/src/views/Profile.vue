@@ -125,6 +125,16 @@
             <button class="action-btn" v-if="!userInfo.emailVerified" @click="showVerifyEmail = true">验证</button>
             <span class="verified-badge" v-else>✓ 已验证</span>
           </div>
+          <div class="security-item">
+            <div class="security-info">
+              <span class="security-icon">🔐</span>
+              <div>
+                <h4>支付密码</h4>
+                <p>{{ hasPayPassword ? '已设置支付密码' : '未设置，转账时需要验证' }}</p>
+              </div>
+            </div>
+            <button class="action-btn" @click="openPayPasswordModal">{{ hasPayPassword ? '修改' : '设置' }}</button>
+          </div>
         </div>
       </div>
 
@@ -242,6 +252,38 @@
       </div>
     </div>
 
+    <!-- 支付密码弹窗 -->
+    <div class="modal-overlay" v-if="showPayPassword" @click="showPayPassword = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>🔐 {{ hasPayPassword ? '修改支付密码' : '设置支付密码' }}</h3>
+          <button class="close-btn" @click="showPayPassword = false">×</button>
+        </div>
+        <div class="modal-body">
+          <!-- 修改时需要输入旧密码 -->
+          <div class="form-group" v-if="hasPayPassword">
+            <label>原支付密码</label>
+            <input type="password" v-model="payPasswordForm.oldPayPassword" placeholder="请输入原支付密码" maxlength="6" />
+          </div>
+          <div class="form-group">
+            <label>{{ hasPayPassword ? '新支付密码' : '支付密码' }}</label>
+            <input type="password" v-model="payPasswordForm.payPassword" placeholder="请输入6位数字支付密码" maxlength="6" />
+          </div>
+          <div class="form-group">
+            <label>确认支付密码</label>
+            <input type="password" v-model="payPasswordForm.confirmPassword" placeholder="请再次输入支付密码" maxlength="6" />
+          </div>
+          <p class="form-hint">支付密码用于转账、取款等敏感操作的验证</p>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" @click="showPayPassword = false">取消</button>
+          <button class="confirm-btn" @click="submitPayPassword" :disabled="payPasswordLoading">
+            {{ payPasswordLoading ? '处理中...' : '确认' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 邮箱验证弹窗 -->
     <div class="modal-overlay" v-if="showVerifyEmail" @click="showVerifyEmail = false">
       <div class="modal" @click.stop>
@@ -339,6 +381,16 @@ export default {
     const verifyEmailForm = reactive({
       email: '',
       code: ''
+    })
+
+    // 支付密码相关
+    const showPayPassword = ref(false)
+    const hasPayPassword = ref(false)
+    const payPasswordLoading = ref(false)
+    const payPasswordForm = reactive({
+      oldPayPassword: '',
+      payPassword: '',
+      confirmPassword: ''
     })
 
     const userAvatar = computed(() => {
@@ -673,9 +725,86 @@ export default {
       }
     }
 
+    // 加载支付密码状态
+    const loadPayPasswordStatus = async () => {
+      try {
+        const response = await userApi.getPayPasswordStatus()
+        const { code, data } = response.data
+        if (code === 1 || code === 200) {
+          hasPayPassword.value = data || false
+        }
+      } catch (error) {
+        console.error('Load pay password status error:', error)
+      }
+    }
+
+    // 打开支付密码弹窗
+    const openPayPasswordModal = () => {
+      // 重置表单
+      payPasswordForm.oldPayPassword = ''
+      payPasswordForm.payPassword = ''
+      payPasswordForm.confirmPassword = ''
+      showPayPassword.value = true
+    }
+
+    // 提交支付密码
+    const submitPayPassword = async () => {
+      // 验证输入
+      if (hasPayPassword.value && !payPasswordForm.oldPayPassword) {
+        proxy.$message.warning('请输入原支付密码')
+        return
+      }
+      if (!payPasswordForm.payPassword) {
+        proxy.$message.warning('请输入支付密码')
+        return
+      }
+      if (!/^\d{6}$/.test(payPasswordForm.payPassword)) {
+        proxy.$message.warning('支付密码必须为6位数字')
+        return
+      }
+      if (payPasswordForm.payPassword !== payPasswordForm.confirmPassword) {
+        proxy.$message.error('两次输入的支付密码不一致')
+        return
+      }
+
+      payPasswordLoading.value = true
+      try {
+        let response
+        if (hasPayPassword.value) {
+          // 修改支付密码
+          response = await userApi.updatePayPassword(
+            payPasswordForm.oldPayPassword,
+            payPasswordForm.payPassword
+          )
+        } else {
+          // 设置支付密码
+          response = await userApi.setPayPassword(payPasswordForm.payPassword)
+        }
+
+        const { code, message } = response.data
+        if (code === 1 || code === 200) {
+          proxy.$message.success(hasPayPassword.value ? '支付密码修改成功！' : '支付密码设置成功！')
+          showPayPassword.value = false
+          hasPayPassword.value = true
+          // 重置表单
+          payPasswordForm.oldPayPassword = ''
+          payPasswordForm.payPassword = ''
+          payPasswordForm.confirmPassword = ''
+        } else {
+          proxy.$message.error(message || '操作失败')
+        }
+      } catch (error) {
+        console.error('Submit pay password error:', error)
+        proxy.$message.error(error.response?.data?.message || '操作失败，请重试')
+      } finally {
+        payPasswordLoading.value = false
+      }
+    }
+
     onMounted(() => {
       loadUserInfo()
       loadAccounts()
+      loadPayPasswordStatus()
     })
 
     // 清理定时器
@@ -722,7 +851,14 @@ export default {
       sendPasswordCode,
       submitPhoneVerify,
       submitEmailVerify,
-      changePassword
+      changePassword,
+      // 支付密码相关
+      showPayPassword,
+      hasPayPassword,
+      payPasswordLoading,
+      payPasswordForm,
+      openPayPasswordModal,
+      submitPayPassword
     }
   }
 }

@@ -184,8 +184,14 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label>当前密码</label>
-            <input type="password" v-model="passwordForm.oldPassword" placeholder="请输入当前密码" />
+            <label>验证码</label>
+            <div class="code-input-group">
+              <input type="text" v-model="passwordForm.verifyCode" placeholder="请输入验证码" maxlength="6" />
+              <button class="send-code-btn" @click="sendPasswordCode" :disabled="passwordCountdown > 0">
+                {{ passwordCountdown > 0 ? passwordCountdown + 's' : '获取验证码' }}
+              </button>
+            </div>
+            <p class="form-hint">验证码将发送至您的注册邮箱</p>
           </div>
           <div class="form-group">
             <label>新密码</label>
@@ -317,10 +323,13 @@ export default {
     })
 
     const passwordForm = reactive({
-      oldPassword: '',
+      verifyCode: '',
       newPassword: '',
       confirmPassword: ''
     })
+    
+    // 修改密码验证码倒计时
+    const passwordCountdown = ref(0)
 
     const verifyPhoneForm = reactive({
       phone: '',
@@ -417,6 +426,18 @@ export default {
       countdownTimer = setInterval(() => {
         if (emailCountdown.value > 0) {
           emailCountdown.value--
+        } else {
+          clearInterval(countdownTimer)
+        }
+      }, 1000)
+    }
+
+    const startPasswordCountdown = () => {
+      passwordCountdown.value = 60
+      if (countdownTimer) clearInterval(countdownTimer)
+      countdownTimer = setInterval(() => {
+        if (passwordCountdown.value > 0) {
+          passwordCountdown.value--
         } else {
           clearInterval(countdownTimer)
         }
@@ -592,9 +613,30 @@ export default {
       }
     }
 
+    // 发送修改密码验证码
+    const sendPasswordCode = async () => {
+      try {
+        const response = await userApi.sendResetPasswordCode()
+        const { code, message } = response.data
+        if (code === 1 || code === 200) {
+          proxy.$message.success('验证码已发送至您的注册邮箱')
+          startPasswordCountdown()
+        } else {
+          proxy.$message.error(message || '发送失败')
+        }
+      } catch (error) {
+        console.error('Send password code error:', error)
+        proxy.$message.error(error.response?.data?.message || '发送验证码失败')
+      }
+    }
+
     // 修改密码 - 调用后端 /users/reset-password 接口
     const changePassword = async () => {
-      if (!passwordForm.oldPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      if (!passwordForm.verifyCode) {
+        proxy.$message.warning('请输入验证码')
+        return
+      }
+      if (!passwordForm.newPassword || !passwordForm.confirmPassword) {
         proxy.$message.warning('请填写所有密码字段')
         return
       }
@@ -609,16 +651,15 @@ export default {
 
       changePasswordLoading.value = true
       try {
-        // 根据后端接口，修改密码不需要验证码（已登录状态）
-        const response = await userApi.changePassword({
-          oldPassword: passwordForm.oldPassword,
+        // 登录后修改密码需要验证码
+        const response = await userApi.resetPassword({
           newPassword: passwordForm.newPassword
-        })
+        }, passwordForm.verifyCode)
         const { code, message } = response.data
         if (code === 1 || code === 200) {
           proxy.$message.success('密码修改成功！')
           showChangePassword.value = false
-          passwordForm.oldPassword = ''
+          passwordForm.verifyCode = ''
           passwordForm.newPassword = ''
           passwordForm.confirmPassword = ''
         } else {
@@ -626,7 +667,7 @@ export default {
         }
       } catch (error) {
         console.error('Change password error:', error)
-        proxy.$message.error(error.response?.data?.message || '修改失败，请检查当前密码是否正确')
+        proxy.$message.error(error.response?.data?.message || '修改失败，请检查验证码是否正确')
       } finally {
         changePasswordLoading.value = false
       }
@@ -675,8 +716,10 @@ export default {
       getMaskedEmail,
       toggleEdit,
       saveProfile,
+      passwordCountdown,
       sendPhoneCode,
       sendEmailCode,
+      sendPasswordCode,
       submitPhoneVerify,
       submitEmailVerify,
       changePassword
@@ -1121,6 +1164,12 @@ export default {
 }
 
 .form-group input::placeholder {
+  color: var(--text-on-gradient-muted);
+}
+
+.form-hint {
+  margin: 8px 0 0 0;
+  font-size: 12px;
   color: var(--text-on-gradient-muted);
 }
 

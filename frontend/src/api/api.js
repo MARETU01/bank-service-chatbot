@@ -101,7 +101,7 @@ export const userApi = {
 
   /**
    * 发送验证码
-   * @param {string} type - 验证码类型：'phone' 或 'email'
+   * @param {string} type - 验证码类型：'register', 'reset-password'
    * @param {string} phone - 手机号（可选）
    * @param {string} email - 邮箱（可选）
    */
@@ -110,6 +110,14 @@ export const userApi = {
     if (phone) body.phone = phone
     if (email) body.email = email
     return await http.post('/users/code', body, { params: { type } })
+  },
+
+  /**
+   * 发送重置密码验证码（登录后）
+   * 使用当前登录用户的邮箱发送验证码
+   */
+  sendResetPasswordCode: async () => {
+    return await http.post('/users/code', {}, { params: { type: 'reset-password' } })
   },
 
   /**

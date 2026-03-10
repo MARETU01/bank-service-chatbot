@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 用户安全信息表
+ * 用户支付密码表
  * </p>
  *
  * @author maretu
@@ -37,34 +37,24 @@ public class UserSecurity implements Serializable {
     private Long userId;
 
     /**
-     * 安全问题
+     * 支付密码(BCrypt加密)
      */
-    private String securityQuestion;
+    private String payPassword;
 
     /**
-     * 安全答案
+     * 支付密码修改时间
      */
-    private String securityAnswer;
+    private LocalDateTime payPasswordUpdatedAt;
 
     /**
-     * 是否启用双因素认证
+     * 支付密码错误次数
      */
-    private Boolean twoFactorEnabled;
+    private Integer payPasswordAttempts;
 
     /**
-     * 双因素认证密钥
+     * 支付密码锁定到期时间(连续错误3次锁定)
      */
-    private String twoFactorSecret;
-
-    /**
-     * 登录失败次数
-     */
-    private Integer failedLoginAttempts;
-
-    /**
-     * 锁定到期时间
-     */
-    private LocalDateTime lockedUntil;
+    private LocalDateTime payPasswordLockedUntil;
 
     /**
      * 创建时间

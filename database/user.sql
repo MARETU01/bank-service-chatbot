@@ -56,21 +56,19 @@ CREATE TABLE user_roles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户角色关联表';
 
 -- ========================================
--- 用户安全信息表
+-- 用户支付密码表
 -- ========================================
 CREATE TABLE user_security (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
     user_id BIGINT NOT NULL UNIQUE COMMENT '用户ID',
-    security_question VARCHAR(100) COMMENT '安全问题',
-    security_answer VARCHAR(255) COMMENT '安全答案',
-    two_factor_enabled BOOLEAN DEFAULT FALSE COMMENT '是否启用双因素认证',
-    two_factor_secret VARCHAR(100) COMMENT '双因素认证密钥',
-    failed_login_attempts INT DEFAULT 0 COMMENT '登录失败次数',
-    locked_until DATETIME COMMENT '锁定到期时间',
+    pay_password VARCHAR(255) COMMENT '支付密码',
+    pay_password_updated_at DATETIME COMMENT '支付密码修改时间',
+    pay_password_attempts INT DEFAULT 0 COMMENT '支付密码错误次数',
+    pay_password_locked_until DATETIME COMMENT '支付密码锁定到期时间(连续错误3次锁定)',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户安全信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户支付密码表';
 
 -- ========================================
 -- 初始化角色数据

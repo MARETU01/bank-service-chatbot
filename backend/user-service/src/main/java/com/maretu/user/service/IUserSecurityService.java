@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * <p>
- * 用户安全信息表 服务类
+ * 用户支付密码表 服务类
  * </p>
  *
  * @author maretu
@@ -13,4 +13,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserSecurityService extends IService<UserSecurity> {
 
+    void setPayPassword(Long userId, String payPassword);
+
+    void updatePayPassword(Long userId, String oldPassword, String newPassword);
+
+    boolean verifyPayPassword(Long userId, String payPassword);
+
+    boolean hasPayPassword(Long userId);
+
+    UserSecurity getByUserId(Long userId);
 }

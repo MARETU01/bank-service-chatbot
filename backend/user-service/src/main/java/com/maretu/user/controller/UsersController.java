@@ -4,12 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maretu.common.dto.Context;
 import com.maretu.common.utils.Result;
+import com.maretu.user.dto.PayPasswordReq;
 import com.maretu.user.dto.ResetPasswordReq;
 import com.maretu.user.dto.UpdateProfileReq;
+import com.maretu.user.dto.VerifyPayPasswordReq;
 import com.maretu.user.pojo.Users;
+import com.maretu.user.service.IUserSecurityService;
 import com.maretu.user.service.IUsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -17,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class UsersController {
 
     private final IUsersService usersService;
+    private final IUserSecurityService userSecurityService;
     private final ObjectMapper jacksonObjectMapper;
 
     @PostMapping("/login")
@@ -105,6 +112,62 @@ public class UsersController {
         }
         try {
             return Result.success(usersService.updateProfile(context.getUserId(), req));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @PostMapping("/pay-password")
+    public Result<Boolean> setPayPassword(@RequestHeader("user-info") String userJson,
+                                          @RequestBody PayPasswordReq req) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            userSecurityService.setPayPassword(Long.valueOf(context.getUserId()), req.getPayPassword());
+            return Result.success(true);
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @PutMapping("/pay-password")
+    public Result<Boolean> updatePayPassword(@RequestHeader("user-info") String userJson,
+                                             @RequestBody PayPasswordReq req) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            userSecurityService.updatePayPassword(
+                    Long.valueOf(context.getUserId()),
+                    req.getOldPayPassword(),
+                    req.getPayPassword()
+            );
+            return Result.success(true);
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @PostMapping("/pay-password/verify")
+    public Result<Boolean> verifyPayPassword(@RequestHeader("user-info") String userJson,
+                                             @RequestBody VerifyPayPasswordReq req) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            boolean result = userSecurityService.verifyPayPassword(
+                    Long.valueOf(context.getUserId()),
+                    req.getPayPassword()
+            );
+            return Result.success(result);
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @GetMapping("/pay-password/status")
+    public Result<Map<String, Boolean>> getPayPasswordStatus(@RequestHeader("user-info") String userJson) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            boolean hasPayPassword = userSecurityService.hasPayPassword(Long.valueOf(context.getUserId()));
+            Map<String, Boolean> result = new HashMap<>();
+            result.put("hasPayPassword", hasPayPassword);
+            return Result.success(result);
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

@@ -76,7 +76,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
 
     @Override
     @Transactional
-    public boolean verifyPayPassword(Long userId, String payPassword) {
+    public Boolean verifyPayPassword(Long userId, String payPassword) {
         if (userId == null || !StringUtils.hasText(payPassword)) {
             throw new RuntimeException("用户ID和支付密码不能为空");
         }
@@ -124,7 +124,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     }
 
     @Override
-    public boolean hasPayPassword(Long userId) {
+    public Boolean hasPayPassword(Long userId) {
         if (userId == null) {
             return false;
         }

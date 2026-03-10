@@ -150,11 +150,10 @@ public class UsersController {
                                              @RequestBody VerifyPayPasswordReq req) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
-            boolean result = userSecurityService.verifyPayPassword(
+            return Result.success(userSecurityService.verifyPayPassword(
                     Long.valueOf(context.getUserId()),
                     req.getPayPassword()
-            );
-            return Result.success(result);
+            ));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

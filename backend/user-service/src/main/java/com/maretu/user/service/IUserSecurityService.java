@@ -17,7 +17,7 @@ public interface IUserSecurityService extends IService<UserSecurity> {
 
     void updatePayPassword(Long userId, String oldPassword, String newPassword);
 
-    boolean verifyPayPassword(Long userId, String payPassword);
+    Boolean verifyPayPassword(Long userId, String payPassword);
 
-    boolean hasPayPassword(Long userId);
+    Boolean hasPayPassword(Long userId);
 }

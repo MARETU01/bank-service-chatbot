@@ -1,6 +1,7 @@
 package com.maretu.bank.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maretu.api.client.UserClient;
 import com.maretu.bank.dto.TransferReq;
 import com.maretu.bank.pojo.AccountDailyLimits;
 import com.maretu.bank.pojo.Accounts;
@@ -12,6 +13,7 @@ import com.maretu.bank.service.IAccountsService;
 import com.maretu.bank.service.ITransactionsService;
 import com.maretu.bank.service.ITransfersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +39,11 @@ public class TransfersServiceImpl extends ServiceImpl<TransfersMapper, Transfers
     private final IAccountsService accountsService;
     private final IAccountDailyLimitsService dailyLimitsService;
     private final ITransactionsService transactionsService;
+    private final UserClient userClient;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Transfers executeTransfer(TransferReq req) {
+    public Transfers executeTransfer(String userJson, TransferReq req) {
         // 1. 查询转出账户
         Accounts fromAccount = accountsService.lambdaQuery()
                 .eq(Accounts::getId, req.getFromAccountId())
@@ -55,15 +58,23 @@ public class TransfersServiceImpl extends ServiceImpl<TransfersMapper, Transfers
             throw new RuntimeException("账户状态异常，无法转账");
         }
 
-        // 3. 检查余额
+        // 3. 验证支付密码
+        Result<Boolean> verifyPayPasswordResult = userClient.verifyPayPassword(userJson, req.getPayPassword());
+        if (verifyPayPasswordResult.getCode().equals(Result.FAILURE_CODE) ||
+                verifyPayPasswordResult.getData() == null ||
+                !verifyPayPasswordResult.getData()) {
+            throw new RuntimeException("支付密码验证失败: " + verifyPayPasswordResult.getMessage());
+        }
+
+        // 4. 检查余额
         if (fromAccount.getBalance().compareTo(req.getAmount()) < 0) {
             throw new RuntimeException("账户余额不足");
         }
 
-        // 4. 检查日限额
+        // 5. 检查日限额
         checkDailyLimit(fromAccount, req.getAmount());
 
-        // 5. 查询目标账户
+        // 6. 查询目标账户
         Accounts toAccount = accountsService.lambdaQuery()
                 .eq(Accounts::getAccountNumber, req.getToAccountNumber())
                 .one();
@@ -72,28 +83,28 @@ public class TransfersServiceImpl extends ServiceImpl<TransfersMapper, Transfers
             throw new RuntimeException("目标账户不存在");
         }
 
-        // 6. 检查目标账户状态
+        // 7. 检查目标账户状态
         if (toAccount.getStatus() != 1) {
             throw new RuntimeException("目标账户状态异常");
         }
 
-        // 7. 生成转账流水号
+        // 8. 生成转账流水号
         String transferId = "TRF" + System.currentTimeMillis() + UUID.randomUUID().toString().substring(0, 4).toUpperCase();
 
-        // 8. 扣减转出账户余额
+        // 9. 扣减转出账户余额
         BigDecimal fromNewBalance = fromAccount.getBalance().subtract(req.getAmount());
         fromAccount.setBalance(fromNewBalance);
         accountsService.updateById(fromAccount);
 
-        // 9. 增加目标账户余额
+        // 10. 增加目标账户余额
         BigDecimal toNewBalance = toAccount.getBalance().add(req.getAmount());
         toAccount.setBalance(toNewBalance);
         accountsService.updateById(toAccount);
 
-        // 10. 更新日限额使用
+        // 11. 更新日限额使用
         updateDailyLimitUsage(fromAccount, req.getAmount());
 
-        // 11. 创建转出交易记录
+        // 12. 创建转出交易记录
         String fromTransactionId = "TXN" + System.currentTimeMillis() + UUID.randomUUID().toString().substring(0, 4).toUpperCase();
         Transactions transaction = new Transactions()
                 .setTransactionId(fromTransactionId)
@@ -108,7 +119,7 @@ public class TransfersServiceImpl extends ServiceImpl<TransfersMapper, Transfers
                 .setTransactionTime(LocalDateTime.now());
         transactionsService.save(transaction);
 
-        // 12. 创建转入交易记录
+        // 13. 创建转入交易记录
         String toTransactionId = "TXN" + System.currentTimeMillis() + "IN" + UUID.randomUUID().toString().substring(0, 4).toUpperCase();
         Transactions toTransaction = new Transactions()
                 .setTransactionId(toTransactionId)
@@ -123,7 +134,7 @@ public class TransfersServiceImpl extends ServiceImpl<TransfersMapper, Transfers
                 .setTransactionTime(LocalDateTime.now());
         transactionsService.save(toTransaction);
 
-        // 13. 创建转账记录
+        // 14. 创建转账记录
         Transfers transfer = new Transfers()
                 .setTransferId(transferId)
                 .setFromAccountId(req.getFromAccountId())

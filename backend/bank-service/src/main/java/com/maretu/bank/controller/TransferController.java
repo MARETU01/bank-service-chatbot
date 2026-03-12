@@ -71,7 +71,7 @@ public class TransferController {
                 return Result.failure("账户不存在或无权访问");
             }
             
-            Transfers transfer = transfersService.executeTransfer(req);
+            Transfers transfer = transfersService.executeTransfer(userJson, req);
             return Result.success(transfer);
         } catch (Exception e) {
             return Result.failure(e.getMessage());

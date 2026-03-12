@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Result<T> {
 
-    private static final Integer SUCCESS_CODE = 1;
-    private static final Integer FAILURE_CODE = 0;
+    public static final Integer SUCCESS_CODE = 1;
+    public static final Integer FAILURE_CODE = 0;
 
     public Integer code;
     public String message;

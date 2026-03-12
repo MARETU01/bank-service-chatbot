@@ -19,7 +19,7 @@ public interface ITransfersService extends IService<Transfers> {
     /**
      * 执行转账
      */
-    Transfers executeTransfer(TransferReq req);
+    Transfers executeTransfer(String userJson, TransferReq req);
 
     /**
      * 根据账户ID获取转账记录

@@ -443,7 +443,8 @@ export default {
         if (code === 1 || code === 200) {
           showPasswordModal.value = false
           showSuccess.value = true
-          // 刷新转账记录
+          // 刷新账户列表和转账记录
+          await loadAccounts()
           await loadRecentTransfers()
         } else {
           proxy.$message.error(message || '转账失败')

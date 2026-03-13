@@ -98,17 +98,6 @@
             </div>
 
             <div class="form-group">
-              <label>支付密码 <span class="required">*</span></label>
-              <input 
-                type="password" 
-                v-model="transfer.payPassword" 
-                placeholder="请输入支付密码"
-                maxlength="6"
-                required
-              />
-            </div>
-
-            <div class="form-group">
               <label>备注</label>
               <textarea 
                 v-model="transfer.remark" 
@@ -189,8 +178,43 @@
         </div>
         <div class="modal-footer">
           <button class="btn cancel" @click="showConfirm = false">返回修改</button>
-          <button class="btn primary" @click="confirmTransfer" :disabled="confirmLoading">
-            {{ confirmLoading ? '处理中...' : '确认转账' }}
+          <button class="btn primary" @click="showPasswordInput" :disabled="confirmLoading">
+            下一步
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 支付密码输入弹窗 -->
+    <div class="modal-overlay" v-if="showPasswordModal" @click="showPasswordModal = false">
+      <div class="modal password-modal" @click.stop>
+        <div class="modal-header">
+          <h3>输入支付密码</h3>
+          <button class="close-btn" @click="closePasswordModal">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="password-info">
+            <p>请验证您的身份以完成转账</p>
+            <div class="amount-display">
+              <span class="label">转账金额</span>
+              <span class="value">¥{{ formatNumber(transfer.amount) }}</span>
+            </div>
+          </div>
+          <div class="password-input-group">
+            <input 
+              type="password" 
+              v-model="transfer.payPassword" 
+              placeholder="请输入支付密码"
+              maxlength="6"
+              ref="passwordInput"
+              @keyup.enter="confirmTransfer"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn cancel" @click="closePasswordModal">返回</button>
+          <button class="btn primary" @click="confirmTransfer" :disabled="!transfer.payPassword || confirmLoading">
+            {{ confirmLoading ? '处理中...' : '确认支付' }}
           </button>
         </div>
       </div>
@@ -241,6 +265,8 @@ export default {
       remark: ''
     })
 
+    const showPasswordModal = ref(false)
+
     const selectedAccount = computed(() => {
       return accounts.value.find(a => a.id === transfer.fromAccount)
     })
@@ -260,7 +286,7 @@ export default {
     })
 
     const canSubmit = computed(() => {
-      if (!transfer.fromAccount || !transfer.amount || !transfer.payPassword || insufficientBalance.value) {
+      if (!transfer.fromAccount || !transfer.amount || insufficientBalance.value) {
         return false
       }
       
@@ -376,8 +402,28 @@ export default {
       showConfirm.value = true
     }
 
+    const showPasswordInput = () => {
+      showConfirm.value = false
+      showPasswordModal.value = true
+      // 自动聚焦到密码输入框
+      setTimeout(() => {
+        if (passwordInput.value) {
+          passwordInput.value.focus()
+        }
+      }, 100)
+    }
+
+    const closePasswordModal = () => {
+      showPasswordModal.value = false
+      transfer.payPassword = ''
+    }
+
     const confirmTransfer = async () => {
       if (!selectedAccount.value) return
+      if (!transfer.payPassword) {
+        proxy.$message.error('请输入支付密码')
+        return
+      }
       
       confirmLoading.value = true
       try {
@@ -395,7 +441,7 @@ export default {
         const { code, data, message } = response.data
         
         if (code === 1 || code === 200) {
-          showConfirm.value = false
+          showPasswordModal.value = false
           showSuccess.value = true
           // 刷新转账记录
           await loadRecentTransfers()
@@ -420,6 +466,8 @@ export default {
       loadRecentTransfers()
     })
 
+    const passwordInput = ref(null)
+
     return {
       accounts,
       recentTransfers,
@@ -429,6 +477,7 @@ export default {
       availableToAccounts,
       showConfirm,
       showSuccess,
+      showPasswordModal,
       loading,
       confirmLoading,
       selectedAccountName,
@@ -440,7 +489,10 @@ export default {
       getStatusClass,
       resetForm,
       submitTransfer,
-      confirmTransfer
+      showPasswordInput,
+      closePasswordModal,
+      confirmTransfer,
+      passwordInput
     }
   }
 }
@@ -780,6 +832,54 @@ export default {
   font-size: var(--font-size-4xl);
   color: var(--status-warning);
   font-weight: var(--font-weight-bold);
+}
+
+/* 支付密码弹窗样式 */
+.password-modal {
+  max-width: 400px;
+}
+
+.password-info {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.password-info p {
+  color: var(--text-on-gradient-muted);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.amount-display {
+  background: var(--glass-bg-light);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.amount-display .label {
+  color: var(--text-on-gradient-muted);
+  font-size: var(--font-size-md);
+}
+
+.amount-display .value {
+  color: var(--status-warning);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.password-input-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.password-input-group input {
+  width: 100%;
+  padding: var(--spacing-xl) var(--spacing-2xl);
+  font-size: var(--font-size-2xl);
+  text-align: center;
+  letter-spacing: 8px;
 }
 
 .modal-footer {

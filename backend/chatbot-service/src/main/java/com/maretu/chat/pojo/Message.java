@@ -20,8 +20,8 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("chat_messages")
-public class ChatMessages implements Serializable {
+@TableName("message")
+public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

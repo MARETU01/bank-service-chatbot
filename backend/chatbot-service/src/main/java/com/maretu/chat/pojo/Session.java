@@ -1,6 +1,5 @@
 package com.maretu.chat.pojo;
 
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -21,8 +20,8 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("chat_sessions")
-public class ChatSessions implements Serializable {
+@TableName("session")
+public class Session implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,6 +42,11 @@ public class ChatSessions implements Serializable {
     private Long userId;
 
     /**
+     * 会话标题
+     */
+    private String title;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createdAt;
@@ -55,7 +59,6 @@ public class ChatSessions implements Serializable {
     /**
      * 逻辑删除标识：0-未删除，1-已删除
      */
-    @TableLogic
     private Integer deleted;
 
 

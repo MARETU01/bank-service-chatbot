@@ -1,6 +1,6 @@
 package com.maretu.chat.service;
 
-import com.maretu.chat.pojo.ChatSessions;
+import com.maretu.chat.pojo.Session;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author maretu
  * @since 2026-03-14
  */
-public interface IChatSessionsService extends IService<ChatSessions> {
+public interface ISessionService extends IService<Session> {
 
 }

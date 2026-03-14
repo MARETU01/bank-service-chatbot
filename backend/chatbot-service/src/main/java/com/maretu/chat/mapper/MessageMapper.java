@@ -1,6 +1,6 @@
 package com.maretu.chat.mapper;
 
-import com.maretu.chat.pojo.ChatMessages;
+import com.maretu.chat.pojo.Message;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author maretu
  * @since 2026-03-14
  */
-public interface ChatMessagesMapper extends BaseMapper<ChatMessages> {
+public interface MessageMapper extends BaseMapper<Message> {
 
 }

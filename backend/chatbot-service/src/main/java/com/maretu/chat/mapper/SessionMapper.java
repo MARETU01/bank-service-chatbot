@@ -1,6 +1,6 @@
 package com.maretu.chat.mapper;
 
-import com.maretu.chat.pojo.ChatSessions;
+import com.maretu.chat.pojo.Session;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author maretu
  * @since 2026-03-14
  */
-public interface ChatSessionsMapper extends BaseMapper<ChatSessions> {
+public interface SessionMapper extends BaseMapper<Session> {
 
 }

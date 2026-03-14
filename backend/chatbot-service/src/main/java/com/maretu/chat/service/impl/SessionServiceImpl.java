@@ -25,20 +25,16 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
     public List<Session> getSessions(Integer userId) {
         return lambdaQuery()
                 .eq(Session::getUserId, userId)
-                .eq(Session::getDeleted, 0)
                 .orderByDesc(Session::getUpdatedAt)
                 .list();
     }
 
     @Override
     public Session createSession(Integer userId, String title) {
-        Session session = new Session();
-        session.setSessionId(UUID.randomUUID().toString());
-        session.setUserId(Long.valueOf(userId));
-        session.setTitle(title != null ? title : "新会话");
-        session.setCreatedAt(LocalDateTime.now());
-        session.setUpdatedAt(LocalDateTime.now());
-        session.setDeleted(0);
+        Session session = new Session()
+                .setSessionId(UUID.randomUUID().toString())
+                .setUserId(Long.valueOf(userId))
+                .setTitle(title != null ? title : "新会话");
         save(session);
         return session;
     }
@@ -50,13 +46,5 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
                 .set(Session::getDeleted, 1)
                 .set(Session::getUpdatedAt, LocalDateTime.now())
                 .update();
-    }
-
-    @Override
-    public Session getBySessionId(String sessionId) {
-        return lambdaQuery()
-                .eq(Session::getSessionId, sessionId)
-                .eq(Session::getDeleted, 0)
-                .one();
     }
 }

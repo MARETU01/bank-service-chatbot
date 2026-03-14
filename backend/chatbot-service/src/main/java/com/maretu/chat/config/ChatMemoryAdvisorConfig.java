@@ -8,10 +8,6 @@ import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * 聊天记忆 Advisor 配置
- * 负责处理对话上下文的存储和检索
- */
 @Slf4j
 @Configuration
 public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {

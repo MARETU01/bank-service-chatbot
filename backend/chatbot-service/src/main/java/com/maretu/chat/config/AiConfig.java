@@ -46,9 +46,6 @@ public class AiConfig {
         return ChatClient.builder(openAiChatModel).build();
     }
 
-    /**
-     * Ollama ChatClient（作为备用）
-     */
     @Bean(name = "ollamaChatClient")
     public ChatClient ollamaChatClient() {
         if (ollamaChatModel == null) {

@@ -66,6 +66,6 @@ INSERT INTO session (session_id, user_id, title) VALUES
 ('550e8400-e29b-41d4-a716-446655440001', 1, '账户余额查询');
 
 -- 示例聊天消息
-INSERT INTO session (session_id, sender_type, content) VALUES
+INSERT INTO message (session_id, sender_type, content) VALUES
 (1, 1, '你好，我想查询一下我的账户余额'),
 (1, 2, '您好！您可以登录手机银行 APP 查看账户余额，或者告诉我您的账号，我帮您查询。');

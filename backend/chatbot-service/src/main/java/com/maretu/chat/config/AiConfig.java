@@ -1,5 +1,6 @@
 package com.maretu.chat.config;
 
+import com.maretu.chat.service.IChatService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -22,6 +23,9 @@ public class AiConfig {
     @Autowired(required = false)
     private OllamaChatModel ollamaChatModel;
 
+    @Autowired
+    private IChatService chatService;
+
     @Bean
     @Primary
     public ChatClient chatClient() {
@@ -29,7 +33,9 @@ public class AiConfig {
         if (primaryModel == null) {
             throw new IllegalStateException("No chat model available. Please configure OpenAI or Ollama.");
         }
-        return ChatClient.builder(primaryModel).build();
+        return ChatClient.builder(primaryModel)
+                .defaultAdvisors(chatService)
+                .build();
     }
 
     @Bean(name = "openAiChatClient")

@@ -177,9 +177,65 @@ export const userApi = {
   }
 }
 
+// 聊天相关 API（通过 chat-service）
+export const chatApi = {
+  /**
+   * 获取用户的聊天会话列表
+   */
+  getSessions: async () => {
+    return await http.get('/chat/sessions')
+  },
+
+  /**
+   * 创建新的聊天会话
+   * @param {string} title - 会话标题（可选）
+   */
+  createSession: async (title) => {
+    return await http.post('/chat/sessions', { title })
+  },
+
+  /**
+   * 删除聊天会话
+   * @param {number} sessionId - 会话 ID
+   */
+  deleteSession: async (sessionId) => {
+    return await http.delete(`/chat/sessions/${sessionId}`)
+  },
+
+  /**
+   * 获取指定会话的聊天记录
+   * @param {number} sessionId - 会话 ID
+   */
+  getMessages: async (sessionId) => {
+    return await http.get(`/chat/messages/${sessionId}`)
+  },
+
+  /**
+   * 发送消息并获取 AI 流式回复
+   * @param {object} data - 聊天数据 {sessionId, message, title}
+   * @returns {ReadableStream} 流式响应
+   */
+  sendMessage: async (data) => {
+    return await http.post('/chat/message', data, {
+      headers: {
+        'Accept': 'text/event-stream'
+      }
+    })
+  },
+
+  /**
+   * 保存 AI 回复消息
+   * @param {object} data - 消息数据 {sessionId, content}
+   */
+  saveBotMessage: async (data) => {
+    return await http.post('/chat/message/save', data)
+  }
+}
+
 export default {
   accountApi,
   transactionApi,
   transferApi,
-  userApi
+  userApi,
+  chatApi
 }

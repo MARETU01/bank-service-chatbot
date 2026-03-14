@@ -6,7 +6,9 @@ import com.maretu.chat.service.ISessionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * <p>
@@ -21,6 +23,40 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
 
     @Override
     public List<Session> getSessions(Integer userId) {
-        return lambdaQuery().eq(Session::getUserId, userId).list();
+        return lambdaQuery()
+                .eq(Session::getUserId, userId)
+                .eq(Session::getDeleted, 0)
+                .orderByDesc(Session::getUpdatedAt)
+                .list();
+    }
+
+    @Override
+    public Session createSession(Integer userId, String title) {
+        Session session = new Session();
+        session.setSessionId(UUID.randomUUID().toString());
+        session.setUserId(Long.valueOf(userId));
+        session.setTitle(title != null ? title : "新会话");
+        session.setCreatedAt(LocalDateTime.now());
+        session.setUpdatedAt(LocalDateTime.now());
+        session.setDeleted(0);
+        save(session);
+        return session;
+    }
+
+    @Override
+    public void deleteSession(Long sessionId) {
+        lambdaUpdate()
+                .eq(Session::getId, sessionId)
+                .set(Session::getDeleted, 1)
+                .set(Session::getUpdatedAt, LocalDateTime.now())
+                .update();
+    }
+
+    @Override
+    public Session getBySessionId(String sessionId) {
+        return lambdaQuery()
+                .eq(Session::getSessionId, sessionId)
+                .eq(Session::getDeleted, 0)
+                .one();
     }
 }

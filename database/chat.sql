@@ -62,10 +62,10 @@ INSERT INTO faqs (question, answer, category) VALUES
 ('银行卡丢失怎么办？', '请立即拨打客服电话挂失，或登录手机银行自助挂失，然后前往网点补办新卡。', '账户安全');
 
 -- 示例聊天会话
-INSERT INTO chat_sessions (session_id, user_id, title) VALUES
+INSERT INTO session (session_id, user_id, title) VALUES
 ('550e8400-e29b-41d4-a716-446655440001', 1, '账户余额查询');
 
 -- 示例聊天消息
-INSERT INTO chat_messages (session_id, sender_type, content) VALUES
+INSERT INTO session (session_id, sender_type, content) VALUES
 (1, 1, '你好，我想查询一下我的账户余额'),
 (1, 2, '您好！您可以登录手机银行 APP 查看账户余额，或者告诉我您的账号，我帮您查询。');

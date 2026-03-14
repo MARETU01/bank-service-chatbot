@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author maretu
- * @since 2026-02-16
+ * @since 2026-03-14
  */
 public interface IChatMessagesService extends IService<ChatMessages> {
 

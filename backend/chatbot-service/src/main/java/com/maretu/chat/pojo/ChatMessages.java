@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author maretu
- * @since 2026-02-16
+ * @since 2026-03-14
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -26,40 +26,20 @@ public class ChatMessages implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 消息ID
+     * 消息 ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 会话ID
+     * 会话 ID
      */
     private Long sessionId;
 
     /**
-     * 消息唯一标识
-     */
-    private String messageId;
-
-    /**
-     * 发送者类型: 1-用户, 2-客服, 3-系统
+     * 发送者类型：1-用户，2-客服
      */
     private Integer senderType;
-
-    /**
-     * 发送者ID
-     */
-    private Long senderId;
-
-    /**
-     * 发送者名称
-     */
-    private String senderName;
-
-    /**
-     * 消息类型: TEXT-文本, IMAGE-图片, FILE-文件, QUICK_REPLY-快捷回复
-     */
-    private String messageType;
 
     /**
      * 消息内容
@@ -67,19 +47,9 @@ public class ChatMessages implements Serializable {
     private String content;
 
     /**
-     * 是否已读
+     * 消息类型：TEXT-文本，IMAGE-图片，FILE-文件
      */
-    private Boolean isRead;
-
-    /**
-     * 阅读时间
-     */
-    private LocalDateTime readAt;
-
-    /**
-     * 额外数据(图片URL、文件信息等)
-     */
-    private String extraData;
+    private String messageType;
 
     /**
      * 创建时间

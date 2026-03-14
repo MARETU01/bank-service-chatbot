@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author maretu
- * @since 2026-02-16
+ * @since 2026-03-14
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -47,34 +47,9 @@ public class Faqs implements Serializable {
     private String category;
 
     /**
-     * 关键词(逗号分隔)
-     */
-    private String keywords;
-
-    /**
-     * 优先级
-     */
-    private Integer priority;
-
-    /**
-     * 查看次数
-     */
-    private Integer viewCount;
-
-    /**
-     * 是否启用
-     */
-    private Boolean isActive;
-
-    /**
      * 创建时间
      */
     private LocalDateTime createdAt;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updatedAt;
 
 
 }

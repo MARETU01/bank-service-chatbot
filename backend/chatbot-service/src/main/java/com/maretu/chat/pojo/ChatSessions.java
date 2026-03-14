@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author maretu
- * @since 2026-02-16
+ * @since 2026-03-14
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -26,65 +26,20 @@ public class ChatSessions implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 会话ID
+     * 会话 ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 会话唯一标识
+     * 会话 UUID
      */
     private String sessionId;
 
     /**
-     * 用户ID(关联用户服务)
+     * 用户 ID
      */
     private Long userId;
-
-    /**
-     * 会话类型: 1-普通咨询, 2-业务办理, 3-投诉建议, 4-紧急求助
-     */
-    private Integer sessionType;
-
-    /**
-     * 状态: 0-已关闭, 1-进行中, 2-等待回复
-     */
-    private Integer status;
-
-    /**
-     * 优先级: 1-普通, 2-紧急, 3-非常紧急
-     */
-    private Integer priority;
-
-    /**
-     * 会话主题
-     */
-    private String topic;
-
-    /**
-     * 会话摘要
-     */
-    private String summary;
-
-    /**
-     * 分配给哪个客服人员
-     */
-    private Long assignedTo;
-
-    /**
-     * 满意度评分: 1-5分
-     */
-    private Integer satisfactionScore;
-
-    /**
-     * 用户反馈
-     */
-    private String feedback;
-
-    /**
-     * 关闭时间
-     */
-    private LocalDateTime closedAt;
 
     /**
      * 创建时间
@@ -95,6 +50,11 @@ public class ChatSessions implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedAt;
+
+    /**
+     * 逻辑删除标识：0-未删除，1-已删除
+     */
+    private Integer deleted;
 
 
 }

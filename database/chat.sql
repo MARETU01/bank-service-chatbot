@@ -11,10 +11,11 @@ USE chat_service;
 -- ========================================
 -- 聊天会话表
 -- ========================================
-CREATE TABLE chat_sessions (
+CREATE TABLE session (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '会话 ID',
     session_id VARCHAR(36) NOT NULL UNIQUE COMMENT '会话 UUID',
     user_id BIGINT NOT NULL COMMENT '用户 ID',
+    title VARCHAR(100) DEFAULT '新会话' COMMENT '会话标题',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     deleted TINYINT DEFAULT 0 COMMENT '逻辑删除标识：0-未删除，1-已删除',
@@ -25,7 +26,7 @@ CREATE TABLE chat_sessions (
 -- ========================================
 -- 聊天消息表
 -- ========================================
-CREATE TABLE chat_messages (
+CREATE TABLE message (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '消息 ID',
     session_id BIGINT NOT NULL COMMENT '会话 ID',
     sender_type TINYINT NOT NULL COMMENT '发送者类型：1-用户，2-客服',
@@ -33,7 +34,7 @@ CREATE TABLE chat_messages (
     message_type VARCHAR(20) DEFAULT 'TEXT' COMMENT '消息类型：TEXT-文本，IMAGE-图片，FILE-文件',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     INDEX idx_session_id (session_id),
-    FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
+    FOREIGN KEY (session_id) REFERENCES session(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天消息表';
 
 -- ========================================
@@ -61,8 +62,8 @@ INSERT INTO faqs (question, answer, category) VALUES
 ('银行卡丢失怎么办？', '请立即拨打客服电话挂失，或登录手机银行自助挂失，然后前往网点补办新卡。', '账户安全');
 
 -- 示例聊天会话
-INSERT INTO chat_sessions (session_id, user_id) VALUES
-('550e8400-e29b-41d4-a716-446655440001', 1);
+INSERT INTO chat_sessions (session_id, user_id, title) VALUES
+('550e8400-e29b-41d4-a716-446655440001', 1, '账户余额查询');
 
 -- 示例聊天消息
 INSERT INTO chat_messages (session_id, sender_type, content) VALUES

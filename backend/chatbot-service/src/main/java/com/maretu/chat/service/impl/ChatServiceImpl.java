@@ -19,7 +19,7 @@ public class ChatServiceImpl implements IChatService {
         System.out.println("ChatServiceImpl.before: " + chatClientRequest);
         System.out.println("before logic executed");
         System.out.println("AdvisorChain: " + advisorChain);
-        return null;
+        return chatClientRequest;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ChatServiceImpl implements IChatService {
         System.out.println("ChatServiceImpl.before: " + chatClientResponse);
         System.out.println("after logic executed");
         System.out.println("AdvisorChain: " + advisorChain);
-        return null;
+        return chatClientResponse;
     }
 
     @Override

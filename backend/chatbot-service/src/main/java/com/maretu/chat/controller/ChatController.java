@@ -9,8 +9,8 @@ import com.maretu.chat.service.IChatService;
 import com.maretu.common.dto.Context;
 import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -72,8 +72,10 @@ public class ChatController {
 //        }
 //    }
 //
-//    @GetMapping("/ai")
-//    public Flux<String> testChat() {
-//        return chatService.chat(null, "今天天气怎么样？", 1);
-//    }
+    @GetMapping("/ai")
+    public Flux<String> testChat() {
+        return chatClient.prompt("你好。你是谁")
+                .stream()
+                .content();
+    }
 }

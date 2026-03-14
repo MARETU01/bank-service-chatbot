@@ -3,6 +3,8 @@ package com.maretu.chat.service;
 import com.maretu.chat.pojo.Session;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * 聊天会话表 服务类
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ISessionService extends IService<Session> {
 
+    List<Session> getSessions(Integer userId);
 }

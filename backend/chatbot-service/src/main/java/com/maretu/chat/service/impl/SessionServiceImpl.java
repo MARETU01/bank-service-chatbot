@@ -6,6 +6,8 @@ import com.maretu.chat.service.ISessionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 聊天会话表 服务实现类
@@ -17,4 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> implements ISessionService {
 
+    @Override
+    public List<Session> getSessions(Integer userId) {
+        return lambdaQuery().eq(Session::getUserId, userId).list();
+    }
 }

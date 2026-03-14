@@ -20,7 +20,7 @@ spring:
       base-url: "https://api-inference.modelscope.cn"
       chat:
         options:
-          model: "Qwen/Qwen3.5-397B-A17B"
+          model: "deepseek-ai/DeepSeek-V3.2"
     ollama:
       base-url: http://ipv6.maretu.top:11434
       chat:

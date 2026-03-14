@@ -10,6 +10,7 @@ import com.maretu.common.dto.Context;
 import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.ai.chat.client.ChatClient;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class ChatController {
 
     private final IChatService chatService;
     private final ObjectMapper jacksonObjectMapper;
+    private final ChatClient chatClient;
 
     /**
      * 流式聊天接口

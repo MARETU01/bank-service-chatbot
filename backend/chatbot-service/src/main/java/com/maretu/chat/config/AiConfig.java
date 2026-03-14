@@ -22,9 +22,6 @@ public class AiConfig {
     @Autowired(required = false)
     private OllamaChatModel ollamaChatModel;
 
-    /**
-     * 主 ChatClient Bean，使用 OpenAI 模型
-     */
     @Bean
     @Primary
     public ChatClient chatClient() {
@@ -35,9 +32,6 @@ public class AiConfig {
         return ChatClient.builder(primaryModel).build();
     }
 
-    /**
-     * OpenAI ChatClient
-     */
     @Bean(name = "openAiChatClient")
     public ChatClient openAiChatClient() {
         if (openAiChatModel == null) {

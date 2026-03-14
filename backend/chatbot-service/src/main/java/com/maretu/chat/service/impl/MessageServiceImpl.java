@@ -20,35 +20,4 @@ import java.util.List;
 @Service
 public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements IMessageService {
 
-    @Override
-    public List<Message> getMessagesBySessionId(Long sessionId) {
-        return lambdaQuery()
-                .eq(Message::getSessionId, sessionId)
-                .orderByAsc(Message::getCreatedAt)
-                .list();
-    }
-
-    @Override
-    public Message saveUserMessage(Long sessionId, String content) {
-        Message message = new Message();
-        message.setSessionId(sessionId);
-        message.setSenderType(1); // 1-用户
-        message.setContent(content);
-        message.setMessageType("TEXT");
-        message.setCreatedAt(LocalDateTime.now());
-        save(message);
-        return message;
-    }
-
-    @Override
-    public Message saveBotMessage(Long sessionId, String content) {
-        Message message = new Message();
-        message.setSessionId(sessionId);
-        message.setSenderType(2); // 2-客服/AI
-        message.setContent(content);
-        message.setMessageType("TEXT");
-        message.setCreatedAt(LocalDateTime.now());
-        save(message);
-        return message;
-    }
 }

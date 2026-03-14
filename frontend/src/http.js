@@ -3,8 +3,8 @@ import router from '@/router'
 import store from '@/store'
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8080',
-    timeout: 10000,
+    baseURL: 'http://ipv6.maretu.top:8080',
+    timeout: 30000,
     withCredentials: true,
 })
 
@@ -66,8 +66,14 @@ async function handleRefreshToken() {
 instance.interceptors.request.use(
     config => {
         const token = localStorage.getItem('token')
+        const userInfo = localStorage.getItem('user-info')
+        
         if (token) {
             config.headers['Maretu'] = token
+        }
+        // 添加 user-info 请求头（用于获取当前用户信息）
+        if (userInfo) {
+            config.headers['user-info'] = userInfo
         }
         return config
     },

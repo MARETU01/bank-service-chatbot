@@ -29,11 +29,32 @@ public class ChatController {
     private final ObjectMapper jacksonObjectMapper;
     private final ChatClient chatClient;
 
-    @GetMapping("/sessions")
+    @GetMapping("/session")
     public Result<List<Session>> getSessions(@RequestHeader("user-info") String userJson) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
             return Result.success(sessionService.getSessions(context.getUserId()));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @PostMapping("/session")
+    public Result<Session> createSession(@RequestHeader("user-info") String userJson) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            return Result.success(sessionService.createSession(context.getUserId()));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/session/{sessionId}")
+    public Result<Boolean> deleteSession(@PathVariable String sessionId,
+                                      @RequestHeader("user-info") String userJson) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            return Result.success(sessionService.deleteSession(context.getUserId(), sessionId));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

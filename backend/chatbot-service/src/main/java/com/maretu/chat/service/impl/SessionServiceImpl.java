@@ -38,21 +38,23 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
     }
 
     @Override
-    public Session createSession(Integer userId, String title) {
+    public Session createSession(Integer userId) {
         Session session = new Session()
                 .setSessionId(UUID.randomUUID().toString())
-                .setUserId(Long.valueOf(userId))
-                .setTitle(title != null ? title : "新会话");
+                .setUserId(Long.valueOf(userId));
         save(session);
         return session;
     }
 
     @Override
-    public void deleteSession(String sessionId) {
-        lambdaUpdate()
+    public Boolean deleteSession(Integer userId, String sessionId) {
+        Session session = lambdaQuery()
                 .eq(Session::getSessionId, sessionId)
-                .set(Session::getDeleted, 1)
-                .set(Session::getUpdatedAt, LocalDateTime.now())
-                .update();
+                .eq(Session::getUserId, userId)
+                .one();
+        if (session == null || !session.getUserId().equals(Long.valueOf(userId))) {
+            throw new RuntimeException("会话不存在或无权限删除");
+        }
+        return removeById(session.getId());
     }
 }

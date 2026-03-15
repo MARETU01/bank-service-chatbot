@@ -1,16 +1,28 @@
 package com.maretu.chat.config;
 
+import com.maretu.chat.pojo.Message;
+import com.maretu.chat.service.IMessageService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.Executor;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {
+
+    private final Executor virtualThreadPoolExecutor;
+
+    @Autowired
+    private IMessageService messageService;
 
     @NotNull
     @Override
@@ -18,12 +30,19 @@ public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {
                                     @NotNull AdvisorChain advisorChain) {
         log.info("ChatMemoryAdvisor - 处理请求前");
         log.info("请求内容：{}", chatClientRequest);
-        chatClientRequest.prompt().getInstructions().getFirst().getText();
+        Message message = new Message()
+                .setMessageType("TEXT")
+                .setSenderType(1)
+                .setContent(chatClientRequest.prompt().getInstructions().getFirst().getText());
+
+        virtualThreadPoolExecutor.execute(() -> {
+            messageService.saveMessage(message);
+        });
 
         // TODO: 实现对话记忆检索逻辑
         // 例如：从 Redis 或数据库中检索用户的对话历史
         // 并将历史上下文添加到请求中
-        
+
         return chatClientRequest;
     }
 

@@ -72,7 +72,7 @@ public class ChatController {
 //        }
 //    }
 //
-    @GetMapping("/ai")
+    @GetMapping(value = "/ai", produces = "text/html;charset=utf-8")
     public Flux<String> testChat() {
         return chatClient.prompt("你好。你是谁")
                 .stream()

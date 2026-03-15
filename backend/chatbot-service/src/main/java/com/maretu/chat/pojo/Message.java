@@ -42,6 +42,11 @@ public class Message implements Serializable {
     private Integer senderType;
 
     /**
+     * AI 元数据
+     */
+    private String aiMetadata;
+
+    /**
      * 消息内容
      */
     private String content;

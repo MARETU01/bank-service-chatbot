@@ -54,6 +54,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
+    public List<Message> getRecentMessages(String sessionId, Integer limit) {
+        return lambdaQuery()
+                .eq(Message::getSessionId, sessionId)
+                .orderByDesc(Message::getCreatedAt)
+                .last("LIMIT " + limit)
+                .list();
+    }
+
+    @Override
     @Async("virtualThreadPoolExecutor")
     public void saveMessage(Message message) {
         save(message);

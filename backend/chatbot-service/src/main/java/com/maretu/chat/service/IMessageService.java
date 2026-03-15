@@ -21,4 +21,6 @@ public interface IMessageService extends IService<Message> {
     void saveMessage(Message message);
 
     Flux<String> chat(Integer userId, Message message);
+
+    List<Message> getRecentMessages(String sessionId, Integer limit);
 }

@@ -9,9 +9,15 @@ import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 @Slf4j
@@ -25,27 +31,44 @@ public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {
     private IMessageService messageService;
 
     public static final String SESSION_ID_KEY = "sessionId";
+    private static final Integer MAX_MEMORY_SIZE = 10;
 
     @NotNull
     @Override
     public ChatClientRequest before(@NotNull ChatClientRequest chatClientRequest,
                                     @NotNull AdvisorChain advisorChain) {
         String sessionId = chatClientRequest.context().get(SESSION_ID_KEY).toString();
+        String userContent = chatClientRequest.prompt().getInstructions().getFirst().getText();
+
+        List<Message> recentMessages = messageService.getRecentMessages(sessionId, MAX_MEMORY_SIZE);
+
+        List<org.springframework.ai.chat.messages.Message> contextMessages = new ArrayList<>();
+        
+        List<Message> reversedMessages = new ArrayList<>(recentMessages).reversed();
+
+        for (Message historyMsg : reversedMessages) {
+            if (historyMsg.getSenderType() == 1) {
+                contextMessages.add(new UserMessage(historyMsg.getContent()));
+            } else {
+                contextMessages.add(new AssistantMessage(historyMsg.getContent()));
+            }
+        }
+
+        contextMessages.add(new UserMessage(userContent));
+
+        Prompt newPrompt = new Prompt(contextMessages);
+        chatClientRequest = new ChatClientRequest(newPrompt, chatClientRequest.context());
 
         virtualThreadPoolExecutor.execute(() -> {
-            Message message = new Message()
+            Message userMessage = new Message()
                     .setMessageType("TEXT")
                     .setSessionId(sessionId)
-                    .setSenderType(1)
-                    .setContent(chatClientRequest.prompt().getInstructions().getFirst().getText());
-            messageService.saveMessage(message);
+                    .setSenderType(1)  // 1-用户
+                    .setContent(userContent);
+            messageService.saveMessage(userMessage);
         });
 
-        // TODO: 实现对话记忆检索逻辑
-        // 例如：从 Redis 或数据库中检索用户的对话历史
-        // 并将历史上下文添加到请求中
-
-        return null;
+        return chatClientRequest;
     }
 
     @NotNull

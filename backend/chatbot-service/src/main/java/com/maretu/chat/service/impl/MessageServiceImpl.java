@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import static com.maretu.chat.config.ChatMemoryAdvisorConfig.SESSION_ID_KEY;
 
@@ -31,6 +32,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     private final ISessionService sessionService;
     private final ChatClient chatClient;
+    private final Executor virtualThreadPoolExecutor;
 
     @Override
     public List<Message> getMessages(Integer userId, String sessionId) {
@@ -55,14 +57,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 .stream()
                 .content()
                 .doOnNext(fullResponse::append)
-                .doOnComplete(() -> {
+                .doOnComplete(() -> virtualThreadPoolExecutor.execute(() -> {
                     Message assistantMsg = new Message()
                             .setMessageType("TEXT")
                             .setSenderType(2)
                             .setSessionId(message.getSessionId())
                             .setContent(fullResponse.toString());
-                    System.out.println("模型完整回复：" + fullResponse);
-                });
+                    saveMessage(assistantMsg);
+                }));
     }
 
     @Override
@@ -75,7 +77,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    @Async("virtualThreadPoolExecutor")
     public void saveMessage(Message message) {
         save(message);
     }

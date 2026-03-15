@@ -16,7 +16,7 @@ spring:
       - "nacos:shared-redis.yaml?group=DEFAULT_GROUP&refresh=true"
   ai:
     openai:
-      api-key: "ms-2cc7452c-4482-4a2f-9788-c692b8811aaf"
+      api-key: "ms-24b8c1e7-507b-409c-992f-79c7cf3523f7"
       base-url: "https://api-inference.modelscope.cn"
       chat:
         options:

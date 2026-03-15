@@ -1,6 +1,7 @@
 package com.maretu.chat.service.impl;
 
 import com.maretu.chat.pojo.Message;
+import com.maretu.chat.pojo.Session;
 import com.maretu.chat.mapper.MessageMapper;
 import com.maretu.chat.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -47,7 +48,8 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         if (!sessionService.isSessionOwner(userId, message.getSessionId())) {
             throw new RuntimeException("无权访问该会话的消息");
         }
-        return chatClient.prompt(message.getContent())
+        return chatClient.prompt()
+                .user(message.getContent())
                 .advisors(a -> a.param(SESSION_ID_KEY, message.getSessionId()))
                 .stream()
                 .content();

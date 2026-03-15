@@ -13,10 +13,10 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -27,6 +27,7 @@ public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {
 
     private final Executor virtualThreadPoolExecutor;
 
+    @Lazy
     @Autowired
     private IMessageService messageService;
 
@@ -62,11 +63,13 @@ public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {
         virtualThreadPoolExecutor.execute(() -> {
             Message userMessage = new Message()
                     .setMessageType("TEXT")
+                    .setSenderType(1)
                     .setSessionId(sessionId)
-                    .setSenderType(1)  // 1-用户
                     .setContent(userContent);
             messageService.saveMessage(userMessage);
         });
+
+        System.out.println("实际发送给模型的提示语：" + chatClientRequest.prompt().getInstructions());
 
         return chatClientRequest;
     }
@@ -75,21 +78,16 @@ public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {
     @Override
     public ChatClientResponse after(@NotNull ChatClientResponse chatClientResponse,
                                     @NotNull AdvisorChain advisorChain) {
-        log.info("ChatMemoryAdvisor - 处理响应后");
-        log.info("响应内容：{}", chatClientResponse.chatResponse());
-
-//        virtualThreadPoolExecutor.execute(() -> {
-//            Message message = new Message()
-//                    .setMessageType("TEXT")
-//                    .setSessionId(sessionId)
-//                    .setSenderType(1)
-//                    .setContent(chatClientRequest.prompt().getInstructions().getFirst().getText());
-//            messageService.saveMessage(message);
-//        });
-
-        // TODO: 实现对话记忆存储逻辑
-        // 例如：将当前对话保存到 Redis 或数据库中
-        
+        System.out.println("模型返回的内容：" + chatClientResponse.chatResponse().getResult().getOutput().getText());
+        virtualThreadPoolExecutor.execute(() -> {
+            Message message = new Message()
+                    .setMessageType("TEXT")
+                    .setSenderType(2)
+                    .setSessionId(chatClientResponse.context().get(SESSION_ID_KEY).toString())
+//                    .setAiMetadata()
+                    .setContent(chatClientResponse.chatResponse().getResult().getOutput().getText());
+            messageService.saveMessage(message);
+        });
         return chatClientResponse;
     }
 

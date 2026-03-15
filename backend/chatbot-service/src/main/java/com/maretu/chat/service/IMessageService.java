@@ -2,6 +2,7 @@ package com.maretu.chat.service;
 
 import com.maretu.chat.pojo.Message;
 import com.baomidou.mybatisplus.extension.service.IService;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface IMessageService extends IService<Message> {
     List<Message> getMessages(Integer userId, String sessionId);
 
     void saveMessage(Message message);
+
+    Flux<String> chat(Integer userId, Message message);
 }

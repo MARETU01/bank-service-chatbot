@@ -6,11 +6,15 @@ import com.maretu.chat.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.chat.service.ISessionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.maretu.chat.config.ChatMemoryAdvisorConfig.SESSION_ID_KEY;
 
 /**
  * <p>
@@ -25,6 +29,7 @@ import java.util.List;
 public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements IMessageService {
 
     private final ISessionService sessionService;
+    private final ChatClient chatClient;
 
     @Override
     public List<Message> getMessages(Integer userId, String sessionId) {
@@ -35,6 +40,17 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 .eq(Message::getSessionId, sessionId)
                 .orderByAsc(Message::getCreatedAt)
                 .list();
+    }
+
+    @Override
+    public Flux<String> chat(Integer userId, Message message) {
+        if (!sessionService.isSessionOwner(userId, message.getSessionId())) {
+            throw new RuntimeException("无权访问该会话的消息");
+        }
+        return chatClient.prompt(message.getContent())
+                .advisors(a -> a.param(SESSION_ID_KEY, message.getSessionId()))
+                .stream()
+                .content();
     }
 
     @Override

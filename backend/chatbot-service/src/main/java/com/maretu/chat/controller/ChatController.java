@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maretu.chat.pojo.Message;
 import com.maretu.chat.pojo.Session;
-import com.maretu.chat.service.IChatService;
 import com.maretu.chat.service.IMessageService;
 import com.maretu.chat.service.ISessionService;
 import com.maretu.common.dto.Context;
@@ -23,7 +22,6 @@ import static com.maretu.chat.config.ChatMemoryAdvisorConfig.SESSION_ID_KEY;
 @RequestMapping("/chat")
 public class ChatController {
 
-    private final IChatService chatService;
     private final ISessionService sessionService;
     private final IMessageService messageService;
     private final ObjectMapper jacksonObjectMapper;
@@ -69,6 +67,13 @@ public class ChatController {
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }
+    }
+
+    @PostMapping("/message")
+    public Flux<String> chat(@RequestHeader("user-info") String userJson,
+                             @RequestBody Message message) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        return messageService.chat(context.getUserId(), message);
     }
 
     @GetMapping(value = "/ai", produces = "text/html;charset=utf-8")

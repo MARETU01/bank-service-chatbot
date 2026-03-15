@@ -60,14 +60,12 @@ public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {
         Prompt newPrompt = new Prompt(contextMessages);
         chatClientRequest = new ChatClientRequest(newPrompt, chatClientRequest.context());
 
-        virtualThreadPoolExecutor.execute(() -> {
-            Message userMessage = new Message()
-                    .setMessageType("TEXT")
-                    .setSenderType(1)
-                    .setSessionId(sessionId)
-                    .setContent(userContent);
-            messageService.saveMessage(userMessage);
-        });
+        virtualThreadPoolExecutor.execute(() -> messageService.save(new Message()
+                .setMessageType("TEXT")
+                .setSenderType(1)
+                .setSessionId(sessionId)
+                .setContent(userContent)
+        ));
 
         System.out.println("实际发送给模型的提示语：" + chatClientRequest.prompt().getInstructions());
 

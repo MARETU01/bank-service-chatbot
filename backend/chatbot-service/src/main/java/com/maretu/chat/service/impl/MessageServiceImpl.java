@@ -57,14 +57,11 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 .stream()
                 .content()
                 .doOnNext(fullResponse::append)
-                .doOnComplete(() -> virtualThreadPoolExecutor.execute(() -> {
-                    Message assistantMsg = new Message()
-                            .setMessageType("TEXT")
-                            .setSenderType(2)
-                            .setSessionId(message.getSessionId())
-                            .setContent(fullResponse.toString());
-                    saveMessage(assistantMsg);
-                }));
+                .doOnComplete(() -> virtualThreadPoolExecutor.execute(() -> save(new Message()
+                        .setMessageType("TEXT")
+                        .setSenderType(2)
+                        .setSessionId(message.getSessionId())
+                        .setContent(fullResponse.toString()))));
     }
 
     @Override
@@ -74,10 +71,5 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 .orderByDesc(Message::getCreatedAt)
                 .last("LIMIT " + limit)
                 .list();
-    }
-
-    @Override
-    public void saveMessage(Message message) {
-        save(message);
     }
 }

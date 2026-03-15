@@ -9,9 +9,9 @@ import lombok.Data;
 public class ChatMessageDTO {
 
     /**
-     * 会话 ID（可选，为空则创建新会话）
+     * 会话 UUID（可选，为空则创建新会话）
      */
-    private Long sessionId;
+    private String sessionId;
 
     /**
      * 用户消息内容

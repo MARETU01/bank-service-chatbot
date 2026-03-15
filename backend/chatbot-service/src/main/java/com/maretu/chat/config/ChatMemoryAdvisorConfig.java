@@ -24,26 +24,28 @@ public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {
     @Autowired
     private IMessageService messageService;
 
+    public static final String SESSION_ID_KEY = "sessionId";
+
     @NotNull
     @Override
     public ChatClientRequest before(@NotNull ChatClientRequest chatClientRequest,
                                     @NotNull AdvisorChain advisorChain) {
         log.info("ChatMemoryAdvisor - 处理请求前");
         log.info("请求内容：{}", chatClientRequest);
+        String sessionId = chatClientRequest.context().get(SESSION_ID_KEY).toString();
         Message message = new Message()
                 .setMessageType("TEXT")
+                .setSessionId(sessionId)
                 .setSenderType(1)
                 .setContent(chatClientRequest.prompt().getInstructions().getFirst().getText());
 
-        virtualThreadPoolExecutor.execute(() -> {
-            messageService.saveMessage(message);
-        });
+        virtualThreadPoolExecutor.execute(() -> messageService.saveMessage(message));
 
         // TODO: 实现对话记忆检索逻辑
         // 例如：从 Redis 或数据库中检索用户的对话历史
         // 并将历史上下文添加到请求中
 
-        return chatClientRequest;
+        return null;
     }
 
     @NotNull

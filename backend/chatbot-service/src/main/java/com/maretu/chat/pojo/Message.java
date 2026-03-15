@@ -32,9 +32,9 @@ public class Message implements Serializable {
     private Long id;
 
     /**
-     * 会话 ID
+     * 会话 UUID
      */
-    private Long sessionId;
+    private String sessionId;
 
     /**
      * 发送者类型：1-用户，2-ai

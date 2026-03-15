@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class ChatResponseDTO {
 
     /**
-     * 会话 ID
+     * 会话 UUID
      */
-    private Long sessionId;
+    private String sessionId;
 
     /**
      * 消息 ID

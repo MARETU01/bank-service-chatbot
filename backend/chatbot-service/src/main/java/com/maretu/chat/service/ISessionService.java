@@ -19,5 +19,5 @@ public interface ISessionService extends IService<Session> {
 
     Session createSession(Integer userId, String title);
 
-    void deleteSession(Long sessionId);
+    void deleteSession(String sessionId);
 }

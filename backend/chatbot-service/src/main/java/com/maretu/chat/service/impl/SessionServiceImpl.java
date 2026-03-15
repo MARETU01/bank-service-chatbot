@@ -40,9 +40,9 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
     }
 
     @Override
-    public void deleteSession(Long sessionId) {
+    public void deleteSession(String sessionId) {
         lambdaUpdate()
-                .eq(Session::getId, sessionId)
+                .eq(Session::getSessionId, sessionId)
                 .set(Session::getDeleted, 1)
                 .set(Session::getUpdatedAt, LocalDateTime.now())
                 .update();

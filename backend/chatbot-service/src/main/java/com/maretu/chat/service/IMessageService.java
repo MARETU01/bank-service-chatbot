@@ -15,4 +15,5 @@ import java.util.List;
  */
 public interface IMessageService extends IService<Message> {
 
+    void saveMessage(Message message);
 }

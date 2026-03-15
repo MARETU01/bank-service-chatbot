@@ -29,7 +29,8 @@ CREATE TABLE session (
 CREATE TABLE message (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '消息 ID',
     session_id BIGINT NOT NULL COMMENT '会话 ID',
-    sender_type TINYINT NOT NULL COMMENT '发送者类型：1-用户，2-客服',
+    sender_type TINYINT NOT NULL COMMENT '发送者类型：1-用户，2-ai',
+    ai_metadata JSON COMMENT 'AI 元数据',
     content TEXT NOT NULL COMMENT '消息内容',
     message_type VARCHAR(20) DEFAULT 'TEXT' COMMENT '消息类型：TEXT-文本，IMAGE-图片，FILE-文件',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

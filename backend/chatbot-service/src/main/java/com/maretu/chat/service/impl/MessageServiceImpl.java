@@ -20,4 +20,8 @@ import java.util.List;
 @Service
 public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements IMessageService {
 
+    @Override
+    public void saveMessage(Message message) {
+        save(message);
+    }
 }

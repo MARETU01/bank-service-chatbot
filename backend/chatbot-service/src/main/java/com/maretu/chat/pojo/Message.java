@@ -37,7 +37,7 @@ public class Message implements Serializable {
     private Long sessionId;
 
     /**
-     * 发送者类型：1-用户，2-客服
+     * 发送者类型：1-用户，2-ai
      */
     private Integer senderType;
 

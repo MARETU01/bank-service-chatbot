@@ -57,4 +57,15 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
         }
         return removeById(session.getId());
     }
+
+    @Override
+    public Boolean renameSession(Integer userId, String sessionId, Session session) {
+        if (!isSessionOwner(userId, sessionId)) {
+            throw new RuntimeException("无权修改该会话");
+        }
+        return lambdaUpdate()
+                .eq(Session::getSessionId, sessionId)
+                .set(Session::getTitle, session.getTitle())
+                .update();
+    }
 }

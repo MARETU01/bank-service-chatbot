@@ -58,7 +58,19 @@ public class ChatController {
         }
     }
 
-    @GetMapping("/session/{sessionId}")
+    @PutMapping("/session/{sessionId}")
+    public Result<Boolean> renameSession(@RequestHeader("user-info") String userJson,
+                                         @PathVariable String sessionId,
+                                         @RequestBody Session session) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            return Result.success(sessionService.renameSession(context.getUserId(), sessionId, session));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @GetMapping("/message/{sessionId}")
     public Result<List<Message>> getSessionMessages(@PathVariable String sessionId,
                                                     @RequestHeader("user-info") String userJson) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
@@ -69,7 +81,7 @@ public class ChatController {
         }
     }
 
-    @PostMapping("/message")
+    @PostMapping(value = "/chat", produces = "text/html;charset=utf-8")
     public Flux<String> chat(@RequestHeader("user-info") String userJson,
                              @RequestBody Message message) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);

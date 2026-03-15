@@ -22,4 +22,6 @@ public interface ISessionService extends IService<Session> {
     Session createSession(Integer userId);
 
     Boolean deleteSession(Integer userId, String sessionId);
+
+    Boolean renameSession(Integer userId, String sessionId, Session session);
 }

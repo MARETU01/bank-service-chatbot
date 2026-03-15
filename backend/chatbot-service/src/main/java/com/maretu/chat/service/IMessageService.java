@@ -15,5 +15,7 @@ import java.util.List;
  */
 public interface IMessageService extends IService<Message> {
 
+    List<Message> getMessages(Integer userId, String sessionId);
+
     void saveMessage(Message message);
 }

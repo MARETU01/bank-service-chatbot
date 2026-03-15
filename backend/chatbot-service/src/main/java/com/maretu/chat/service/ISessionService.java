@@ -17,6 +17,8 @@ public interface ISessionService extends IService<Session> {
 
     List<Session> getSessions(Integer userId);
 
+    Boolean isSessionOwner(Integer userId, String sessionId);
+
     Session createSession(Integer userId, String title);
 
     void deleteSession(String sessionId);

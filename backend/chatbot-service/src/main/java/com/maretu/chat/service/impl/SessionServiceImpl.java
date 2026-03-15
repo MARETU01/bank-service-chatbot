@@ -30,6 +30,14 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
     }
 
     @Override
+    public Boolean isSessionOwner(Integer userId, String sessionId) {
+        return lambdaQuery()
+                .eq(Session::getSessionId, sessionId)
+                .eq(Session::getUserId, userId)
+                .count() > 0;
+    }
+
+    @Override
     public Session createSession(Integer userId, String title) {
         Session session = new Session()
                 .setSessionId(UUID.randomUUID().toString())

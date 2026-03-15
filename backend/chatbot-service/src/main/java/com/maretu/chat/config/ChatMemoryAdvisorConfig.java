@@ -78,16 +78,6 @@ public class ChatMemoryAdvisorConfig implements BaseChatMemoryAdvisor {
     @Override
     public ChatClientResponse after(@NotNull ChatClientResponse chatClientResponse,
                                     @NotNull AdvisorChain advisorChain) {
-        System.out.println("模型返回的内容：" + chatClientResponse.chatResponse().getResult().getOutput().getText());
-        virtualThreadPoolExecutor.execute(() -> {
-            Message message = new Message()
-                    .setMessageType("TEXT")
-                    .setSenderType(2)
-                    .setSessionId(chatClientResponse.context().get(SESSION_ID_KEY).toString())
-//                    .setAiMetadata()
-                    .setContent(chatClientResponse.chatResponse().getResult().getOutput().getText());
-            messageService.saveMessage(message);
-        });
         return chatClientResponse;
     }
 

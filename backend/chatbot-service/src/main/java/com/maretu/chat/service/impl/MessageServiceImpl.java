@@ -48,11 +48,21 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         if (!sessionService.isSessionOwner(userId, message.getSessionId())) {
             throw new RuntimeException("无权访问该会话的消息");
         }
+        StringBuilder fullResponse = new StringBuilder();
         return chatClient.prompt()
                 .user(message.getContent())
                 .advisors(a -> a.param(SESSION_ID_KEY, message.getSessionId()))
                 .stream()
-                .content();
+                .content()
+                .doOnNext(fullResponse::append)
+                .doOnComplete(() -> {
+                    Message assistantMsg = new Message()
+                            .setMessageType("TEXT")
+                            .setSenderType(2)
+                            .setSessionId(message.getSessionId())
+                            .setContent(fullResponse.toString());
+                    System.out.println("模型完整回复：" + fullResponse);
+                });
     }
 
     @Override

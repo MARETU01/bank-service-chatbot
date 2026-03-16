@@ -56,11 +56,16 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 .stream()
                 .content()
                 .doOnNext(fullResponse::append)
-                .doOnComplete(() -> virtualThreadPoolExecutor.execute(() -> save(new Message()
-                        .setMessageType("TEXT")
-                        .setSenderType(2)
-                        .setSessionId(message.getSessionId())
-                        .setContent(fullResponse.toString()))));
+                .doOnComplete(() -> virtualThreadPoolExecutor.execute(() -> {
+                    List<Message> saveMessages = new ArrayList<>();
+                    saveMessages.add(message.setSenderType(1).setMessageType("TEXT"));
+                    saveMessages.add(new Message()
+                            .setMessageType("TEXT")
+                            .setSenderType(2)
+                            .setSessionId(message.getSessionId())
+                            .setContent(fullResponse.toString()));
+                    saveBatch(saveMessages, 2);
+                }));
     }
 
     @Override

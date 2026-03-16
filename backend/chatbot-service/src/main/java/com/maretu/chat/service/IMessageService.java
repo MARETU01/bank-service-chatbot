@@ -20,5 +20,5 @@ public interface IMessageService extends IService<Message> {
 
     Flux<String> chat(Integer userId, Message message);
 
-    List<Message> getRecentMessages(String sessionId, Integer limit);
+    List<org.springframework.ai.chat.messages.Message> getRecentMessages(String sessionId, Integer limit);
 }

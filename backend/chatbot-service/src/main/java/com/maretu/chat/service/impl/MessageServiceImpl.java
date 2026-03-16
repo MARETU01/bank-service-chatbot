@@ -1,22 +1,21 @@
 package com.maretu.chat.service.impl;
 
 import com.maretu.chat.pojo.Message;
-import com.maretu.chat.pojo.Session;
 import com.maretu.chat.mapper.MessageMapper;
 import com.maretu.chat.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.chat.service.ISessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import static com.maretu.chat.config.ChatMemoryAdvisorConfig.SESSION_ID_KEY;
 
 /**
  * <p>
@@ -53,7 +52,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         StringBuilder fullResponse = new StringBuilder();
         return chatClient.prompt()
                 .user(message.getContent())
-                .advisors(a -> a.param(SESSION_ID_KEY, message.getSessionId()))
+                .messages(getRecentMessages(message.getSessionId(), 20))
                 .stream()
                 .content()
                 .doOnNext(fullResponse::append)
@@ -65,11 +64,21 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public List<Message> getRecentMessages(String sessionId, Integer limit) {
-        return lambdaQuery()
+    public List<org.springframework.ai.chat.messages.Message> getRecentMessages(String sessionId, Integer limit) {
+        List<Message> dbMessages = lambdaQuery()
                 .eq(Message::getSessionId, sessionId)
                 .orderByDesc(Message::getCreatedAt)
                 .last("LIMIT " + limit)
-                .list();
+                .list()
+                .reversed();
+        List<org.springframework.ai.chat.messages.Message> contextMessages = new ArrayList<>();
+        for (Message message : dbMessages) {
+            if (message.getSenderType() == 1) {
+                contextMessages.add(new UserMessage(message.getContent()));
+            } else if (message.getSenderType() == 2) {
+                contextMessages.add(new AssistantMessage(message.getContent()));
+            }
+        }
+        return contextMessages;
     }
 }

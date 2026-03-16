@@ -15,8 +15,6 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
-import static com.maretu.chat.config.ChatMemoryAdvisorConfig.SESSION_ID_KEY;
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/chat")
@@ -91,7 +89,6 @@ public class ChatController {
     @GetMapping(value = "/ai", produces = "text/html;charset=utf-8")
     public Flux<String> testChat() {
         return chatClient.prompt("你好。你是谁")
-                .advisors(a -> a.param(SESSION_ID_KEY, "123456"))
                 .stream()
                 .content();
     }

@@ -44,7 +44,7 @@ public class ChatController {
     }
 
     @DeleteMapping("/session/{sessionId}")
-    public Result<Boolean> deleteSession(@PathVariable String sessionId,
+    public Result<Boolean> deleteSession(@PathVariable("sessionId") String sessionId,
                                       @RequestHeader("user-info") String userJson) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
@@ -56,7 +56,7 @@ public class ChatController {
 
     @PutMapping("/session/{sessionId}")
     public Result<Boolean> renameSession(@RequestHeader("user-info") String userJson,
-                                         @PathVariable String sessionId,
+                                         @PathVariable("sessionId") String sessionId,
                                          @RequestBody Session session) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
@@ -67,7 +67,7 @@ public class ChatController {
     }
 
     @GetMapping("/message/{sessionId}")
-    public Result<List<Message>> getSessionMessages(@PathVariable String sessionId,
+    public Result<List<Message>> getSessionMessages(@PathVariable("sessionId") String sessionId,
                                                     @RequestHeader("user-info") String userJson) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {

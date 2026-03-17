@@ -11,9 +11,7 @@
               <span v-else>👤</span>
             </div>
             <div class="message-content">
-              <div class="message-bubble">
-                <p>{{ msg.text }}</p>
-              </div>
+              <div class="message-bubble markdown-content" v-html="renderMarkdown(msg.text)"></div>
               <div class="message-time">{{ msg.time }}</div>
             </div>
           </div>
@@ -120,6 +118,13 @@
 import { ref, reactive, nextTick, onMounted } from 'vue'
 import { chatApi } from '@/api/api'
 import Message from '@/utils/message'
+import { marked } from 'marked'
+
+// 配置 marked 选项
+marked.setOptions({
+  breaks: true,
+  gfm: true
+})
 
 export default {
   name: 'Chatbot',
@@ -147,6 +152,12 @@ export default {
         hour: '2-digit', 
         minute: '2-digit' 
       })
+    }
+
+    // 渲染 Markdown
+    function renderMarkdown(text) {
+      if (!text) return ''
+      return marked.parse(text)
     }
 
     // 格式化会话时间
@@ -349,7 +360,8 @@ export default {
       selectSession,
       deleteSession,
       sendMessage,
-      sendQuickQuestion
+      sendQuickQuestion,
+      renderMarkdown
     }
   }
 }
@@ -732,5 +744,128 @@ export default {
 
 .contact-info {
   margin-top: var(--spacing-2xl);
+}
+
+/* Markdown 内容样式 */
+.markdown-content {
+  color: var(--color-white);
+  line-height: var(--line-height-normal);
+}
+
+.markdown-content :deep(p) {
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: 1.6;
+}
+
+.markdown-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.markdown-content :deep(h1),
+.markdown-content :deep(h2),
+.markdown-content :deep(h3),
+.markdown-content :deep(h4),
+.markdown-content :deep(h5),
+.markdown-content :deep(h6) {
+  margin: var(--spacing-lg) 0 var(--spacing-sm) 0;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+}
+
+.markdown-content :deep(h1) { font-size: var(--font-size-2xl); }
+.markdown-content :deep(h2) { font-size: var(--font-size-xl); }
+.markdown-content :deep(h3) { font-size: var(--font-size-lg); }
+
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
+  margin: var(--spacing-sm) 0;
+  padding-left: var(--spacing-xl);
+}
+
+.markdown-content :deep(li) {
+  margin: var(--spacing-xs) 0;
+}
+
+.markdown-content :deep(code) {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius-md);
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9em;
+}
+
+.markdown-content :deep(pre) {
+  background: rgba(0, 0, 0, 0.3);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+}
+
+.markdown-content :deep(pre code) {
+  background: transparent;
+  padding: 0;
+}
+
+.markdown-content :deep(blockquote) {
+  border-left: 3px solid var(--glass-border-hover);
+  padding-left: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  color: var(--text-on-gradient-secondary);
+}
+
+.markdown-content :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--spacing-md) 0;
+}
+
+.markdown-content :deep(th),
+.markdown-content :deep(td) {
+  border: 1px solid var(--glass-border);
+  padding: var(--spacing-sm);
+  text-align: left;
+}
+
+.markdown-content :deep(th) {
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: var(--font-weight-semibold);
+}
+
+.markdown-content :deep(a) {
+  color: var(--btn-glass-bg);
+  text-decoration: none;
+}
+
+.markdown-content :deep(a:hover) {
+  text-decoration: underline;
+}
+
+.markdown-content :deep(hr) {
+  border: none;
+  border-top: 1px solid var(--glass-border);
+  margin: var(--spacing-lg) 0;
+}
+
+/* 数学公式样式 */
+.markdown-content :deep(.math) {
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+}
+
+.markdown-content :deep(.math-inline) {
+  display: inline;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+}
+
+.markdown-content :deep(.math-display) {
+  display: block;
+  text-align: center;
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-lg);
+  margin: var(--spacing-md) 0;
 }
 </style>

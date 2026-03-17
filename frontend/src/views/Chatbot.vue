@@ -285,14 +285,14 @@ export default {
       isTyping.value = true
 
       try {
-        // 发送消息到后端
+        // 发送消息到后端（使用 fetch 实现流式响应）
         const response = await chatApi.sendMessage({
           sessionId: currentSessionId.value,
           content: text
         })
 
         // 处理流式响应
-        const reader = response.data.pipeThrough(new TextDecoderStream()).getReader()
+        const reader = response.body.pipeThrough(new TextDecoderStream('utf-8')).getReader()
         let botResponse = ''
         const botMessage = {
           type: 'bot',

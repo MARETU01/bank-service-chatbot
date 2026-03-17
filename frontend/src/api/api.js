@@ -224,12 +224,28 @@ export const chatApi = {
    * @returns {ReadableStream} 流式响应
    */
   sendMessage: async (data) => {
-    return await http.post('/chat', data, {
+    // 使用 fetch API 实现真正的流式响应（axios 不支持流式）
+    const token = localStorage.getItem('token')
+    const userInfo = localStorage.getItem('user-info')
+    
+    const response = await fetch('http://ipv6.maretu.top:8080/chat', {
+      method: 'POST',
       headers: {
-        'Accept': 'text/html'
+        'Content-Type': 'application/json',
+        'Accept': 'text/html',
+        'Maretu': token,
+        'user-info': userInfo
       },
-      responseType: 'text'
+      body: JSON.stringify(data)
     })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || '发送消息失败')
+    }
+    
+    // 返回原始响应对象，包含可读流
+    return response
   }
 }
 

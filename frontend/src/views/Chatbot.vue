@@ -40,6 +40,7 @@
           v-for="(q, index) in quickQuestions" 
           :key="index"
           @click="sendQuickQuestion(q)"
+          :disabled="isTyping"
         >
           {{ q }}
         </button>
@@ -65,19 +66,23 @@
     <!-- 侧边栏 - 聊天记录 -->
     <div class="chat-sidebar">
       <div class="sidebar-header">
-        <h3>💬 常见问题</h3>
+        <h3>💬 会话列表</h3>
+        <button class="new-chat-btn" @click="createNewSession" title="新建会话">➕</button>
       </div>
-      <div class="faq-list">
+      <div class="session-list">
         <div 
-          class="faq-item" 
-          v-for="(faq, index) in faqs" 
-          :key="index"
-          @click="sendQuickQuestion(faq.question)"
+          class="session-item" 
+          v-for="session in sessions" 
+          :key="session.sessionId"
+          :class="{ active: currentSessionId === session.sessionId }"
+          @click="selectSession(session.sessionId)"
         >
-          <div class="faq-icon">❓</div>
-          <div class="faq-content">
-            <div class="faq-question">{{ faq.question }}</div>
+          <div class="session-icon">💬</div>
+          <div class="session-content">
+            <div class="session-title">{{ session.title || '新会话' }}</div>
+            <div class="session-time">{{ formatSessionTime(session.updatedAt) }}</div>
           </div>
+          <button class="delete-btn" @click.stop="deleteSession(session.sessionId)" title="删除会话">🗑️</button>
         </div>
       </div>
 
@@ -112,7 +117,9 @@
 </template>
 
 <script>
-import { ref, reactive, nextTick } from 'vue'
+import { ref, reactive, nextTick, onMounted } from 'vue'
+import { chatApi } from '@/api/api'
+import Message from '@/utils/message'
 
 export default {
   name: 'Chatbot',
@@ -121,14 +128,10 @@ export default {
     const chatMessages = ref(null)
     const inputMessage = ref('')
     const isTyping = ref(false)
+    const currentSessionId = ref(null)
+    const sessions = ref([])
 
-    const messages = ref([
-      {
-        type: 'bot',
-        text: '您好！我是您的智能银行助手，请问有什么可以帮助您的？',
-        time: getCurrentTime()
-      }
-    ])
+    const messages = ref([])
 
     const quickQuestions = [
       '如何查询余额？',
@@ -137,32 +140,7 @@ export default {
       '如何挂失银行卡？'
     ]
 
-    const faqs = ref([
-      { question: '如何查询账户余额？' },
-      { question: '转账限额是多少？' },
-      { question: '如何申请信用卡？' },
-      { question: '定期存款利率是多少？' },
-      { question: '如何开通网上银行？' },
-      { question: '银行卡丢失怎么办？' },
-      { question: '如何修改手机号码？' },
-      { question: '理财产品有哪些？' }
-    ])
-
-    // 模拟自动回复
-    const autoReplies = {
-      '余额': '您可以通过以下方式查询余额：\n1. 登录网上银行\n2. 使用手机银行 APP\n3. 拨打客服热线 95588\n4. 前往 ATM 机或银行网点查询',
-      '转账': '转账服务支持以下类型：\n1. 行内转账：实时到账，免费\n2. 跨行转账：2 小时内到账，手续费 0.5%\n3. 加急转账：实时到账，手续费 1%\n\n您可以在"转账服务"页面进行操作。',
-      '密码': '修改密码方式：\n1. 登录网上银行，进入"安全中心"\n2. 使用手机银行 APP\n3. 前往银行网点柜台\n4. 拨打客服热线 95588',
-      '挂失': '银行卡挂失流程：\n1. 立即拨打客服热线 95588 进行口头挂失\n2. 携带身份证前往银行网点办理正式挂失\n3. 补办新卡（工本费 10 元）\n\n挂失后原卡即刻失效，请放心。',
-      '限额': '转账限额说明：\n- 网上银行：单笔 5 万，日累计 20 万\n- 手机银行：单笔 5 万，日累计 20 万\n- ATM 转账：单笔 5 万，日累计 5 万\n\n如需提高限额，请前往网点办理。',
-      '信用卡': '信用卡申请方式：\n1. 网上银行在线申请\n2. 手机银行 APP 申请\n3. 银行网点柜台申请\n4. 拨打客服热线申请\n\n审批时间：3-5 个工作日',
-      '利率': '当前定期存款利率：\n- 3 个月：1.35%\n- 6 个月：1.55%\n- 1 年期：1.75%\n- 2 年期：2.25%\n- 3 年期：2.75%\n\n* 利率可能调整，以实际为准',
-      '网银': '开通网上银行：\n1. 携带身份证和银行卡前往网点\n2. 柜台工作人员协助开通\n3. 设置登录密码和 U 盾\n4. 下载安全控件后即可使用',
-      '手机': '修改手机号码：\n1. 携带身份证和银行卡\n2. 前往银行网点柜台办理\n3. 填写变更申请表\n4. 验证身份后即时生效',
-      '理财': '我行理财产品：\n1. 稳健型：年化 3%-4%\n2. 平衡型：年化 4%-5%\n3. 进取型：年化 5%-7%\n\n具体产品请在"理财服务"页面查看。',
-      'default': '感谢您的咨询！为了给您提供更准确的帮助，您可以：\n1. 拨打客服热线 95588\n2. 前往附近银行网点\n3. 使用网上银行或手机银行\n\n请问还有其他问题吗？'
-    }
-
+    // 获取当前时间
     function getCurrentTime() {
       const now = new Date()
       return now.toLocaleTimeString('zh-CN', { 
@@ -171,6 +149,25 @@ export default {
       })
     }
 
+    // 格式化会话时间
+    function formatSessionTime(timeStr) {
+      if (!timeStr) return ''
+      const date = new Date(timeStr)
+      const now = new Date()
+      const diff = now - date
+      
+      if (diff < 60000) return '刚刚'
+      if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前'
+      if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前'
+      if (diff < 604800000) return Math.floor(diff / 86400000) + '天前'
+      
+      return date.toLocaleDateString('zh-CN', { 
+        month: '2-digit', 
+        day: '2-digit' 
+      })
+    }
+
+    // 滚动到底部
     function scrollToBottom() {
       nextTick(() => {
         if (chatMessages.value) {
@@ -179,18 +176,102 @@ export default {
       })
     }
 
-    function getAutoReply(message) {
-      for (const [keyword, reply] of Object.entries(autoReplies)) {
-        if (keyword !== 'default' && message.includes(keyword)) {
-          return reply
+    // 获取会话列表
+    async function loadSessions() {
+      try {
+        const res = await chatApi.getSessions()
+        if (res.data.code === 1 || res.data.code === 200) {
+          sessions.value = res.data.data || []
+          // 如果有会话且当前没有选中，选择第一个
+          if (sessions.value.length > 0 && !currentSessionId.value) {
+            selectSession(sessions.value[0].sessionId)
+          }
         }
+      } catch (error) {
+        console.error('加载会话列表失败:', error)
       }
-      return autoReplies.default
     }
 
-    function sendMessage() {
+    // 创建新会话
+    async function createNewSession() {
+      try {
+        const res = await chatApi.createSession()
+        if (res.data.code === 1 || res.data.code === 200) {
+          const newSession = res.data.data
+          sessions.value.unshift(newSession)
+          selectSession(newSession.sessionId)
+          // 清空消息，显示欢迎语
+          messages.value = [{
+            type: 'bot',
+            text: '您好！我是您的智能银行助手，请问有什么可以帮助您的？',
+            time: getCurrentTime()
+          }]
+          Message.success('新建会话成功')
+        }
+      } catch (error) {
+        console.error('创建会话失败:', error)
+        Message.error('创建会话失败')
+      }
+    }
+
+    // 选择会话
+    async function selectSession(sessionId) {
+      currentSessionId.value = sessionId
+      messages.value = []
+      isTyping.value = false
+      
+      try {
+        const res = await chatApi.getMessages(sessionId)
+        if (res.data.code === 1 || res.data.code === 200) {
+          const msgList = res.data.data || []
+          messages.value = msgList.map(msg => ({
+            type: msg.senderType === 1 ? 'user' : 'bot',
+            text: msg.content,
+            time: msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString('zh-CN', { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            }) : getCurrentTime()
+          }))
+          scrollToBottom()
+        }
+      } catch (error) {
+        console.error('加载消息失败:', error)
+        Message.error('加载消息失败')
+      }
+    }
+
+    // 删除会话
+    async function deleteSession(sessionId) {
+      try {
+        const res = await chatApi.deleteSession(sessionId)
+        if (res.data.code === 1 || res.data.code === 200) {
+          sessions.value = sessions.value.filter(s => s.sessionId !== sessionId)
+          if (currentSessionId.value === sessionId) {
+            currentSessionId.value = null
+            messages.value = [{
+              type: 'bot',
+              text: '您好！我是您的智能银行助手，请问有什么可以帮助您的？',
+              time: getCurrentTime()
+            }]
+          }
+          Message.success('删除会话成功')
+        }
+      } catch (error) {
+        console.error('删除会话失败:', error)
+        Message.error('删除会话失败')
+      }
+    }
+
+    // 发送消息
+    async function sendMessage() {
       const text = inputMessage.value.trim()
       if (!text || isTyping.value) return
+
+      // 如果没有当前会话，先创建
+      if (!currentSessionId.value) {
+        await createNewSession()
+        if (!currentSessionId.value) return
+      }
 
       // 添加用户消息
       messages.value.push({
@@ -201,25 +282,55 @@ export default {
 
       inputMessage.value = ''
       scrollToBottom()
-
-      // 模拟机器人回复
       isTyping.value = true
-      setTimeout(() => {
-        const reply = getAutoReply(text)
-        messages.value.push({
-          type: 'bot',
-          text: reply,
-          time: getCurrentTime()
+
+      try {
+        // 发送消息到后端
+        const response = await chatApi.sendMessage({
+          sessionId: currentSessionId.value,
+          content: text
         })
+
+        // 处理流式响应
+        const reader = response.data.pipeThrough(new TextDecoderStream()).getReader()
+        let botResponse = ''
+        const botMessage = {
+          type: 'bot',
+          text: '',
+          time: getCurrentTime()
+        }
+        messages.value.push(botMessage)
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          
+          botResponse += value
+          messages.value[messages.value.length - 1].text = botResponse
+          scrollToBottom()
+        }
+
         isTyping.value = false
-        scrollToBottom()
-      }, 1000 + Math.random() * 1000)
+      } catch (error) {
+        console.error('发送消息失败:', error)
+        isTyping.value = false
+        Message.error('发送消息失败，请重试')
+        
+        // 移除失败的消息
+        messages.value.pop()
+      }
     }
 
+    // 发送快捷问题
     function sendQuickQuestion(question) {
       inputMessage.value = question
       sendMessage()
     }
+
+    // 组件挂载时加载会话列表
+    onMounted(() => {
+      loadSessions()
+    })
 
     return {
       chatWindow,
@@ -228,7 +339,15 @@ export default {
       isTyping,
       messages,
       quickQuestions,
-      faqs,
+      sessions,
+      currentSessionId,
+      getCurrentTime,
+      formatSessionTime,
+      scrollToBottom,
+      loadSessions,
+      createNewSession,
+      selectSession,
+      deleteSession,
       sendMessage,
       sendQuickQuestion
     }
@@ -393,10 +512,15 @@ export default {
   transition: all var(--transition-normal);
 }
 
-.quick-btn:hover {
+.quick-btn:hover:not(:disabled) {
   background: var(--glass-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.quick-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* 输入区域 */
@@ -472,6 +596,9 @@ export default {
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-lg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .sidebar-header h3 {
@@ -481,18 +608,38 @@ export default {
   font-weight: var(--font-weight-semibold);
 }
 
-.faq-list {
+.new-chat-btn {
+  background: var(--glass-bg-hover);
+  border: 1px solid var(--glass-border-hover);
+  color: var(--color-white);
+  border-radius: var(--radius-lg);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: var(--font-size-lg);
+}
+
+.new-chat-btn:hover {
+  background: var(--btn-glass-hover);
+  transform: scale(1.1);
+}
+
+.session-list {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-2xl);
 }
 
-.faq-item {
+.session-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   background: var(--glass-bg-light);
   border-radius: var(--radius-xl);
   cursor: pointer;
@@ -500,19 +647,56 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.faq-item:hover {
+.session-item:hover {
   background: var(--glass-border-hover);
-  transform: translateY(-2px);
+  transform: translateX(-4px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.faq-icon {
-  font-size: var(--font-size-2xl);
+.session-item.active {
+  background: var(--btn-glass-bg);
+  border-color: var(--btn-glass-border);
 }
 
-.faq-question {
-  font-size: var(--font-size-md);
+.session-icon {
+  font-size: var(--font-size-xl);
+}
+
+.session-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-title {
+  font-size: var(--font-size-sm);
   color: var(--color-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-time {
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
+  margin-top: 2px;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  opacity: 0;
+  transition: all var(--transition-normal);
+  padding: 4px;
+}
+
+.session-item:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  transform: scale(1.2);
 }
 
 .contact-list {
@@ -532,7 +716,7 @@ export default {
 }
 
 .contact-icon {
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-2xl);
 }
 
 .contact-label {

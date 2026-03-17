@@ -183,52 +183,53 @@ export const chatApi = {
    * 获取用户的聊天会话列表
    */
   getSessions: async () => {
-    return await http.get('/chat/sessions')
+    return await http.get('/chat/session')
   },
 
   /**
    * 创建新的聊天会话
-   * @param {string} title - 会话标题（可选）
    */
-  createSession: async (title) => {
-    return await http.post('/chat/sessions', { title })
+  createSession: async () => {
+    return await http.post('/chat/session')
   },
 
   /**
    * 删除聊天会话
-   * @param {number} sessionId - 会话 ID
+   * @param {string} sessionId - 会话 UUID
    */
   deleteSession: async (sessionId) => {
-    return await http.delete(`/chat/sessions/${sessionId}`)
+    return await http.delete(`/chat/session/${sessionId}`)
+  },
+
+  /**
+   * 重命名聊天会话
+   * @param {string} sessionId - 会话 UUID
+   * @param {string} title - 新标题
+   */
+  renameSession: async (sessionId, title) => {
+    return await http.put(`/chat/session/${sessionId}`, { title })
   },
 
   /**
    * 获取指定会话的聊天记录
-   * @param {number} sessionId - 会话 ID
+   * @param {string} sessionId - 会话 UUID
    */
   getMessages: async (sessionId) => {
-    return await http.get(`/chat/messages/${sessionId}`)
+    return await http.get(`/chat/message/${sessionId}`)
   },
 
   /**
    * 发送消息并获取 AI 流式回复
-   * @param {object} data - 聊天数据 {sessionId, message, title}
+   * @param {object} data - 聊天数据 {sessionId, content}
    * @returns {ReadableStream} 流式响应
    */
   sendMessage: async (data) => {
-    return await http.post('/chat/message', data, {
+    return await http.post('/chat', data, {
       headers: {
-        'Accept': 'text/event-stream'
-      }
+        'Accept': 'text/html'
+      },
+      responseType: 'text'
     })
-  },
-
-  /**
-   * 保存 AI 回复消息
-   * @param {object} data - 消息数据 {sessionId, content}
-   */
-  saveBotMessage: async (data) => {
-    return await http.post('/chat/message/save', data)
   }
 }
 

@@ -429,6 +429,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  align-items: flex-start;
 }
 
 .message-bubble {
@@ -437,6 +438,7 @@ export default {
   border-radius: var(--radius-xl);
   border-top-left-radius: var(--radius-sm);
   border: 1px solid var(--glass-border);
+  text-align: left;
 }
 
 .message-bubble p {
@@ -457,10 +459,19 @@ export default {
   font-size: var(--font-size-xs);
   color: var(--text-on-gradient-muted);
   padding: 0 var(--spacing-xs);
+  text-align: left;
 }
 
 .message.user .message-time {
   text-align: right;
+}
+
+.message.user .message-bubble {
+  text-align: right;
+}
+
+.message.user .message-content {
+  align-items: flex-end;
 }
 
 /* 输入指示器 */

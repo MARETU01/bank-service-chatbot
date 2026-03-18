@@ -1,7 +1,9 @@
 package com.maretu.api.client;
 
+import com.maretu.api.dto.AccountDTO;
 import com.maretu.api.dto.DashboardStatsDTO;
 import com.maretu.api.dto.TransactionDTO;
+import com.maretu.api.dto.TransferDTO;
 import com.maretu.api.dto.TransferReqDTO;
 import com.maretu.common.utils.Result;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -15,51 +17,48 @@ import java.util.List;
 @FeignClient(value = "bank-service")
 public interface BankClient {
 
-    /**
-     * 获取用户账户列表
-     */
+    @PostMapping("/accounts")
+    Result<AccountDTO> createAccount(@RequestHeader("user-info") String userJson,
+                                     @RequestBody AccountDTO req);
+
     @GetMapping("/accounts")
-    Result<List<Object>> getAccounts(@RequestHeader("user-info") String userJson);
+    Result<List<AccountDTO>> getAccounts(@RequestHeader("user-info") String userJson);
 
-    /**
-     * 获取账户详情
-     */
     @GetMapping("/accounts/{id}")
-    Result<Object> getAccountDetail(@PathVariable("id") Long id,
-                                    @RequestHeader("user-info") String userJson);
+    Result<AccountDTO> getAccountDetail(@PathVariable("id") Long id,
+                                        @RequestHeader("user-info") String userJson);
 
-    /**
-     * 获取交易记录
-     */
-    @GetMapping("/accounts/{accountId}/transactions")
-    Result<List<TransactionDTO>> getTransactions(@PathVariable("accountId") Long accountId,
-                                                  @RequestHeader("user-info") String userJson,
+    @GetMapping("/accounts/dashboard/stats")
+    Result<DashboardStatsDTO> getDashboardStats(@RequestHeader("user-info") String userJson);
+
+    @PutMapping("/accounts/{id}")
+    Result<AccountDTO> updateAccount(@PathVariable("id") Long id,
+                                     @RequestHeader("user-info") String userJson,
+                                     @RequestBody AccountDTO req);
+
+    @PutMapping("/accounts/{id}/status")
+    Result<AccountDTO> updateStatus(@PathVariable("id") Long id,
+                                    @RequestHeader("user-info") String userJson,
+                                    @RequestBody AccountDTO req);
+
+    @GetMapping("/transactions")
+    Result<List<TransactionDTO>> getTransactions(@RequestHeader("user-info") String userJson,
+                                                  @RequestParam(value = "accountId", required = false) Long accountId,
                                                   @RequestParam(value = "type", required = false) String type,
                                                   @RequestParam(value = "status", required = false) Integer status,
                                                   @RequestParam(value = "startDate", required = false) String startDate,
                                                   @RequestParam(value = "endDate", required = false) String endDate,
                                                   @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                  @RequestParam(value = "size", defaultValue = "10") Integer size);
+                                                  @RequestParam(value = "size", defaultValue = "10") Integer size,
+                                                  @RequestParam(value = "allAccounts", defaultValue = "false") Boolean allAccounts);
 
-    /**
-     * 获取转账记录
-     */
-    @GetMapping("/accounts/{accountId}/transfers")
-    Result<List<Object>> getTransfers(@PathVariable("accountId") Long accountId,
-                                      @RequestHeader("user-info") String userJson,
-                                      @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                      @RequestParam(value = "size", defaultValue = "10") Integer size);
+    @GetMapping("/transfers")
+    Result<List<TransferDTO>> getTransfers(@RequestHeader("user-info") String userJson,
+                                           @RequestParam(value = "accountId", required = false) Long accountId,
+                                           @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                           @RequestParam(value = "size", defaultValue = "10") Integer size);
 
-    /**
-     * 发起转账
-     */
-    @PostMapping("/accounts/transfer")
-    Result<Object> transfer(@RequestHeader("user-info") String userJson,
-                            @RequestBody TransferReqDTO req);
-
-    /**
-     * 获取仪表盘统计数据
-     */
-    @GetMapping("/accounts/dashboard/stats")
-    Result<DashboardStatsDTO> getDashboardStats(@RequestHeader("user-info") String userJson);
+    @PostMapping("/transfers")
+    Result<TransferDTO> transfer(@RequestHeader("user-info") String userJson,
+                                 @RequestBody TransferReqDTO req);
 }

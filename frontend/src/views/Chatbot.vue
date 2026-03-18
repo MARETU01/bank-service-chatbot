@@ -17,7 +17,7 @@
           </div>
 
           <!-- 正在输入 -->
-          <div class="message bot-message" v-if="isTyping">
+          <div class="message bot-message" v-if="isTyping && messages.length > 0 && messages[messages.length - 1].text === ''">
             <div class="message-avatar">🤖</div>
             <div class="message-content">
               <div class="typing-indicator">

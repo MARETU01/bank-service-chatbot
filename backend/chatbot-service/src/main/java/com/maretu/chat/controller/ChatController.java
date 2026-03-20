@@ -80,7 +80,6 @@ public class ChatController {
     @PostMapping(produces = "text/html;charset=utf-8")
     public Flux<String> chat(@RequestHeader("user-info") String userJson,
                              @RequestBody Message message) throws JsonProcessingException {
-        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
-        return messageService.chat(context.getUserId(), message);
+        return messageService.chat(userJson, message);
     }
 }

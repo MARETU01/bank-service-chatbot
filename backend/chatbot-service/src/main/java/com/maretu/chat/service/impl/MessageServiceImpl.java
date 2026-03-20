@@ -1,10 +1,13 @@
 package com.maretu.chat.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maretu.chat.pojo.Message;
 import com.maretu.chat.mapper.MessageMapper;
 import com.maretu.chat.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.chat.service.ISessionService;
+import com.maretu.common.dto.Context;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -14,6 +17,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 
@@ -29,6 +33,7 @@ import java.util.concurrent.Executor;
 @RequiredArgsConstructor
 public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements IMessageService {
 
+    private final ObjectMapper jacksonObjectMapper;
     private final ISessionService sessionService;
     private final ChatClient chatClient;
     private final Executor virtualThreadPoolExecutor;
@@ -45,14 +50,16 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public Flux<String> chat(Integer userId, Message message) {
-        if (!sessionService.isSessionOwner(userId, message.getSessionId())) {
+    public Flux<String> chat(String userJson, Message message) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        if (!sessionService.isSessionOwner(context.getUserId(), message.getSessionId())) {
             throw new RuntimeException("无权访问该会话的消息");
         }
         StringBuilder fullResponse = new StringBuilder();
         return chatClient.prompt()
                 .user(message.getContent())
                 .messages(getRecentMessages(message.getSessionId(), 20))
+                .toolContext(Map.of("context", userJson))
                 .stream()
                 .content()
                 .doOnNext(fullResponse::append)

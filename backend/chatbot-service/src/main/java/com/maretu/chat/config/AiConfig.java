@@ -22,6 +22,9 @@ public class AiConfig {
     @Autowired(required = false)
     private OllamaChatModel ollamaChatModel;
 
+    @Autowired
+    private FunctionCallTools functionCallTools;
+
     @Bean
     @Primary
     public ChatClient chatClient() {
@@ -30,6 +33,8 @@ public class AiConfig {
             throw new IllegalStateException("No chat model available. Please configure OpenAI or Ollama.");
         }
         return ChatClient.builder(primaryModel)
+                .defaultSystem("你是一个银行智能客服助手，可以使用function call帮助用户查询账户信息")
+                .defaultTools(functionCallTools)
                 .build();
     }
 
@@ -38,7 +43,8 @@ public class AiConfig {
         if (openAiChatModel == null) {
             return null;
         }
-        return ChatClient.builder(openAiChatModel).build();
+        return ChatClient.builder(openAiChatModel)
+                .build();
     }
 
     @Bean(name = "ollamaChatClient")
@@ -46,6 +52,7 @@ public class AiConfig {
         if (ollamaChatModel == null) {
             return null;
         }
-        return ChatClient.builder(ollamaChatModel).build();
+        return ChatClient.builder(ollamaChatModel)
+                .build();
     }
 }

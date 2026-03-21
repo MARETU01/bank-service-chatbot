@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @FeignClient(value = "user-service")
 public interface UserClient {
 
-    @GetMapping("/users/{id}")
-    UserDTO getUser(@PathVariable("id") Long id);
-
     @PostMapping("/users/pay-password/verify")
     Result<Boolean> verifyPayPassword(@RequestHeader("user-info") String userJson, @RequestBody String payPassword);
 }

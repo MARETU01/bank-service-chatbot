@@ -30,6 +30,11 @@ spring:
       base-url: http://ipv6.maretu.top:11434
       chat:
         model: deepseek-r1:7b
+    vectorstore:
+      redis:
+        initialize-schema: true
+        index-name: chat-index
+        prefix: chat-prefix
 
 maretu:
   mysql:

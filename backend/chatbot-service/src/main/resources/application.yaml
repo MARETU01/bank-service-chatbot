@@ -33,8 +33,8 @@ spring:
     vectorstore:
       redis:
         initialize-schema: true
-        index-name: chat-index
-        prefix: chat-prefix
+        index-name: knowledge-base-index
+        prefix: "doc:"
 
 maretu:
   mysql:

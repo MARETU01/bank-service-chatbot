@@ -4,9 +4,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.vectorstore.SimpleVectorStore;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,9 +21,6 @@ public class AiConfig {
 
     @Autowired(required = false)
     private OllamaChatModel ollamaChatModel;
-
-    @Autowired
-    private OpenAiEmbeddingModel openAiEmbeddingModel;
 
     @Autowired
     private FunctionCallTools functionCallTools;
@@ -60,10 +54,5 @@ public class AiConfig {
         }
         return ChatClient.builder(ollamaChatModel)
                 .build();
-    }
-
-    @Bean
-    public VectorStore vectorStore() {
-        return SimpleVectorStore.builder(openAiEmbeddingModel).build();
     }
 }

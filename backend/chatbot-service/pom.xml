@@ -101,6 +101,12 @@
             <artifactId>spring-ai-starter-vector-store-redis</artifactId>
         </dependency>
 
+        <!-- Pdf reader -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-pdf-document-reader</artifactId>
+        </dependency>
+
         <!-- Connect Pool -->
         <dependency>
             <groupId>org.apache.commons</groupId>

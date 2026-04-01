@@ -17,4 +17,9 @@ public class RedisConstants {
     public static final Long VERIFY_CODE_TTL = 10L;
     public static final String RESET_PASSWORD_KEY = USER_SERVICE_PREFIX + "reset:";
     public static final Long RESET_PASSWORD_TTL = 10L;
+
+    //  Chat-service
+    public static final String CHAT_SERVICE_PREFIX = APP_NAME + ":chat:";
+    public static final String SESSION_OWNER_KEY = CHAT_SERVICE_PREFIX + "session:";
+    public static final Long SESSION_OWNER_TTL = 30L;
 }

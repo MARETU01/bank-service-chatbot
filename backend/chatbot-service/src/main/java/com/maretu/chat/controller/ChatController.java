@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maretu.chat.pojo.Message;
 import com.maretu.chat.pojo.Session;
+import com.maretu.chat.service.IKnowledgeService;
 import com.maretu.chat.service.IMessageService;
 import com.maretu.chat.service.ISessionService;
 import com.maretu.common.dto.Context;
@@ -11,12 +12,11 @@ import com.maretu.common.utils.Result;
 import com.maretu.common.utils.VectorDistanceUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -25,6 +25,7 @@ public class ChatController {
 
     private final ISessionService sessionService;
     private final IMessageService messageService;
+    private final IKnowledgeService knowledgeService;
     private final ObjectMapper jacksonObjectMapper;
     private final OpenAiEmbeddingModel openAiEmbeddingModel;
 
@@ -126,5 +127,30 @@ public class ChatController {
                 System.out.println(VectorDistanceUtils.cosineDistance(queryVector, textVector));
             }
         return Result.success(null);
+    }
+
+    /**
+     * 批量上传文档到知识库（支持 PDF 和 TXT 文件）
+     */
+    @PostMapping("/knowledge")
+    public Result<List<Map<String, Object>>> uploadDocuments(@RequestParam("files") MultipartFile[] files) {
+        try {
+            return Result.success(knowledgeService.uploadDocuments(files));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    /**
+     * 清空知识库
+     */
+    @DeleteMapping("/knowledge")
+    public Result<Void> clearKnowledge() {
+        try {
+            knowledgeService.clearKnowledge();
+            return Result.success(null);
+        } catch (Exception e) {
+            return Result.failure("清空知识库失败：" + e.getMessage());
+        }
     }
 }

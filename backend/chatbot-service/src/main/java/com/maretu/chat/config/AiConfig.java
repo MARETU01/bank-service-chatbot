@@ -69,6 +69,9 @@ public class AiConfig {
     @Primary
     public VectorStore vectorStore(JedisPooled jedisPooled, @Qualifier("embeddingModel") EmbeddingModel embeddingModel) {
         return RedisVectorStore.builder(jedisPooled, embeddingModel)
+                .initializeSchema(true)
+                .indexName("knowledge-base-index")
+                .prefix("doc:")
                 .build();
     }
 

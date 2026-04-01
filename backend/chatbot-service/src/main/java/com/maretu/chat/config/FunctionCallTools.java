@@ -49,7 +49,7 @@ public class FunctionCallTools {
 
         System.out.println("docs:" +docs);
 
-        if (docs == null || docs.isEmpty()) {
+        if (docs.isEmpty()) {
             return "知识库中未找到与该问题相关的信息，请尝试换一种方式提问，或联系人工客服获取帮助。";
         }
 
@@ -57,7 +57,7 @@ public class FunctionCallTools {
                 .map(doc -> {
                     StringBuilder sb = new StringBuilder();
                     // 如果文档有来源元数据，附加来源信息
-                    if (doc.getMetadata() != null && doc.getMetadata().containsKey("source")) {
+                    if (doc.getMetadata().containsKey("source")) {
                         sb.append("【来源：").append(doc.getMetadata().get("source")).append("】\n");
                     }
                     sb.append(doc.getText());

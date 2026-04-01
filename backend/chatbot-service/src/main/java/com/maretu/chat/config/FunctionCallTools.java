@@ -9,11 +9,16 @@ import com.maretu.api.dto.TransferReqDTO;
 import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * AI 助手工具类 - 提供银行服务相关的工具方法供 AI 调用
@@ -23,6 +28,47 @@ import java.util.List;
 public class FunctionCallTools {
     
     private final BankClient bankClient;
+    private final VectorStore vectorStore;
+
+    /**
+     * RAG 知识库检索工具 - 供 AI 在需要回答银行通用知识类问题时调用
+     *
+     * @param query 检索关键词，由 AI 根据用户问题生成
+     * @return 检索到的相关知识库内容
+     */
+    @Tool(description = "搜索银行知识库，用于回答银行通用知识类问题。" +
+            "当用户询问以下类型问题时应使用此工具：" +
+            "1. 银行产品介绍（存款、贷款、理财、信用卡、基金等）；" +
+            "2. 业务办理流程（开户、销户、挂失、密码重置等）；" +
+            "3. 费率和收费标准（手续费、利率、汇率等）；" +
+            "4. 银行政策和规定（限额、风控、合规等）；" +
+            "5. 常见问题解答（FAQ）。" +
+            "注意：当用户询问的是个人账户数据（余额、交易记录、转账等）时，不要使用此工具，应使用对应的账户查询工具。")
+    public String searchKnowledge(@ToolParam(description = "根据用户问题提炼出的检索关键词，应简洁准确地概括用户想了解的知识点") String query) {
+        List<Document> docs = vectorStore.similaritySearch(
+                SearchRequest.builder()
+                        .query(query)
+                        .topK(5)
+                        .similarityThreshold(0.7)
+                        .build()
+        );
+
+        if (docs == null || docs.isEmpty()) {
+            return "知识库中未找到与该问题相关的信息，请尝试换一种方式提问，或联系人工客服获取帮助。";
+        }
+
+        return docs.stream()
+                .map(doc -> {
+                    StringBuilder sb = new StringBuilder();
+                    // 如果文档有来源元数据，附加来源信息
+                    if (doc.getMetadata() != null && doc.getMetadata().containsKey("source")) {
+                        sb.append("【来源：").append(doc.getMetadata().get("source")).append("】\n");
+                    }
+                    sb.append(doc.getText());
+                    return sb.toString();
+                })
+                .collect(Collectors.joining("\n---\n"));
+    }
 
     @Tool(description = "创建新的银行账户，需要提供账户名称、初始余额、货币类型、日限额等信息")
     public AccountDTO createAccount(ToolContext toolContext,

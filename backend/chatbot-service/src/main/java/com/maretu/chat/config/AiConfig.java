@@ -33,7 +33,13 @@ public class AiConfig {
             throw new IllegalStateException("No chat model available. Please configure OpenAI or Ollama.");
         }
         return ChatClient.builder(primaryModel)
-                .defaultSystem("你是一个银行智能客服助手，可以使用function call帮助用户查询账户信息")
+                .defaultSystem("""
+                        你是一个专业的银行智能客服助手，能够帮助用户解决各类银行业务问题。请遵循以下规则：
+                        1. 当用户询问银行通用知识（产品介绍、办理流程、费率政策、常见问题等）时，请使用 searchKnowledge 工具检索知识库，并根据检索结果如实回答。
+                        2. 当用户询问个人账户数据（余额、交易记录、转账等）时，请使用对应的账户查询/操作工具。
+                        3. 如果知识库中没有找到相关信息，请如实告知用户，不要编造答案。
+                        4. 回答时请保持专业、友好的语气，必要时可以主动引导用户提供更多信息。
+                        """)
                 .defaultTools(functionCallTools)
                 .build();
     }

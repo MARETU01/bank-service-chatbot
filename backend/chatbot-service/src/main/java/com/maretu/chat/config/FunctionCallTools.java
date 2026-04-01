@@ -30,12 +30,6 @@ public class FunctionCallTools {
     private final BankClient bankClient;
     private final VectorStore vectorStore;
 
-    /**
-     * RAG 知识库检索工具 - 供 AI 在需要回答银行通用知识类问题时调用
-     *
-     * @param query 检索关键词，由 AI 根据用户问题生成
-     * @return 检索到的相关知识库内容
-     */
     @Tool(description = "搜索银行知识库，用于回答银行通用知识类问题。" +
             "当用户询问以下类型问题时应使用此工具：" +
             "1. 银行产品介绍（存款、贷款、理财、信用卡、基金等）；" +
@@ -52,6 +46,8 @@ public class FunctionCallTools {
                         .similarityThreshold(0.7)
                         .build()
         );
+
+        System.out.println("docs:" +docs);
 
         if (docs == null || docs.isEmpty()) {
             return "知识库中未找到与该问题相关的信息，请尝试换一种方式提问，或联系人工客服获取帮助。";

@@ -3,11 +3,23 @@ package com.maretu.chat.config;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.ollama.OllamaEmbeddingModel;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.beans.factory.annotation.Qualifier;
+import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisClientConfig;
+import redis.clients.jedis.DefaultJedisClientConfig;
 
 /**
  * AI 配置类
@@ -22,8 +34,43 @@ public class AiConfig {
     @Autowired(required = false)
     private OllamaChatModel ollamaChatModel;
 
+    @Autowired(required = false)
+    private OpenAiEmbeddingModel openAiEmbeddingModel;
+
+    @Autowired(required = false)
+    private OllamaEmbeddingModel ollamaEmbeddingModel;
+
+    @Lazy
     @Autowired
     private FunctionCallTools functionCallTools;
+
+    @Value("${spring.data.redis.host:ipv6.maretu.top}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port:6379}")
+    private int redisPort;
+
+    @Value("${spring.data.redis.password:maretu}")
+    private String redisPassword;
+
+    @Value("${spring.data.redis.database:0}")
+    private int redisDatabase;
+
+    @Bean
+    public JedisPooled jedisPooled() {
+        JedisClientConfig config = DefaultJedisClientConfig.builder()
+                .password(redisPassword)
+                .database(redisDatabase)
+                .build();
+        return new JedisPooled(new HostAndPort(redisHost, redisPort), config);
+    }
+
+    @Bean
+    @Primary
+    public VectorStore vectorStore(JedisPooled jedisPooled, @Qualifier("embeddingModel") EmbeddingModel embeddingModel) {
+        return RedisVectorStore.builder(jedisPooled, embeddingModel)
+                .build();
+    }
 
     @Bean
     @Primary
@@ -52,6 +99,12 @@ public class AiConfig {
                         """)
                 .defaultTools(functionCallTools)
                 .build();
+    }
+
+    @Bean
+    @Primary
+    public EmbeddingModel embeddingModel() {
+        return openAiEmbeddingModel != null ? openAiEmbeddingModel : ollamaEmbeddingModel;
     }
 
     @Bean(name = "openAiChatClient")

@@ -8,7 +8,9 @@ import com.maretu.chat.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.chat.service.ISessionService;
 import com.maretu.common.dto.Context;
+import com.maretu.common.utils.ChatGuardUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -29,6 +31,7 @@ import java.util.concurrent.Executor;
  * @author maretu
  * @since 2026-03-14
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements IMessageService {
@@ -55,22 +58,51 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         if (!sessionService.isSessionOwner(context.getUserId(), message.getSessionId())) {
             throw new RuntimeException("无权访问该会话的消息");
         }
+
+        // ===== 输入安全防护 =====
+        ChatGuardUtils.GuardResult guardResult = ChatGuardUtils.processInput(message.getContent());
+        if (!guardResult.isPassed()) {
+            // 输入未通过安全检查，直接返回拒绝原因，同时保存对话记录
+            String rejectReason = guardResult.getRejectReason();
+            log.warn("用户[{}]输入未通过安全检查: {}", context.getUserId(), rejectReason);
+            virtualThreadPoolExecutor.execute(() -> {
+                List<Message> saveMessages = new ArrayList<>();
+                saveMessages.add(message.setSenderType(1).setMessageType("TEXT"));
+                saveMessages.add(new Message()
+                        .setMessageType("TEXT")
+                        .setSenderType(2)
+                        .setSessionId(message.getSessionId())
+                        .setContent(rejectReason));
+                saveBatch(saveMessages, 2);
+            });
+            return Flux.just(rejectReason);
+        }
+        // 使用安全处理后的内容（已脱敏、已清理）
+        String safeContent = guardResult.getSafeContent();
+
+        // ===== 调用 LLM =====
         StringBuilder fullResponse = new StringBuilder();
         return chatClient.prompt()
-                .user(message.getContent())
+                .user(safeContent)
                 .messages(getRecentMessages(message.getSessionId(), 20))
                 .toolContext(Map.of("context", userJson))
                 .stream()
                 .content()
+                // ===== 输出安全审核（逐片段累积后在完成时审核） =====
                 .doOnNext(fullResponse::append)
                 .doOnComplete(() -> virtualThreadPoolExecutor.execute(() -> {
+                    // 对完整回答进行输出审核
+                    String reviewedResponse = ChatGuardUtils.reviewOutput(fullResponse.toString());
+                    if (!reviewedResponse.equals(fullResponse.toString())) {
+                        log.warn("用户[{}]的AI回答未通过输出审核，已替换为安全回答", context.getUserId());
+                    }
                     List<Message> saveMessages = new ArrayList<>();
                     saveMessages.add(message.setSenderType(1).setMessageType("TEXT"));
                     saveMessages.add(new Message()
                             .setMessageType("TEXT")
                             .setSenderType(2)
                             .setSessionId(message.getSessionId())
-                            .setContent(fullResponse.toString()));
+                            .setContent(reviewedResponse));
                     saveBatch(saveMessages, 2);
                 }));
     }

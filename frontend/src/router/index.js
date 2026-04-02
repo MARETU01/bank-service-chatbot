@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Layout from '../components/Layout.vue'
+import Message from '../utils/message'
 
 const routes = [
   {
@@ -120,11 +121,9 @@ router.beforeEach((to, from, next) => {
     const isAdmin = roles.includes('ADMIN')
     
     if (!isAdmin) {
-      // 普通用户尝试访问管理员页面，重定向到首页
-      next({
-        path: '/dashboard',
-        query: { message: '无权访问管理员页面' }
-      })
+      // 普通用户尝试访问管理员页面，显示错误提示并重定向到首页
+      Message.error('无权访问管理员页面')
+      next('/dashboard')
       return
     }
   }

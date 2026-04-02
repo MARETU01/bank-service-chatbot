@@ -8,6 +8,7 @@ import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -118,7 +119,12 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
     @Override
     @Async("virtualThreadPoolExecutor")
     public void clearKnowledge() {
-        vectorStore.delete("*");
+        Filter.Expression filterExpression = new Filter.Expression(
+                Filter.ExpressionType.EQ,
+                new Filter.Key("type"),
+                new Filter.Value("pdf")
+        );
+        vectorStore.delete(filterExpression);
     }
 
     /**

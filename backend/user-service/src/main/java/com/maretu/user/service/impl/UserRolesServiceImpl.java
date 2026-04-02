@@ -45,11 +45,9 @@ public class UserRolesServiceImpl extends ServiceImpl<UserRolesMapper, UserRoles
                 .map(UserRoles::getRoleId)
                 .collect(Collectors.toList());
 
-        // 3. 查询角色信息，返回角色代码列表
-        return rolesService.lambdaQuery()
-                .in(Roles::getId, roleIds)
-                .list()
-                .stream()
+        // 3. 从缓存获取角色信息，返回角色代码列表
+        return rolesService.getAllRoles().stream()
+                .filter(role -> roleIds.contains(role.getId()))
                 .map(Roles::getRoleCode)
                 .collect(Collectors.toList());
     }
@@ -57,9 +55,11 @@ public class UserRolesServiceImpl extends ServiceImpl<UserRolesMapper, UserRoles
     @Override
     @Async("virtualThreadPoolExecutor")
     public void assignDefaultRole(Long userId) {
-        Roles userRole = rolesService.lambdaQuery()
-                .eq(Roles::getRoleCode, RoleCode.USER.getCode())
-                .one();
+        // 从缓存获取角色列表，找到USER角色
+        Roles userRole = rolesService.getAllRoles().stream()
+                .filter(r -> RoleCode.USER.getCode().equals(r.getRoleCode()))
+                .findFirst()
+                .orElse(null);
         if (userRole != null) {
             UserRoles ur = new UserRoles();
             ur.setUserId(userId)

@@ -14,16 +14,7 @@ import java.util.Map;
  */
 public interface IKnowledgeService {
 
-    /**
-     * 批量上传文档到知识库
-     *
-     * @param files 上传的文件列表
-     * @return 每个文件的入库结果
-     */
     List<Map<String, Object>> uploadDocuments(MultipartFile[] files);
 
-    /**
-     * 清空知识库
-     */
     void clearKnowledge();
 }

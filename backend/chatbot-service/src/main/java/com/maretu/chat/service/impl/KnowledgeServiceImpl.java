@@ -10,6 +10,7 @@ import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,7 +25,6 @@ import java.util.*;
  *
  * @author maretu
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KnowledgeServiceImpl implements IKnowledgeService {
@@ -75,8 +75,6 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
         // 写入向量数据库（VectorStore 会自动调用 Embedding 模型进行向量化）
         vectorStore.add(chunks);
 
-        log.info("文档入库成功：文件名={}, 原始文档数={}, 切片数={}", filename, documents.size(), chunks.size());
-
         Map<String, Object> resultData = new HashMap<>();
         resultData.put("filename", filename);
         resultData.put("fileType", fileType);
@@ -109,8 +107,6 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
             results.add(fileResult);
         }
 
-        log.info("批量文档入库完成：成功={}, 失败={}", successCount, failCount);
-
         if (successCount == 0) {
             throw new RuntimeException("所有文件入库均失败");
         }
@@ -119,9 +115,9 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
     }
 
     @Override
+    @Async("virtualThreadPoolExecutor")
     public void clearKnowledge() {
         vectorStore.delete(List.of("*"));
-        log.info("知识库已清空");
     }
 
     // ==================== 私有方法 ====================
@@ -130,21 +126,14 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
      * 读取 PDF 文档
      */
     private List<Document> readPdfDocument(MultipartFile file, String filename) throws IOException {
-        PdfDocumentReaderConfig config = PdfDocumentReaderConfig.builder()
-                .withPageExtractedTextFormatter(
-                        ExtractedTextFormatter.builder()
-                                .withNumberOfBottomTextLinesToDelete(0)
-                                .withNumberOfTopPagesToSkipBeforeDelete(0)
-                                .build()
-                )
-                .withPagesPerDocument(1) // 每页作为一个 Document
-                .build();
-
         PagePdfDocumentReader reader = new PagePdfDocumentReader(
                 new InputStreamResource(file.getInputStream()),
-                config
+                PdfDocumentReaderConfig.builder()
+                        .withPageExtractedTextFormatter(ExtractedTextFormatter.defaults())
+                        .withPagesPerDocument(1)
+                        .build()
         );
-        List<Document> documents = reader.get();
+        List<Document> documents = reader.read();
 
         // 为每个文档添加来源元数据
         for (Document doc : documents) {

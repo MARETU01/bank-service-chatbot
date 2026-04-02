@@ -47,8 +47,6 @@ public class FunctionCallTools {
                         .build()
         );
 
-        System.out.println("docs:" +docs);
-
         if (docs.isEmpty()) {
             return "知识库中未找到与该问题相关的信息，请尝试换一种方式提问，或联系人工客服获取帮助。";
         }

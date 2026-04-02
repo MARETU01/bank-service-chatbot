@@ -88,4 +88,8 @@ INSERT INTO users (username, password, email, real_name, status) VALUES
 -- 关联管理员角色
 INSERT INTO user_roles (user_id, role_id) 
 SELECT u.id, r.id FROM users u, roles r 
+WHERE u.username = 'admin' AND r.role_code = 'USER';
+
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u, roles r
 WHERE u.username = 'admin' AND r.role_code = 'ADMIN';

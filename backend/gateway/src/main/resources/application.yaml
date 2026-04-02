@@ -30,4 +30,3 @@ maretu:
   auth:
     excludePaths:
       - /users/**
-      - /chat/**

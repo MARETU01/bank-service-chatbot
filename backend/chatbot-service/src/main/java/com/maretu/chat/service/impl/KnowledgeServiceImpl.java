@@ -1,7 +1,10 @@
 package com.maretu.chat.service.impl;
 
+import com.maretu.api.client.UserClient;
 import com.maretu.chat.service.IKnowledgeService;
+import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
@@ -30,6 +33,22 @@ import java.util.*;
 public class KnowledgeServiceImpl implements IKnowledgeService {
 
     private final VectorStore vectorStore;
+    private final UserClient userClient;
+    private final VirtualThreadExecutor virtualThreadExecutor;
+
+    /**
+     * 检查用户是否具有 admin 角色
+     */
+    private void checkAdminRole(String userJson) {
+        Result<List<String>> result = userClient.getUserRoles(userJson);
+        if (result == null || result.getData() == null) {
+            throw new RuntimeException("获取用户角色失败");
+        }
+        List<String> roles = result.getData();
+        if (roles.isEmpty() || !roles.contains("ADMIN")) {
+            throw new RuntimeException("权限不足：需要 admin 角色才能执行此操作");
+        }
+    }
 
     /**
      * 处理单个文件的入库逻辑
@@ -86,6 +105,9 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
 
     @Override
     public List<Map<String, Object>> uploadDocuments(String userJson, MultipartFile[] files) {
+        // 检查 admin 角色
+        checkAdminRole(userJson);
+
         List<Map<String, Object>> results = new ArrayList<>();
         int successCount = 0;
         int failCount = 0;
@@ -115,14 +137,15 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
     }
 
     @Override
-    @Async("virtualThreadPoolExecutor")
     public void clearKnowledge(String userJson) {
-        Filter.Expression filterExpression = new Filter.Expression(
+        // 检查 admin 角色
+        checkAdminRole(userJson);
+
+        virtualThreadExecutor.execute(() -> vectorStore.delete(new Filter.Expression(
                 Filter.ExpressionType.EQ,
                 new Filter.Key("type"),
                 new Filter.Value("pdf")
-        );
-        vectorStore.delete(filterExpression);
+        )));
     }
 
     /**

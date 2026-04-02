@@ -9,12 +9,14 @@ import com.maretu.user.dto.ResetPasswordReq;
 import com.maretu.user.dto.UpdateProfileReq;
 import com.maretu.user.dto.VerifyPayPasswordReq;
 import com.maretu.user.pojo.Users;
+import com.maretu.user.service.IUserRolesService;
 import com.maretu.user.service.IUserSecurityService;
 import com.maretu.user.service.IUsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class UsersController {
 
     private final IUsersService usersService;
     private final IUserSecurityService userSecurityService;
+    private final IUserRolesService userRolesService;
     private final ObjectMapper jacksonObjectMapper;
 
     @PostMapping("/login")
@@ -164,6 +167,16 @@ public class UsersController {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
             return Result.success(userSecurityService.hasPayPassword(Long.valueOf(context.getUserId())));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @GetMapping("/roles")
+    public Result<List<String>> getUserRoles(@RequestHeader("user-info") String userJson) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            return Result.success(userRolesService.getUserRoles(context.getUserId()));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

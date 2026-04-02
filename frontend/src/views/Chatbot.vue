@@ -210,7 +210,8 @@ export default {
         if (res.data.code === 1 || res.data.code === 200) {
           const newSession = res.data.data
           sessions.value.unshift(newSession)
-          selectSession(newSession.sessionId)
+          // 直接设置当前会话ID，不调用 selectSession（避免异步加载消息覆盖 messages）
+          currentSessionId.value = newSession.sessionId
           // 清空消息，显示欢迎语
           messages.value = [{
             type: 'bot',

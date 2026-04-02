@@ -174,6 +174,14 @@ export const userApi = {
    */
   getPayPasswordStatus: async () => {
     return await http.get('/users/pay-password/status')
+  },
+
+  /**
+   * 获取当前用户的角色列表
+   * @returns {Promise} - 返回角色代码数组，如 ['USER', 'ADMIN']
+   */
+  getUserRoles: async () => {
+    return await http.get('/users/roles')
   }
 }
 
@@ -249,10 +257,50 @@ export const chatApi = {
   }
 }
 
+// 知识库管理相关 API
+export const knowledgeApi = {
+  /**
+   * 上传文档到知识库
+   * 支持 PDF 和 TXT 文件
+   * 注意：PDF 文件会按每一页进行切片（pagesPerDocument=1），
+   *       务必使用 multipart/form-data 格式提交，参数名为 "files"，
+   *       不要修改此提交格式，否则会导致后端知识库切片异常
+   * @param {File[]} files - 文件数组
+   * @param {Function} onProgress - 上传进度回调 (progressEvent) => {}
+   * @returns {Promise} - 返回每个文件的入库结果
+   */
+  uploadDocuments: async (files, onProgress = null) => {
+    const formData = new FormData()
+    // 必须使用 "files" 作为参数名，与后端 @RequestParam("files") 对应
+    files.forEach(file => {
+      formData.append('files', file)
+    })
+    return await http.post('/chat/knowledge', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      // 文档上传+向量化可能耗时较长，设置 5 分钟超时
+      timeout: 300000,
+      // 上传进度回调
+      ...(onProgress ? { onUploadProgress: onProgress } : {})
+    })
+  },
+
+  /**
+   * 清空知识库
+   * 警告：此操作会删除所有已入库的向量数据，不可恢复
+   * @returns {Promise}
+   */
+  clearKnowledge: async () => {
+    return await http.delete('/chat/knowledge')
+  }
+}
+
 export default {
   accountApi,
   transactionApi,
   transferApi,
   userApi,
-  chatApi
+  chatApi,
+  knowledgeApi
 }

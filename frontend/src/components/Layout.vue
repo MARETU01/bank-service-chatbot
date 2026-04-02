@@ -30,6 +30,21 @@
           <span class="icon">👤</span>
           <span>个人中心</span>
         </router-link>
+
+        <!-- 管理员菜单 -->
+        <template v-if="isAdmin">
+          <div class="menu-divider">
+            <span class="divider-text">管理功能</span>
+          </div>
+          <router-link to="/admin/knowledge" class="menu-item admin-item">
+            <span class="icon">📚</span>
+            <span>知识库管理</span>
+          </router-link>
+          <router-link to="/admin/users" class="menu-item admin-item">
+            <span class="icon">👥</span>
+            <span>用户管理</span>
+          </router-link>
+        </template>
       </nav>
     </aside>
 
@@ -69,6 +84,9 @@ export default {
     const router = useRouter()
     const store = useStore()
 
+    // 是否是管理员
+    const isAdmin = computed(() => store.getters.isAdmin)
+
     const pageTitle = computed(() => {
       const titles = {
         '/dashboard': '仪表盘',
@@ -76,7 +94,9 @@ export default {
         '/transactions': '交易记录',
         '/transfers': '转账服务',
         '/chatbot': '智能客服',
-        '/profile': '个人中心'
+        '/profile': '个人中心',
+        '/admin/knowledge': '知识库管理',
+        '/admin/users': '用户管理'
       }
       return titles[route.path] || '银行服务'
     })
@@ -113,6 +133,7 @@ export default {
     return {
       pageTitle,
       currentUser,
+      isAdmin,
       toggleSidebar,
       handleLogout
     }
@@ -320,6 +341,53 @@ export default {
 
 .page-content {
   padding: var(--spacing-3xl) var(--spacing-4xl);
+}
+
+/* 管理员菜单分隔线 */
+.menu-divider {
+  margin: var(--spacing-lg) var(--spacing-2xl);
+  padding: var(--spacing-sm) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+}
+
+.divider-text {
+  font-size: var(--font-size-xs);
+  color: var(--text-on-gradient-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: var(--spacing-xs) 0;
+  white-space: nowrap;
+}
+
+.sidebar.collapsed .divider-text {
+  display: none;
+}
+
+.sidebar.collapsed .menu-divider {
+  margin: var(--spacing-lg) var(--spacing-md);
+}
+
+.admin-item {
+  position: relative;
+}
+
+.admin-item::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, #f59e0b, #ef4444);
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+.sidebar.collapsed .admin-item::before {
+  display: none;
 }
 
 @media (max-width: 768px) {

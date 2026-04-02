@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
-import router from '@/router'
+import router, { adminRoutes } from '@/router'
 import http from '@/http'
+import { userApi } from '@/api/api'
 
 export default createStore({
   state: {
@@ -11,7 +12,11 @@ export default createStore({
     // 是否已登录
     isLoggedIn: !!localStorage.getItem('token'),
     // 加载状态
-    loading: false
+    loading: false,
+    // 用户角色列表
+    roles: [],
+    // 是否已加载动态路由
+    dynamicRoutesAdded: false
   },
   
   getters: {
@@ -26,7 +31,11 @@ export default createStore({
     // 是否已登录
     isLoggedIn: state => state.isLoggedIn,
     // 是否正在加载
-    loading: state => state.loading
+    loading: state => state.loading,
+    // 获取用户角色
+    roles: state => state.roles,
+    // 是否是管理员
+    isAdmin: state => state.roles.includes('ADMIN'),
   },
   
   mutations: {
@@ -61,7 +70,19 @@ export default createStore({
       state.user = null
       state.token = null
       state.isLoggedIn = false
+      state.roles = []
+      state.dynamicRoutesAdded = false
       localStorage.removeItem('token')
+    },
+
+    // 设置用户角色
+    SET_ROLES(state, roles) {
+      state.roles = roles
+    },
+
+    // 设置动态路由已加载标记
+    SET_DYNAMIC_ROUTES_ADDED(state, value) {
+      state.dynamicRoutesAdded = value
     }
   },
   
@@ -79,6 +100,9 @@ export default createStore({
           
           // 获取用户信息
           await this.dispatch('fetchUserInfo')
+          
+          // 获取用户角色并添加动态路由
+          await this.dispatch('fetchUserRoles')
           
           return { success: true, message }
         } else {
@@ -140,8 +164,45 @@ export default createStore({
       }
     },
     
+    // 获取用户角色
+    async fetchUserRoles({ commit, state }) {
+      if (!state.token) {
+        return
+      }
+
+      try {
+        const response = await userApi.getUserRoles()
+        const { code, data } = response.data
+
+        if (code === 1 || code === 200) {
+          commit('SET_ROLES', data || [])
+          // 如果是管理员，动态添加管理路由
+          if (data && data.includes('ADMIN') && !state.dynamicRoutesAdded) {
+            adminRoutes.forEach(route => {
+              router.addRoute(route)
+            })
+            commit('SET_DYNAMIC_ROUTES_ADDED', true)
+          }
+        }
+      } catch (error) {
+        console.error('Fetch user roles error:', error)
+        // 角色获取失败不影响正常使用，默认为普通用户
+        commit('SET_ROLES', ['USER'])
+      }
+    },
+
     // 登出动作
-    async logout({ commit }) {
+    async logout({ commit, state }) {
+      // 移除动态添加的管理路由
+      if (state.dynamicRoutesAdded) {
+        adminRoutes.forEach(route => {
+          if (route.children) {
+            route.children.forEach(child => {
+              router.removeRoute(child.name)
+            })
+          }
+        })
+      }
       commit('CLEAR_USER')
       router.push('/')
     },
@@ -152,6 +213,7 @@ export default createStore({
       if (token) {
         commit('SET_TOKEN', token)
         await dispatch('fetchUserInfo')
+        await dispatch('fetchUserRoles')
       }
     }
   },

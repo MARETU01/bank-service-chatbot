@@ -70,6 +70,28 @@ const routes = [
   }
 ]
 
+// 管理员专属路由（动态添加）
+export const adminRoutes = [
+  {
+    path: '/',
+    component: Layout,
+    children: [
+      {
+        path: 'admin/knowledge',
+        name: 'KnowledgeManage',
+        component: () => import('../views/admin/KnowledgeManage.vue'),
+        meta: { title: '知识库管理', icon: '📚', requiresAuth: true, requiresAdmin: true }
+      },
+      {
+        path: 'admin/users',
+        name: 'UserManage',
+        component: () => import('../views/admin/UserManage.vue'),
+        meta: { title: '用户管理', icon: '👥', requiresAuth: true, requiresAdmin: true }
+      }
+    ]
+  }
+]
+
 const router = createRouter({
   history: createWebHistory(),
   routes,

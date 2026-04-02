@@ -203,8 +203,19 @@ export default {
       }
     }
 
-    // 创建新会话
+    // 判断当前会话是否为空会话（只有欢迎语，没有用户消息）
+    function isCurrentSessionEmpty() {
+      return messages.value.every(msg => msg.type === 'bot')
+    }
+
+    // 创建新会话（如果当前已是空会话则复用，不重复创建）
     async function createNewSession() {
+      // 如果当前已有会话且是空会话（没有用户消息），直接复用，不创建新的
+      if (currentSessionId.value && isCurrentSessionEmpty()) {
+        // 已经在空会话中，无需创建
+        return
+      }
+
       try {
         const res = await chatApi.createSession()
         if (res.data.code === 1 || res.data.code === 200) {
@@ -244,6 +255,14 @@ export default {
               minute: '2-digit' 
             }) : getCurrentTime()
           }))
+          // 如果是空会话（没有消息），显示欢迎语
+          if (messages.value.length === 0) {
+            messages.value = [{
+              type: 'bot',
+              text: '您好！我是您的智能银行助手，请问有什么可以帮助您的？',
+              time: getCurrentTime()
+            }]
+          }
           scrollToBottom()
         }
       } catch (error) {

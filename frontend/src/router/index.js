@@ -1,30 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Layout from '../components/Layout.vue'
-import Message from '../utils/message'
+import Layout from '@/components/Layout'
+import Message from '@/utils/message'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/HomeView.vue'),
+    component: () => import('@/views/HomeView'),
     meta: { title: '首页', requiresAuth: false }
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/LoginView.vue'),
+    component: () => import('@/views/LoginView'),
     meta: { title: '登录页面', requiresAuth: false }
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('../views/RegisterView.vue'),
+    component: () => import('@/views/RegisterView'),
     meta: { title: '注册页面', requiresAuth: false }
   },
   {
     path: '/reset-password',
     name: 'ResetPassword',
-    component: () => import('../views/ResetPasswordView.vue'),
+    component: () => import('@/views/ResetPasswordView'),
     meta: { title: '重设密码', requiresAuth: false }
   },
   {
@@ -34,49 +34,49 @@ const routes = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('../views/Dashboard.vue'),
+        component: () => import('@/views/Dashboard'),
         meta: { title: '仪表盘', icon: '📊', requiresAuth: true }
       },
       {
         path: 'accounts',
         name: 'Accounts',
-        component: () => import('../views/Accounts.vue'),
+        component: () => import('@/views/Accounts'),
         meta: { title: '我的账户', icon: '💳', requiresAuth: true }
       },
       {
         path: 'transactions',
         name: 'Transactions',
-        component: () => import('../views/Transactions.vue'),
+        component: () => import('@/views/Transactions'),
         meta: { title: '交易记录', icon: '📋', requiresAuth: true }
       },
       {
         path: 'transfers',
         name: 'Transfers',
-        component: () => import('../views/Transfers.vue'),
+        component: () => import('@/views/Transfers'),
         meta: { title: '转账服务', icon: '💸', requiresAuth: true }
       },
       {
         path: 'chatbot',
         name: 'Chatbot',
-        component: () => import('../views/Chatbot.vue'),
+        component: () => import('@/views/Chatbot'),
         meta: { title: '在线客服', icon: '🤖', requiresAuth: true }
       },
       {
         path: 'profile',
         name: 'Profile',
-        component: () => import('../views/Profile.vue'),
+        component: () => import('@/views/Profile'),
         meta: { title: '个人中心', icon: '👤', requiresAuth: true }
       },
       {
         path: 'admin/knowledge',
         name: 'KnowledgeManage',
-        component: () => import('../views/admin/KnowledgeManage.vue'),
+        component: () => import('@/views/admin/KnowledgeManage'),
         meta: { title: '知识库管理', icon: '📚', requiresAuth: true, requiresAdmin: true }
       },
       {
         path: 'admin/users',
         name: 'UserManage',
-        component: () => import('../views/admin/UserManage.vue'),
+        component: () => import('@/views/admin/UserManage'),
         meta: { title: '用户管理', icon: '👥', requiresAuth: true, requiresAdmin: true }
       }
     ]

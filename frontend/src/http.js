@@ -36,15 +36,7 @@ function onRefreshed(token) {
  */
 async function handleRefreshToken() {
     try {
-        const response = await axios.post(
-            'http://localhost:8080/users/refresh',
-            {},
-            {
-                headers: {
-                    'Maretu': localStorage.getItem('token')
-                }
-            }
-        )
+        const response = await instance.post('/users/refresh')
         
         const { code, data } = response.data
         if (code === 1 || code === 200) {

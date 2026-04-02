@@ -19,7 +19,7 @@ public class RedisConstants {
     public static final Long RESET_PASSWORD_TTL = 10L;
     public static final String ROLES_KEY = USER_SERVICE_PREFIX + "roles";
     public static final String USER_ROLES_KEY = USER_SERVICE_PREFIX + "user-roles:";
-    public static final Long USER_ROLES_TTL = 30L; // 30分钟
+    public static final Long USER_ROLES_TTL = 30L;
 
     //  Chat-service
     public static final String CHAT_SERVICE_PREFIX = APP_NAME + ":chat:";

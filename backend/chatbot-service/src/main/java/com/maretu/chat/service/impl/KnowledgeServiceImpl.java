@@ -10,7 +10,6 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +30,6 @@ import java.util.*;
 public class KnowledgeServiceImpl implements IKnowledgeService {
 
     private final VectorStore vectorStore;
-    private final RedisTemplate<Object, Object> redisTemplate;
 
     /**
      * 处理单个文件的入库逻辑
@@ -87,7 +85,7 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
     }
 
     @Override
-    public List<Map<String, Object>> uploadDocuments(MultipartFile[] files) {
+    public List<Map<String, Object>> uploadDocuments(String userJson, MultipartFile[] files) {
         List<Map<String, Object>> results = new ArrayList<>();
         int successCount = 0;
         int failCount = 0;
@@ -118,7 +116,7 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
 
     @Override
     @Async("virtualThreadPoolExecutor")
-    public void clearKnowledge() {
+    public void clearKnowledge(String userJson) {
         Filter.Expression filterExpression = new Filter.Expression(
                 Filter.ExpressionType.EQ,
                 new Filter.Key("type"),

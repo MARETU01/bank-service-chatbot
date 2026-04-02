@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface IKnowledgeService {
 
-    List<Map<String, Object>> uploadDocuments(MultipartFile[] files);
+    List<Map<String, Object>> uploadDocuments(String userJson, MultipartFile[] files);
 
-    void clearKnowledge();
+    void clearKnowledge(String userId);
 }

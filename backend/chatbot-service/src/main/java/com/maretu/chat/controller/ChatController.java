@@ -87,18 +87,19 @@ public class ChatController {
     }
 
     @PostMapping("/knowledge")
-    public Result<List<Map<String, Object>>> uploadDocuments(@RequestParam("files") MultipartFile[] files) {
+    public Result<List<Map<String, Object>>> uploadDocuments(@RequestHeader("user-info") String userJson,
+                                                             @RequestParam("files") MultipartFile[] files) {
         try {
-            return Result.success(knowledgeService.uploadDocuments(files));
+            return Result.success(knowledgeService.uploadDocuments(userJson, files));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }
     }
 
     @DeleteMapping("/knowledge")
-    public Result<Void> clearKnowledge() {
+    public Result<Void> clearKnowledge(@RequestHeader("user-info") String userJson) {
         try {
-            knowledgeService.clearKnowledge();
+            knowledgeService.clearKnowledge(userJson);
             return Result.success(null);
         } catch (Exception e) {
             return Result.failure("清空知识库失败：" + e.getMessage());

@@ -118,7 +118,7 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
     @Override
     @Async("virtualThreadPoolExecutor")
     public void clearKnowledge() {
-        redisTemplate.opsForHash().delete( "doc:*");
+        vectorStore.delete("*");
     }
 
     /**

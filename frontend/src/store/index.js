@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import router, { adminRoutes } from '@/router'
+import router from '@/router'
 import http from '@/http'
 import { userApi } from '@/api/api'
 
@@ -73,11 +73,14 @@ export default createStore({
       state.roles = []
       state.dynamicRoutesAdded = false
       localStorage.removeItem('token')
+      localStorage.removeItem('roles')
     },
 
     // 设置用户角色
     SET_ROLES(state, roles) {
       state.roles = roles
+      // 将角色保存到 localStorage 供路由守卫使用
+      localStorage.setItem('roles', JSON.stringify(roles))
     },
 
     // 设置动态路由已加载标记
@@ -176,13 +179,6 @@ export default createStore({
 
         if (code === 1 || code === 200) {
           commit('SET_ROLES', data || [])
-          // 如果是管理员，动态添加管理路由
-          if (data && data.includes('ADMIN') && !state.dynamicRoutesAdded) {
-            adminRoutes.forEach(route => {
-              router.addRoute(route)
-            })
-            commit('SET_DYNAMIC_ROUTES_ADDED', true)
-          }
         }
       } catch (error) {
         console.error('Fetch user roles error:', error)
@@ -193,16 +189,6 @@ export default createStore({
 
     // 登出动作
     async logout({ commit, state }) {
-      // 移除动态添加的管理路由
-      if (state.dynamicRoutesAdded) {
-        adminRoutes.forEach(route => {
-          if (route.children) {
-            route.children.forEach(child => {
-              router.removeRoute(child.name)
-            })
-          }
-        })
-      }
       commit('CLEAR_USER')
       router.push('/')
     },

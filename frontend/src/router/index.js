@@ -65,17 +65,7 @@ const routes = [
         name: 'Profile',
         component: () => import('../views/Profile.vue'),
         meta: { title: '个人中心', icon: '👤', requiresAuth: true }
-      }
-    ]
-  }
-]
-
-// 管理员专属路由（动态添加）
-export const adminRoutes = [
-  {
-    path: '/',
-    component: Layout,
-    children: [
+      },
       {
         path: 'admin/knowledge',
         name: 'KnowledgeManage',
@@ -121,13 +111,33 @@ router.beforeEach((to, from, next) => {
       path: '/login',
       query: { redirect: to.fullPath } // 保存原始目标路径
     })
-  } else if (to.path === '/login' && token) {
+    return
+  }
+  
+  // 检查是否是管理员专属页面
+  if (to.meta.requiresAdmin) {
+    const roles = JSON.parse(localStorage.getItem('roles') || '[]')
+    const isAdmin = roles.includes('ADMIN')
+    
+    if (!isAdmin) {
+      // 普通用户尝试访问管理员页面，重定向到首页
+      next({
+        path: '/dashboard',
+        query: { message: '无权访问管理员页面' }
+      })
+      return
+    }
+  }
+  
+  // 检查已登录用户访问登录页
+  if (to.path === '/login' && token) {
     // 已登录用户访问登录页，重定向到首页
     next('/')
-  } else {
-    // 允许访问
-    next()
+    return
   }
+  
+  // 允许访问
+  next()
 })
 
 // 全局后置守卫

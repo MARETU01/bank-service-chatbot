@@ -7,6 +7,7 @@ import com.maretu.user.dto.ResetPasswordReq;
 import com.maretu.user.dto.UpdateProfileReq;
 import com.maretu.user.pojo.Users;
 import com.maretu.user.mapper.UsersMapper;
+import com.maretu.user.service.IUserRolesService;
 import com.maretu.user.service.IUsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.user.utils.HashUtil;
@@ -37,6 +38,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     private final StringRedisTemplate stringRedisTemplate;
     private final MailUtil mailUtil;
+    private final IUserRolesService userRolesService;
     @Lazy
     @Autowired
     private UsersServiceImpl self;
@@ -119,6 +121,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 .setEmailVerified(true);
         save(user);
         stringRedisTemplate.delete(RedisConstants.VERIFY_CODE_KEY + user.getEmail());
+        userRolesService.assignDefaultRole(user.getId());
         return true;
     }
 

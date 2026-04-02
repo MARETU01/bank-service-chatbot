@@ -1,5 +1,6 @@
 package com.maretu.user.service.impl;
 
+import com.maretu.user.enums.RoleCode;
 import com.maretu.user.pojo.Roles;
 import com.maretu.user.pojo.UserRoles;
 import com.maretu.user.mapper.UserRolesMapper;
@@ -7,6 +8,7 @@ import com.maretu.user.service.IRolesService;
 import com.maretu.user.service.IUserRolesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -50,5 +52,19 @@ public class UserRolesServiceImpl extends ServiceImpl<UserRolesMapper, UserRoles
                 .stream()
                 .map(Roles::getRoleCode)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Async("virtualThreadPoolExecutor")
+    public void assignDefaultRole(Long userId) {
+        Roles userRole = rolesService.lambdaQuery()
+                .eq(Roles::getRoleCode, RoleCode.USER.getCode())
+                .one();
+        if (userRole != null) {
+            UserRoles ur = new UserRoles();
+            ur.setUserId(userId)
+                    .setRoleId(userRole.getId());
+            save(ur);
+        }
     }
 }

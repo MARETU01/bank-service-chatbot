@@ -2,7 +2,6 @@ package com.maretu.chat.service.impl;
 
 import com.maretu.chat.service.IKnowledgeService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
@@ -10,6 +9,7 @@ import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +30,7 @@ import java.util.*;
 public class KnowledgeServiceImpl implements IKnowledgeService {
 
     private final VectorStore vectorStore;
+    private final RedisTemplate<Object, Object> redisTemplate;
 
     /**
      * 处理单个文件的入库逻辑
@@ -117,10 +118,8 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
     @Override
     @Async("virtualThreadPoolExecutor")
     public void clearKnowledge() {
-        vectorStore.delete(List.of("*"));
+        redisTemplate.opsForHash().delete( "doc:*");
     }
-
-    // ==================== 私有方法 ====================
 
     /**
      * 读取 PDF 文档
@@ -136,10 +135,10 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
         List<Document> documents = reader.read();
 
         // 为每个文档添加来源元数据
-        for (Document doc : documents) {
+        documents.forEach(doc -> {
             doc.getMetadata().put("source", filename);
             doc.getMetadata().put("type", "pdf");
-        }
+        });
         return documents;
     }
 

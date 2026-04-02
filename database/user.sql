@@ -83,7 +83,7 @@ INSERT INTO roles (role_name, role_code, description) VALUES
 -- 创建默认管理员用户 (密码: admin123, 使用BCrypt加密)
 -- ========================================
 INSERT INTO users (username, password, email, real_name, status) VALUES
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', 'admin@bank.com', '系统管理员', 1);
+('admin', '$2a$10$n42hHjQwpbYA/IDml3mdR.MA0RqUdegjnHxbrx/MYQsMODM1GYiLS', 'admin@bank.com', '系统管理员', 1);
 
 -- 关联管理员角色
 INSERT INTO user_roles (user_id, role_id) 

@@ -12,7 +12,7 @@ import com.maretu.chat.pojo.Session;
 import com.maretu.chat.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.chat.service.ISessionService;
-import com.maretu.common.dto.ChatStatsDTO;
+import com.maretu.chat.dto.ChatStatsDTO;
 import com.maretu.common.dto.Context;
 import com.maretu.common.utils.ChatGuardUtils;
 import com.maretu.common.utils.Result;
@@ -187,41 +187,75 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public ChatStatsDTO getChatStats(String userJson) {
+    public ChatStatsDTO getChatStats(String userJson, String startDate, String endDate) {
         // 检查 admin 角色
         checkAdminRole(userJson);
 
         ChatStatsDTO stats = new ChatStatsDTO();
         LocalDateTime todayStart = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
 
-        // ===== 基础对话统计 =====
+        // 解析时间范围参数
+        LocalDateTime rangeStart = null;
+        LocalDateTime rangeEnd = null;
+        if (startDate != null && !startDate.isEmpty()) {
+            rangeStart = LocalDate.parse(startDate).atStartOfDay();
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            rangeEnd = LocalDate.parse(endDate).atTime(LocalTime.MAX);
+        }
+
+        // 用于 lambda 闭包的 final 变量
+        final LocalDateTime finalRangeStart = rangeStart;
+        final LocalDateTime finalRangeEnd = rangeEnd;
+
+        // 传给 Mapper 的日期字符串（用于 AI 元数据聚合 SQL）
+        final String sqlStartDate = rangeStart != null ? rangeStart.toString() : null;
+        final String sqlEndDate = rangeEnd != null ? rangeEnd.toString() : null;
+
+        // ===== 所有查询互不依赖，使用虚拟线程并发执行 =====
 
         // 总会话数
-        CompletableFuture<Long> totalSessionsFuture = CompletableFuture.supplyAsync(() ->
-                sessionMapper.selectCount(
-                        Wrappers.lambdaQuery(Session.class).eq(Session::getDeleted, 0)
-                ), virtualThreadPoolExecutor);
+        CompletableFuture<Long> totalSessionsFuture = CompletableFuture.supplyAsync(() -> {
+            var query = Wrappers.lambdaQuery(Session.class).eq(Session::getDeleted, 0);
+            if (finalRangeStart != null) query.ge(Session::getCreatedAt, finalRangeStart);
+            if (finalRangeEnd != null) query.le(Session::getCreatedAt, finalRangeEnd);
+            return sessionMapper.selectCount(query);
+        }, virtualThreadPoolExecutor);
 
         // 总消息数
-        CompletableFuture<Long> totalMessagesFuture = CompletableFuture.supplyAsync(() ->
-                lambdaQuery().count(), virtualThreadPoolExecutor);
+        CompletableFuture<Long> totalMessagesFuture = CompletableFuture.supplyAsync(() -> {
+            var query = lambdaQuery();
+            if (finalRangeStart != null) query.ge(Message::getCreatedAt, finalRangeStart);
+            if (finalRangeEnd != null) query.le(Message::getCreatedAt, finalRangeEnd);
+            return query.count();
+        }, virtualThreadPoolExecutor);
 
         // 用户消息数
-        CompletableFuture<Long> userMessagesFuture = CompletableFuture.supplyAsync(() ->
-                lambdaQuery().eq(Message::getSenderType, 1).count(), virtualThreadPoolExecutor);
+        CompletableFuture<Long> userMessagesFuture = CompletableFuture.supplyAsync(() -> {
+            var query = lambdaQuery().eq(Message::getSenderType, 1);
+            if (finalRangeStart != null) query.ge(Message::getCreatedAt, finalRangeStart);
+            if (finalRangeEnd != null) query.le(Message::getCreatedAt, finalRangeEnd);
+            return query.count();
+        }, virtualThreadPoolExecutor);
 
         // AI 回复数
-        CompletableFuture<Long> aiMessagesFuture = CompletableFuture.supplyAsync(() ->
-                lambdaQuery().eq(Message::getSenderType, 2).count(), virtualThreadPoolExecutor);
+        CompletableFuture<Long> aiMessagesFuture = CompletableFuture.supplyAsync(() -> {
+            var query = lambdaQuery().eq(Message::getSenderType, 2);
+            if (finalRangeStart != null) query.ge(Message::getCreatedAt, finalRangeStart);
+            if (finalRangeEnd != null) query.le(Message::getCreatedAt, finalRangeEnd);
+            return query.count();
+        }, virtualThreadPoolExecutor);
 
         // 活跃用户数（有过对话的用户，按 user_id 分组）
-        CompletableFuture<Long> activeUsersFuture = CompletableFuture.supplyAsync(() ->
-                (long) sessionMapper.selectList(
-                        Wrappers.lambdaQuery(Session.class)
-                                .eq(Session::getDeleted, 0)
-                                .select(Session::getUserId)
-                                .groupBy(Session::getUserId)
-                ).size(), virtualThreadPoolExecutor);
+        CompletableFuture<Long> activeUsersFuture = CompletableFuture.supplyAsync(() -> {
+            var query = Wrappers.lambdaQuery(Session.class)
+                    .eq(Session::getDeleted, 0)
+                    .select(Session::getUserId)
+                    .groupBy(Session::getUserId);
+            if (finalRangeStart != null) query.ge(Session::getCreatedAt, finalRangeStart);
+            if (finalRangeEnd != null) query.le(Session::getCreatedAt, finalRangeEnd);
+            return (long) sessionMapper.selectList(query).size();
+        }, virtualThreadPoolExecutor);
 
         // 今日新增会话数
         CompletableFuture<Long> todaySessionsFuture = CompletableFuture.supplyAsync(() ->
@@ -235,14 +269,17 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         CompletableFuture<Long> todayMessagesFuture = CompletableFuture.supplyAsync(() ->
                 lambdaQuery().ge(Message::getCreatedAt, todayStart).count(), virtualThreadPoolExecutor);
 
-        // AI 元数据聚合统计
+        // AI 元数据聚合统计（支持时间范围）
         CompletableFuture<AiMetadataStatsDTO> aiStatsFuture = CompletableFuture.supplyAsync(() ->
-                getBaseMapper().selectAiMetadataStats(), virtualThreadPoolExecutor);
+                getBaseMapper().selectAiMetadataStats(sqlStartDate, sqlEndDate), virtualThreadPoolExecutor);
 
         // 被拦截的消息数
-        CompletableFuture<Long> blockedMessagesFuture = CompletableFuture.supplyAsync(() ->
-                lambdaQuery().eq(Message::getSenderType, 2).isNull(Message::getAiMetadata).count(),
-                virtualThreadPoolExecutor);
+        CompletableFuture<Long> blockedMessagesFuture = CompletableFuture.supplyAsync(() -> {
+            var query = lambdaQuery().eq(Message::getSenderType, 2).isNull(Message::getAiMetadata);
+            if (finalRangeStart != null) query.ge(Message::getCreatedAt, finalRangeStart);
+            if (finalRangeEnd != null) query.le(Message::getCreatedAt, finalRangeEnd);
+            return query.count();
+        }, virtualThreadPoolExecutor);
 
         // 等待所有查询完成
         CompletableFuture.allOf(

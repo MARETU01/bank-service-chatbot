@@ -20,12 +20,28 @@
     </div>
 
     <template v-else>
-      <!-- 刷新按钮 -->
+      <!-- 工具栏：时间范围筛选 + 刷新 -->
       <div class="toolbar">
         <div class="toolbar-left">
+          <div class="date-filter">
+            <div class="quick-btns">
+              <button v-for="opt in quickOptions" :key="opt.label"
+                      class="btn btn-quick" :class="{ active: activeQuick === opt.label }"
+                      @click="applyQuickOption(opt)">
+                {{ opt.label }}
+              </button>
+            </div>
+            <div class="date-inputs">
+              <input type="date" v-model="startDate" class="date-input" placeholder="开始日期" />
+              <span class="date-sep">~</span>
+              <input type="date" v-model="endDate" class="date-input" placeholder="结束日期" />
+              <button class="btn btn-primary btn-sm" @click="loadStats" :disabled="refreshing">查询</button>
+            </div>
+          </div>
           <span class="last-update" v-if="lastUpdateTime">最后更新：{{ lastUpdateTime }}</span>
         </div>
         <div class="toolbar-right">
+          <button class="btn btn-outline" @click="clearDateFilter" v-if="startDate || endDate">清除筛选</button>
           <button class="btn btn-primary" @click="loadStats" :disabled="refreshing">
             {{ refreshing ? '刷新中...' : '🔄 刷新数据' }}
           </button>
@@ -194,6 +210,62 @@ export default {
     const error = ref(null)
     const lastUpdateTime = ref('')
 
+    // 时间范围筛选
+    const startDate = ref('')
+    const endDate = ref('')
+    const activeQuick = ref('全部')
+
+    // 快捷时间选项
+    const quickOptions = [
+      { label: '全部', days: null },
+      { label: '今日', days: 0 },
+      { label: '近7天', days: 7 },
+      { label: '近30天', days: 30 },
+      { label: '近90天', days: 90 }
+    ]
+
+    /**
+     * 应用快捷时间选项
+     */
+    const applyQuickOption = (opt) => {
+      activeQuick.value = opt.label
+      if (opt.days === null) {
+        startDate.value = ''
+        endDate.value = ''
+      } else {
+        const today = new Date()
+        endDate.value = formatDate(today)
+        if (opt.days === 0) {
+          startDate.value = formatDate(today)
+        } else {
+          const start = new Date(today)
+          start.setDate(start.getDate() - opt.days + 1)
+          startDate.value = formatDate(start)
+        }
+      }
+      loadStats()
+    }
+
+    /**
+     * 清除日期筛选
+     */
+    const clearDateFilter = () => {
+      startDate.value = ''
+      endDate.value = ''
+      activeQuick.value = '全部'
+      loadStats()
+    }
+
+    /**
+     * 格式化日期为 yyyy-MM-dd
+     */
+    const formatDate = (date) => {
+      const y = date.getFullYear()
+      const m = String(date.getMonth() + 1).padStart(2, '0')
+      const d = String(date.getDate()).padStart(2, '0')
+      return `${y}-${m}-${d}`
+    }
+
     /**
      * 加载统计数据
      */
@@ -204,7 +276,11 @@ export default {
       error.value = null
 
       try {
-        const response = await chatStatsApi.getChatStats()
+        const params = {}
+        if (startDate.value) params.startDate = startDate.value
+        if (endDate.value) params.endDate = endDate.value
+
+        const response = await chatStatsApi.getChatStats(params)
         const { code, data, message } = response.data
         if (code === 1 || code === 200) {
           stats.value = data
@@ -252,7 +328,13 @@ export default {
       refreshing,
       error,
       lastUpdateTime,
+      startDate,
+      endDate,
+      activeQuick,
+      quickOptions,
       loadStats,
+      applyQuickOption,
+      clearDateFilter,
       formatNumber,
       formatMs
     }
@@ -344,6 +426,98 @@ export default {
 .last-update {
   color: var(--text-on-gradient-muted);
   font-size: var(--font-size-md);
+}
+
+/* 日期筛选 */
+.date-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.quick-btns {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.btn-quick {
+  padding: var(--spacing-xs) var(--spacing-lg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  background: var(--glass-bg);
+  color: var(--text-on-gradient);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.btn-quick:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.btn-quick.active {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.6);
+  color: #93c5fd;
+  font-weight: var(--font-weight-semibold);
+}
+
+.date-inputs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.date-input {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  outline: none;
+  transition: border-color var(--transition-normal);
+}
+
+.date-input:focus {
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.date-sep {
+  color: var(--text-on-gradient-muted);
+  font-size: var(--font-size-lg);
+}
+
+.btn-sm {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-md);
+}
+
+.btn-outline {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  background: transparent;
+  color: var(--text-on-gradient);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+}
+
+.btn-outline:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
 }
 
 /* 按钮 */

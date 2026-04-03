@@ -293,10 +293,11 @@ export const chatStatsApi = {
   /**
    * 获取对话统计概览数据
    * 需要 ADMIN 角色
+   * @param {object} params - 可选查询参数 {startDate, endDate}，格式 yyyy-MM-dd
    * @returns {Promise} - 返回 ChatStatsDTO
    */
-  getChatStats: async () => {
-    return await http.get('/chat/stats')
+  getChatStats: async (params = {}) => {
+    return await http.get('/chat/stats', { params })
   }
 }
 

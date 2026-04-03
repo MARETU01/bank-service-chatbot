@@ -7,8 +7,8 @@ import com.maretu.chat.pojo.Session;
 import com.maretu.chat.service.IKnowledgeService;
 import com.maretu.chat.service.IMessageService;
 import com.maretu.chat.service.ISessionService;
+import com.maretu.chat.dto.ChatStatsDTO;
 import com.maretu.common.dto.Context;
-import com.maretu.common.dto.ChatStatsDTO;
 import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -88,9 +88,11 @@ public class ChatController {
     }
 
     @GetMapping("/stats")
-    public Result<ChatStatsDTO> getChatStats(@RequestHeader("user-info") String userJson) {
+    public Result<ChatStatsDTO> getChatStats(@RequestHeader("user-info") String userJson,
+                                              @RequestParam(value = "startDate", required = false) String startDate,
+                                              @RequestParam(value = "endDate", required = false) String endDate) {
         try {
-            return Result.success(messageService.getChatStats(userJson));
+            return Result.success(messageService.getChatStats(userJson, startDate, endDate));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

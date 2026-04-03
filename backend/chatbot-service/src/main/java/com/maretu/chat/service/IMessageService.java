@@ -1,10 +1,9 @@
 package com.maretu.chat.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.maretu.chat.dto.ChatStatsDTO;
 import com.maretu.chat.pojo.Message;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.maretu.common.dto.ChatStatsDTO;
-import com.maretu.common.dto.Context;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -25,5 +24,5 @@ public interface IMessageService extends IService<Message> {
 
     List<org.springframework.ai.chat.messages.Message> getRecentMessages(String sessionId, Integer limit);
 
-    ChatStatsDTO getChatStats(String userJson);
+    ChatStatsDTO getChatStats(String userJson, String startDate, String endDate);
 }

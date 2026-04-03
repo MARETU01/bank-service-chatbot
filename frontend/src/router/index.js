@@ -74,6 +74,12 @@ const routes = [
         meta: { title: '知识库管理', icon: '📚', requiresAuth: true, requiresAdmin: true }
       },
       {
+        path: 'admin/chat-stats',
+        name: 'ChatStats',
+        component: () => import('@/views/admin/ChatStats'),
+        meta: { title: '对话统计', icon: '📈', requiresAuth: true, requiresAdmin: true }
+      },
+      {
         path: 'admin/users',
         name: 'UserManage',
         component: () => import('@/views/admin/UserManage'),

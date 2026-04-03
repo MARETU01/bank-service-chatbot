@@ -40,6 +40,10 @@
             <span class="icon">📚</span>
             <span>知识库管理</span>
           </router-link>
+          <router-link to="/admin/chat-stats" class="menu-item admin-item">
+            <span class="icon">📈</span>
+            <span>对话统计</span>
+          </router-link>
           <router-link to="/admin/users" class="menu-item admin-item">
             <span class="icon">👥</span>
             <span>用户管理</span>
@@ -96,6 +100,7 @@ export default {
         '/chatbot': '智能客服',
         '/profile': '个人中心',
         '/admin/knowledge': '知识库管理',
+        '/admin/chat-stats': '对话统计',
         '/admin/users': '用户管理'
       }
       return titles[route.path] || '银行服务'

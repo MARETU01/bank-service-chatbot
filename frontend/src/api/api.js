@@ -288,6 +288,18 @@ export const adminApi = {
   }
 }
 
+// 对话统计相关 API（管理员）
+export const chatStatsApi = {
+  /**
+   * 获取对话统计概览数据
+   * 需要 ADMIN 角色
+   * @returns {Promise} - 返回 ChatStatsDTO
+   */
+  getChatStats: async () => {
+    return await http.get('/chat/stats')
+  }
+}
+
 // 知识库管理相关 API
 export const knowledgeApi = {
   /**
@@ -333,6 +345,7 @@ export default {
   transferApi,
   userApi,
   chatApi,
+  chatStatsApi,
   knowledgeApi,
   adminApi
 }

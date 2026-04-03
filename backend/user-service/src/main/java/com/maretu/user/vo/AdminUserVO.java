@@ -1,6 +1,7 @@
 package com.maretu.user.vo;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
  * 管理员用户列表返回对象
  */
 @Data
+@Accessors(chain = true)
 public class AdminUserVO {
     /**
      * 用户ID

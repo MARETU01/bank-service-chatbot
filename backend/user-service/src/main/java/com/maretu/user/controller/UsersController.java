@@ -3,7 +3,10 @@ package com.maretu.user.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maretu.common.dto.Context;
+import com.maretu.common.dto.PageDTO;
 import com.maretu.common.utils.Result;
+import com.maretu.user.dto.AdminUserQuery;
+import com.maretu.user.dto.AssignRolesReq;
 import com.maretu.user.dto.PayPasswordReq;
 import com.maretu.user.dto.ResetPasswordReq;
 import com.maretu.user.dto.UpdateProfileReq;
@@ -12,6 +15,7 @@ import com.maretu.user.pojo.Users;
 import com.maretu.user.service.IUserRolesService;
 import com.maretu.user.service.IUserSecurityService;
 import com.maretu.user.service.IUsersService;
+import com.maretu.user.vo.AdminUserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -177,6 +181,42 @@ public class UsersController {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
             return Result.success(userRolesService.getUserRoles(context.getUserId()));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    // ==================== 管理员接口 ====================
+
+    @GetMapping("/list")
+    public Result<PageDTO<AdminUserVO>> getAdminUserList(@RequestHeader("user-info") String userJson,
+                                                         AdminUserQuery query) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            return Result.success(usersService.getAdminUserList(query, context.getUserId()));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @PutMapping("/status/{userId}")
+    public Result<Boolean> toggleUserStatus(@RequestHeader("user-info") String userJson,
+                                            @PathVariable Long userId) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            return Result.success(usersService.toggleUserStatus(userId, context.getUserId()));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+    @PutMapping("/roles/{userId}")
+    public Result<Boolean> assignUserRoles(@RequestHeader("user-info") String userJson,
+									       @PathVariable Long userId,
+									       @RequestBody AssignRolesReq req) throws JsonProcessingException {
+        Context context = jacksonObjectMapper.readValue(userJson, Context.class);
+        try {
+            return Result.success(userRolesService.assignRoles(userId, req.getRoles(), context.getUserId()));
         } catch (Exception e) {
             return Result.failure(e.getMessage());
         }

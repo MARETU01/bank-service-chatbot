@@ -1,8 +1,10 @@
 package com.maretu.user.service.impl;
 
+import com.maretu.common.dto.PageDTO;
 import com.maretu.common.dto.Context;
 import com.maretu.common.utils.JwtUtils;
 import com.maretu.common.utils.RedisConstants;
+import com.maretu.user.dto.AdminUserQuery;
 import com.maretu.user.dto.ResetPasswordReq;
 import com.maretu.user.dto.UpdateProfileReq;
 import com.maretu.user.pojo.Users;
@@ -10,6 +12,9 @@ import com.maretu.user.mapper.UsersMapper;
 import com.maretu.user.service.IUserRolesService;
 import com.maretu.user.service.IUsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.maretu.user.enums.RoleCode;
+import com.maretu.user.vo.AdminUserVO;
 import com.maretu.user.utils.HashUtil;
 import com.maretu.user.utils.MailUtil;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +25,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+import java.util.Collections;
 
 /**
  * 用户信息表 服务实现类
@@ -253,6 +261,93 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         user.setLastLoginIp(ip)
                 .setLastLoginTime(LocalDateTime.now());
         updateById(user);
+    }
+
+    @Override
+    public PageDTO<AdminUserVO> getAdminUserList(AdminUserQuery query, Integer adminUserId) {
+        // 1. 权限校验
+        checkAdminRole(adminUserId);
+
+        // 2. 构建分页查询
+        Page<Users> page = new Page<>(query.getPage(), query.getSize());
+
+        // 3. 如果有角色筛选，先查出拥有该角色的用户ID列表
+        List<Long> filteredUserIds = null;
+        if (query.getRole() != null && !query.getRole().isEmpty()) {
+            filteredUserIds = userRolesService.getUserIdsByRoleCode(query.getRole());
+            if (filteredUserIds.isEmpty()) {
+                // 没有匹配的用户，直接返回空结果
+                PageDTO<AdminUserVO> emptyResult = new PageDTO<>();
+                emptyResult.setData(Collections.emptyList());
+                emptyResult.setTotal(0L);
+                emptyResult.setTotalPage(0L);
+                return emptyResult;
+            }
+        }
+
+        // 4. 构建查询条件
+        List<Long> finalFilteredUserIds = filteredUserIds;
+        Page<Users> usersPage = lambdaQuery()
+                .and(query.getKeyword() != null && !query.getKeyword().isEmpty(),
+                        q -> q.like(Users::getUsername, query.getKeyword())
+                                .or()
+                                .like(Users::getEmail, query.getKeyword()))
+                .in(finalFilteredUserIds != null, Users::getId, finalFilteredUserIds)
+                .orderByDesc(Users::getCreatedAt)
+                .page(page);
+
+        // 5. 转换为VO，组装角色信息
+        List<AdminUserVO> voList = usersPage.getRecords().stream()
+                .map(user -> {
+                    AdminUserVO vo = new AdminUserVO();
+                    vo.setId(user.getId());
+                    vo.setUsername(user.getUsername());
+                    vo.setEmail(user.getEmail());
+                    vo.setActive(user.getStatus() != null && user.getStatus() == 1);
+                    vo.setCreatedAt(user.getCreatedAt());
+                    vo.setRoles(userRolesService.getUserRoles(Math.toIntExact(user.getId())));
+                    return vo;
+                })
+                .collect(Collectors.toList());
+
+        // 6. 组装分页结果
+        PageDTO<AdminUserVO> result = new PageDTO<>();
+        result.setData(voList);
+        result.setTotal(usersPage.getTotal());
+        result.setTotalPage(usersPage.getPages());
+        return result;
+    }
+
+    @Override
+    public Boolean toggleUserStatus(Long userId, Integer adminUserId) {
+        // 1. 权限校验
+        checkAdminRole(adminUserId);
+
+        // 2. 不能禁用自己
+        if (Objects.equals(userId, Long.valueOf(adminUserId))) {
+            throw new RuntimeException("不能修改自己的状态");
+        }
+
+        // 3. 查询目标用户
+        Users targetUser = lambdaQuery().eq(Users::getId, userId).one();
+        if (targetUser == null) {
+            throw new RuntimeException("用户不存在");
+        }
+
+        // 4. 切换状态：1→0, 0→1
+        targetUser.setStatus(targetUser.getStatus() == 1 ? 0 : 1);
+        updateById(targetUser);
+        return targetUser.getStatus() == 1;
+    }
+
+    /**
+     * 校验当前用户是否拥有管理员角色
+     */
+    private void checkAdminRole(Integer userId) {
+        List<String> roles = userRolesService.getUserRoles(userId);
+        if (roles == null || !roles.contains(RoleCode.ADMIN.getCode())) {
+            throw new RuntimeException("权限不足：需要管理员角色");
+        }
     }
 
 }

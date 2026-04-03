@@ -12,9 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -86,5 +88,87 @@ public class UserRolesServiceImpl extends ServiceImpl<UserRolesMapper, UserRoles
                     .setRoleId(userRole.getId());
             save(ur);
         }
+    }
+
+    @Override
+    @Transactional
+    public Boolean assignRoles(Long userId, List<String> roleCodes, Integer adminUserId) {
+        // 1. 权限校验
+        List<String> adminRoles = getUserRoles(adminUserId);
+        if (adminRoles == null || !adminRoles.contains(RoleCode.ADMIN.getCode())) {
+            throw new RuntimeException("权限不足：需要管理员角色");
+        }
+
+        // 2. 参数校验
+        if (roleCodes == null || roleCodes.isEmpty()) {
+            throw new RuntimeException("至少需要分配一个角色");
+        }
+
+        // 3. 校验角色代码是否合法
+        List<String> validCodes = List.of(
+                RoleCode.USER.getCode(),
+                RoleCode.ADMIN.getCode(),
+                RoleCode.CUSTOMER_SERVICE.getCode()
+        );
+        roleCodes.forEach(code -> {
+            if (!validCodes.contains(code)) {
+                throw new RuntimeException("无效的角色代码：" + code);
+            }
+        });
+
+        // 4. 防止管理员移除自己的ADMIN角色
+        if (Objects.equals(Long.valueOf(adminUserId), userId)
+                && !roleCodes.contains(RoleCode.ADMIN.getCode())) {
+            throw new RuntimeException("不能移除自己的管理员角色");
+        }
+
+        // 5. 删除该用户的所有旧角色
+        lambdaUpdate()
+                .eq(UserRoles::getUserId, userId)
+                .remove();
+
+        // 6. 批量插入新角色
+        List<Roles> allRoles = rolesService.getAllRoles();
+        List<UserRoles> newUserRoles = roleCodes.stream()
+                .map(code -> allRoles.stream()
+                        .filter(r -> r.getRoleCode().equals(code))
+                        .findFirst()
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .map(role -> {
+                    UserRoles ur = new UserRoles();
+                    ur.setUserId(userId)
+                            .setRoleId(role.getId());
+                    return ur;
+                })
+                .collect(Collectors.toList());
+
+        saveBatch(newUserRoles);
+
+        // 7. 清除该用户的角色缓存
+        stringRedisTemplate.delete(RedisConstants.USER_ROLES_KEY + userId);
+
+        return true;
+    }
+
+    @Override
+    public List<Long> getUserIdsByRoleCode(String roleCode) {
+        // 1. 找到角色ID
+        Roles targetRole = rolesService.getAllRoles().stream()
+                .filter(r -> r.getRoleCode().equals(roleCode))
+                .findFirst()
+                .orElse(null);
+
+        if (targetRole == null) {
+            return Collections.emptyList();
+        }
+
+        // 2. 查询拥有该角色的所有用户ID
+        return lambdaQuery()
+                .eq(UserRoles::getRoleId, targetRole.getId())
+                .list()
+                .stream()
+                .map(UserRoles::getUserId)
+                .collect(Collectors.toList());
     }
 }

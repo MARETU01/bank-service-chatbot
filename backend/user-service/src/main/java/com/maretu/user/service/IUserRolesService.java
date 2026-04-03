@@ -18,4 +18,8 @@ public interface IUserRolesService extends IService<UserRoles> {
     List<String> getUserRoles(Integer userId);
 
     void assignDefaultRole(Long userId);
+
+    Boolean assignRoles(Long userId, List<String> roleCodes, Integer adminUserId);
+
+    List<Long> getUserIdsByRoleCode(String roleCode);
 }

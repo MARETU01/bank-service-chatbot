@@ -10,6 +10,7 @@ import com.maretu.user.service.IUserRolesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -35,12 +35,53 @@ public class UserRolesServiceImpl extends ServiceImpl<UserRolesMapper, UserRoles
     private final IRolesService rolesService;
     private final StringRedisTemplate stringRedisTemplate;
 
+    /**
+     * Lua脚本：原子性地读取List并自动续期
+     * 如果key存在且List非空，则刷新TTL并返回数据；否则返回空列表
+     */
+    @SuppressWarnings("unchecked")
+    private static final DefaultRedisScript<List<String>> GET_AND_RENEW_SCRIPT;
+    static {
+        GET_AND_RENEW_SCRIPT = new DefaultRedisScript<>();
+        GET_AND_RENEW_SCRIPT.setScriptText(
+                "local data = redis.call('LRANGE', KEYS[1], 0, -1) " +
+                "if #data > 0 then " +
+                "  redis.call('EXPIRE', KEYS[1], ARGV[1]) " +
+                "end " +
+                "return data"
+        );
+        GET_AND_RENEW_SCRIPT.setResultType((Class) List.class);
+    }
+
+    /**
+     * Lua脚本：原子性地写入List并设置TTL（先清除旧数据再写入）
+     * 保证RPUSH和EXPIRE在同一原子操作中完成，避免出现永不过期的缓存
+     */
+    private static final DefaultRedisScript<Long> PUSH_LIST_WITH_TTL_SCRIPT;
+    static {
+        PUSH_LIST_WITH_TTL_SCRIPT = new DefaultRedisScript<>();
+        PUSH_LIST_WITH_TTL_SCRIPT.setScriptText(
+                "redis.call('DEL', KEYS[1]) " +
+                "for i = 2, #ARGV do " +
+                "  redis.call('RPUSH', KEYS[1], ARGV[i]) " +
+                "end " +
+                "redis.call('EXPIRE', KEYS[1], ARGV[1]) " +
+                "return 1"
+        );
+        PUSH_LIST_WITH_TTL_SCRIPT.setResultType(Long.class);
+    }
+
     @Override
     public List<String> getUserRoles(Integer userId) {
         String cacheKey = RedisConstants.USER_ROLES_KEY + userId;
+        String ttlSeconds = String.valueOf(RedisConstants.USER_ROLES_TTL * 60);
 
-        // 1. 先从缓存读取
-        List<String> cachedRoles = stringRedisTemplate.opsForList().range(cacheKey, 0, -1);
+        // 1. 使用Lua脚本原子性地读取缓存并自动续期
+        List<String> cachedRoles = stringRedisTemplate.execute(
+                GET_AND_RENEW_SCRIPT,
+                List.of(cacheKey),
+                ttlSeconds
+        );
         if (cachedRoles != null && !cachedRoles.isEmpty()) {
             return cachedRoles;
         }
@@ -65,10 +106,14 @@ public class UserRolesServiceImpl extends ServiceImpl<UserRolesMapper, UserRoles
                 .map(Roles::getRoleCode)
                 .collect(Collectors.toList());
 
-        // 5. 写入缓存，设置30分钟TTL
+        // 5. 使用Lua脚本原子性地写入缓存并设置TTL，避免RPUSH和EXPIRE之间崩溃导致缓存永不过期
         if (!roleCodes.isEmpty()) {
-            stringRedisTemplate.opsForList().rightPushAll(cacheKey, roleCodes);
-            stringRedisTemplate.expire(cacheKey, RedisConstants.USER_ROLES_TTL, TimeUnit.MINUTES);
+            String[] args = new String[roleCodes.size() + 1];
+            args[0] = ttlSeconds;
+            for (int i = 0; i < roleCodes.size(); i++) {
+                args[i + 1] = roleCodes.get(i);
+            }
+            stringRedisTemplate.execute(PUSH_LIST_WITH_TTL_SCRIPT, List.of(cacheKey), (Object[]) args);
         }
 
         return roleCodes;

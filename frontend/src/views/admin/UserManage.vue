@@ -25,7 +25,7 @@
       </div>
       <div class="toolbar-right">
         <div class="user-count">
-          共 <strong>{{ userList.length }}</strong> 位用户
+          共 <strong>{{ total }}</strong> 位用户
         </div>
       </div>
     </div>
@@ -46,14 +46,14 @@
         <p>加载中...</p>
       </div>
 
-      <div v-else-if="filteredUsers.length === 0" class="empty-state">
+      <div v-else-if="userList.length === 0" class="empty-state">
         <p>📭 暂无匹配的用户</p>
       </div>
 
       <div v-else>
         <div
           class="list-item"
-          v-for="user in filteredUsers"
+          v-for="user in userList"
           :key="user.id"
         >
           <span class="col-id">{{ user.id }}</span>
@@ -85,6 +85,27 @@
           </span>
         </div>
       </div>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination" v-if="totalPage > 1">
+      <button
+        class="page-btn"
+        :disabled="currentPage <= 1"
+        @click="changePage(currentPage - 1)"
+      >上一页</button>
+      <button
+        class="page-btn"
+        v-for="p in totalPage"
+        :key="p"
+        :class="{ active: p === currentPage }"
+        @click="changePage(p)"
+      >{{ p }}</button>
+      <button
+        class="page-btn"
+        :disabled="currentPage >= totalPage"
+        @click="changePage(currentPage + 1)"
+      >下一页</button>
     </div>
 
     <!-- 角色分配弹窗 -->
@@ -129,7 +150,8 @@
 </template>
 
 <script>
-import { ref, computed, getCurrentInstance } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
+import { adminApi } from '@/api/api'
 
 export default {
   name: 'UserManage',
@@ -143,6 +165,15 @@ export default {
     const selectedUser = ref(null)
     const selectedRoles = ref([])
 
+    // 分页相关
+    const currentPage = ref(1)
+    const pageSize = ref(10)
+    const total = ref(0)
+    const totalPage = ref(0)
+
+    // 用户列表（从后端获取）
+    const userList = ref([])
+
     // 所有可用角色
     const allRoles = ref([
       { code: 'USER', name: '普通用户', icon: '👤', description: '基本的银行服务功能' },
@@ -150,29 +181,36 @@ export default {
       { code: 'CUSTOMER_SERVICE', name: '客服', icon: '🎧', description: '处理客户咨询和投诉' }
     ])
 
-    // 模拟用户数据（接口待实现）
-    const userList = ref([
-      { id: 1, username: 'admin', email: 'admin@bank.com', roles: ['USER', 'ADMIN'], active: true, createdAt: '2024-01-01 08:00' },
-      { id: 2, username: 'zhangsan', email: 'zhangsan@example.com', roles: ['USER'], active: true, createdAt: '2024-01-05 10:30' },
-      { id: 3, username: 'lisi', email: 'lisi@example.com', roles: ['USER'], active: true, createdAt: '2024-01-08 14:20' },
-      { id: 4, username: 'wangwu', email: 'wangwu@example.com', roles: ['USER', 'CUSTOMER_SERVICE'], active: true, createdAt: '2024-01-10 09:15' },
-      { id: 5, username: 'zhaoliu', email: 'zhaoliu@example.com', roles: ['USER'], active: false, createdAt: '2024-01-12 16:45' },
-    ])
+    /**
+     * 加载用户列表
+     */
+    const fetchUserList = async () => {
+      loading.value = true
+      try {
+        const res = await adminApi.getUserList({
+          keyword: searchKeyword.value || undefined,
+          role: filterRole.value || undefined,
+          page: currentPage.value,
+          size: pageSize.value
+        })
+        const { code, data, message } = res.data
+        if (code === 1) {
+          userList.value = data.data || []
+          total.value = data.total || 0
+          totalPage.value = data.totalPage || 0
+        } else {
+          proxy.$message.error(message || '获取用户列表失败')
+        }
+      } catch (e) {
+        proxy.$message.error('获取用户列表失败：' + (e.message || '网络异常'))
+      } finally {
+        loading.value = false
+      }
+    }
 
-    // 过滤后的用户列表
-    const filteredUsers = computed(() => {
-      let list = userList.value
-      if (searchKeyword.value) {
-        const keyword = searchKeyword.value.toLowerCase()
-        list = list.filter(u =>
-          u.username.toLowerCase().includes(keyword) ||
-          u.email.toLowerCase().includes(keyword)
-        )
-      }
-      if (filterRole.value) {
-        list = list.filter(u => u.roles.includes(filterRole.value))
-      }
-      return list
+    // 页面加载时获取数据
+    onMounted(() => {
+      fetchUserList()
     })
 
     const getRoleName = (code) => {
@@ -185,19 +223,47 @@ export default {
       return map[code] || ''
     }
 
+    /**
+     * 搜索 - 重置到第一页并重新请求
+     */
     const handleSearch = () => {
-      // TODO: 调用搜索接口
-      proxy.$message.info('搜索功能接口待实现，当前为前端过滤')
+      currentPage.value = 1
+      fetchUserList()
     }
 
+    /**
+     * 角色筛选 - 重置到第一页并重新请求
+     */
     const handleFilter = () => {
-      // 前端过滤，无需调用接口
+      currentPage.value = 1
+      fetchUserList()
     }
 
-    const handleToggleStatus = (user) => {
-      // TODO: 调用切换状态接口
-      user.active = !user.active
-      proxy.$message.success(`已${user.active ? '启用' : '禁用'}用户 ${user.username}`)
+    /**
+     * 切换页码
+     */
+    const changePage = (page) => {
+      if (page < 1 || page > totalPage.value) return
+      currentPage.value = page
+      fetchUserList()
+    }
+
+    /**
+     * 切换用户启用/禁用状态
+     */
+    const handleToggleStatus = async (user) => {
+      try {
+        const res = await adminApi.toggleUserStatus(user.id)
+        const { code, message } = res.data
+        if (code === 1) {
+          user.active = !user.active
+          proxy.$message.success(`已${user.active ? '启用' : '禁用'}用户 ${user.username}`)
+        } else {
+          proxy.$message.error(message || '操作失败')
+        }
+      } catch (e) {
+        proxy.$message.error('操作失败：' + (e.message || '网络异常'))
+      }
     }
 
     const showRoleDialog = (user) => {
@@ -211,17 +277,28 @@ export default {
       selectedUser.value = null
     }
 
-    const handleSaveRoles = () => {
+    /**
+     * 保存角色分配
+     */
+    const handleSaveRoles = async () => {
       if (selectedRoles.value.length === 0) {
         proxy.$message.warning('至少需要分配一个角色')
         return
       }
-      // TODO: 调用角色分配接口
-      if (selectedUser.value) {
-        selectedUser.value.roles = [...selectedRoles.value]
-        proxy.$message.success(`已更新 ${selectedUser.value.username} 的角色`)
+      if (!selectedUser.value) return
+      try {
+        const res = await adminApi.assignRoles(selectedUser.value.id, selectedRoles.value)
+        const { code, message } = res.data
+        if (code === 1) {
+          selectedUser.value.roles = [...selectedRoles.value]
+          proxy.$message.success(`已更新 ${selectedUser.value.username} 的角色`)
+          closeRoleDialog()
+        } else {
+          proxy.$message.error(message || '角色分配失败')
+        }
+      } catch (e) {
+        proxy.$message.error('角色分配失败：' + (e.message || '网络异常'))
       }
-      closeRoleDialog()
     }
 
     return {
@@ -229,15 +306,18 @@ export default {
       filterRole,
       loading,
       userList,
-      filteredUsers,
       allRoles,
       roleDialogVisible,
       selectedUser,
       selectedRoles,
+      currentPage,
+      total,
+      totalPage,
       getRoleName,
       getRoleClass,
       handleSearch,
       handleFilter,
+      changePage,
       handleToggleStatus,
       showRoleDialog,
       closeRoleDialog,
@@ -480,9 +560,47 @@ export default {
   background: #6b7280;
 }
 
-.col-action {
+  .col-action {
   display: flex;
   gap: var(--spacing-sm);
+}
+
+/* 分页 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) 0;
+}
+
+.page-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  min-width: 36px;
+  text-align: center;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+}
+
+.page-btn.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-color: #3b82f6;
+  font-weight: var(--font-weight-semibold);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .btn-sm {

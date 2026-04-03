@@ -257,6 +257,37 @@ export const chatApi = {
   }
 }
 
+// 管理员用户管理相关 API
+export const adminApi = {
+  /**
+   * 获取用户列表（管理员）
+   * @param {object} params - 查询参数 {keyword, role, page, size}
+   * @returns {Promise} - 返回分页用户数据 {total, pages, list}
+   */
+  getUserList: async (params = {}) => {
+    return await http.get('/users/list', { params })
+  },
+
+  /**
+   * 切换用户启用/禁用状态（管理员）
+   * @param {number} userId - 用户 ID
+   * @returns {Promise} - 返回操作结果
+   */
+  toggleUserStatus: async (userId) => {
+    return await http.put(`/users/status/${userId}`)
+  },
+
+  /**
+   * 分配用户角色（管理员）
+   * @param {number} userId - 用户 ID
+   * @param {string[]} roles - 角色代码数组，如 ['USER', 'ADMIN']
+   * @returns {Promise} - 返回操作结果
+   */
+  assignRoles: async (userId, roles) => {
+    return await http.put(`/users/roles/${userId}`, { roles })
+  }
+}
+
 // 知识库管理相关 API
 export const knowledgeApi = {
   /**
@@ -302,5 +333,6 @@ export default {
   transferApi,
   userApi,
   chatApi,
-  knowledgeApi
+  knowledgeApi,
+  adminApi
 }

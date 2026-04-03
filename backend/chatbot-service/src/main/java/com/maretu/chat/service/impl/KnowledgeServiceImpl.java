@@ -4,7 +4,6 @@ import com.maretu.api.client.UserClient;
 import com.maretu.chat.service.IKnowledgeService;
 import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
@@ -13,13 +12,16 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
 
 /**
  * <p>
@@ -34,7 +36,7 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
 
     private final VectorStore vectorStore;
     private final UserClient userClient;
-    private final VirtualThreadExecutor virtualThreadExecutor;
+    private final Executor virtualThreadPoolExecutor;
 
     /**
      * 检查用户是否具有 admin 角色
@@ -141,7 +143,7 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
         // 检查 admin 角色
         checkAdminRole(userJson);
 
-        virtualThreadExecutor.execute(() -> vectorStore.delete(new Filter.Expression(
+        virtualThreadPoolExecutor.execute(() -> vectorStore.delete(new Filter.Expression(
                 Filter.ExpressionType.EQ,
                 new Filter.Key("type"),
                 new Filter.Value("pdf")

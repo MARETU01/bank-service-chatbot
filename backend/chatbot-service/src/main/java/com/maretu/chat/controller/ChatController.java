@@ -8,6 +8,7 @@ import com.maretu.chat.service.IKnowledgeService;
 import com.maretu.chat.service.IMessageService;
 import com.maretu.chat.service.ISessionService;
 import com.maretu.common.dto.Context;
+import com.maretu.common.dto.ChatStatsDTO;
 import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -84,6 +85,15 @@ public class ChatController {
     public Flux<String> chat(@RequestHeader("user-info") String userJson,
                              @RequestBody Message message) throws JsonProcessingException {
         return messageService.chat(userJson, message);
+    }
+
+    @GetMapping("/stats")
+    public Result<ChatStatsDTO> getChatStats(@RequestHeader("user-info") String userJson) {
+        try {
+            return Result.success(messageService.getChatStats(userJson));
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
     }
 
     @PostMapping("/knowledge")

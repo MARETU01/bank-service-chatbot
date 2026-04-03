@@ -1,14 +1,21 @@
 package com.maretu.chat.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.maretu.api.client.UserClient;
+import com.maretu.chat.dto.AiMetadataStatsDTO;
+import com.maretu.chat.mapper.SessionMapper;
 import com.maretu.chat.pojo.Message;
 import com.maretu.chat.mapper.MessageMapper;
+import com.maretu.chat.pojo.Session;
 import com.maretu.chat.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.chat.service.ISessionService;
+import com.maretu.common.dto.ChatStatsDTO;
 import com.maretu.common.dto.Context;
 import com.maretu.common.utils.ChatGuardUtils;
+import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -19,10 +26,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -44,6 +55,8 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     private final ISessionService sessionService;
     private final ChatClient chatClient;
     private final Executor virtualThreadPoolExecutor;
+    private final UserClient userClient;
+    private final SessionMapper sessionMapper;
 
     @Value("${spring.ai.openai.chat.options.model:unknown}")
     private String modelName;
@@ -157,6 +170,141 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                             .setAiMetadata(aiMetadataJson));
                     saveBatch(saveMessages, 2);
                 }));
+    }
+
+    /**
+     * 检查用户是否具有 admin 角色
+     */
+    private void checkAdminRole(String userJson) {
+        Result<List<String>> result = userClient.getUserRoles(userJson);
+        if (result == null || result.getData() == null) {
+            throw new RuntimeException("获取用户角色失败");
+        }
+        List<String> roles = result.getData();
+        if (roles.isEmpty() || !roles.contains("ADMIN")) {
+            throw new RuntimeException("权限不足：需要 admin 角色才能执行此操作");
+        }
+    }
+
+    @Override
+    public ChatStatsDTO getChatStats(String userJson) {
+        // 检查 admin 角色
+        checkAdminRole(userJson);
+
+        ChatStatsDTO stats = new ChatStatsDTO();
+        LocalDateTime todayStart = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+
+        // ===== 基础对话统计 =====
+
+        // 总会话数
+        CompletableFuture<Long> totalSessionsFuture = CompletableFuture.supplyAsync(() ->
+                sessionMapper.selectCount(
+                        Wrappers.lambdaQuery(Session.class).eq(Session::getDeleted, 0)
+                ), virtualThreadPoolExecutor);
+
+        // 总消息数
+        CompletableFuture<Long> totalMessagesFuture = CompletableFuture.supplyAsync(() ->
+                lambdaQuery().count(), virtualThreadPoolExecutor);
+
+        // 用户消息数
+        CompletableFuture<Long> userMessagesFuture = CompletableFuture.supplyAsync(() ->
+                lambdaQuery().eq(Message::getSenderType, 1).count(), virtualThreadPoolExecutor);
+
+        // AI 回复数
+        CompletableFuture<Long> aiMessagesFuture = CompletableFuture.supplyAsync(() ->
+                lambdaQuery().eq(Message::getSenderType, 2).count(), virtualThreadPoolExecutor);
+
+        // 活跃用户数（有过对话的用户，按 user_id 分组）
+        CompletableFuture<Long> activeUsersFuture = CompletableFuture.supplyAsync(() ->
+                (long) sessionMapper.selectList(
+                        Wrappers.lambdaQuery(Session.class)
+                                .eq(Session::getDeleted, 0)
+                                .select(Session::getUserId)
+                                .groupBy(Session::getUserId)
+                ).size(), virtualThreadPoolExecutor);
+
+        // 今日新增会话数
+        CompletableFuture<Long> todaySessionsFuture = CompletableFuture.supplyAsync(() ->
+                sessionMapper.selectCount(
+                        Wrappers.lambdaQuery(Session.class)
+                                .eq(Session::getDeleted, 0)
+                                .ge(Session::getCreatedAt, todayStart)
+                ), virtualThreadPoolExecutor);
+
+        // 今日消息数
+        CompletableFuture<Long> todayMessagesFuture = CompletableFuture.supplyAsync(() ->
+                lambdaQuery().ge(Message::getCreatedAt, todayStart).count(), virtualThreadPoolExecutor);
+
+        // AI 元数据聚合统计
+        CompletableFuture<AiMetadataStatsDTO> aiStatsFuture = CompletableFuture.supplyAsync(() ->
+                getBaseMapper().selectAiMetadataStats(), virtualThreadPoolExecutor);
+
+        // 被拦截的消息数
+        CompletableFuture<Long> blockedMessagesFuture = CompletableFuture.supplyAsync(() ->
+                lambdaQuery().eq(Message::getSenderType, 2).isNull(Message::getAiMetadata).count(),
+                virtualThreadPoolExecutor);
+
+        // 等待所有查询完成
+        CompletableFuture.allOf(
+                totalSessionsFuture, totalMessagesFuture, userMessagesFuture,
+                aiMessagesFuture, activeUsersFuture, todaySessionsFuture,
+                todayMessagesFuture, aiStatsFuture, blockedMessagesFuture
+        ).join();
+
+        // ===== 汇总结果 =====
+        try {
+            Long totalSessions = totalSessionsFuture.get();
+            Long totalMessages = totalMessagesFuture.get();
+            Long userMessages = userMessagesFuture.get();
+            Long aiMessages = aiMessagesFuture.get();
+            Long blockedMessages = blockedMessagesFuture.get();
+
+            // 基础对话统计
+            stats.setTotalSessions(totalSessions);
+            stats.setTotalMessages(totalMessages);
+            stats.setUserMessages(userMessages);
+            stats.setAiMessages(aiMessages);
+            stats.setActiveUsers(activeUsersFuture.get());
+            stats.setTodaySessions(todaySessionsFuture.get());
+            stats.setTodayMessages(todayMessagesFuture.get());
+            stats.setAvgMessagesPerSession(
+                    totalSessions > 0
+                            ? Math.round((double) totalMessages / totalSessions * 100.0) / 100.0
+                            : 0.0
+            );
+
+            // AI 性能统计
+            AiMetadataStatsDTO aiStats = aiStatsFuture.get();
+            if (aiStats != null) {
+                stats.setModelName(aiStats.getModelName());
+                stats.setTotalTokens(aiStats.getTotalTokens());
+                stats.setTotalPromptTokens(aiStats.getTotalPromptTokens());
+                stats.setTotalCompletionTokens(aiStats.getTotalCompletionTokens());
+                stats.setTodayTokens(aiStats.getTodayTokens());
+                stats.setAvgResponseTimeMs(
+                        Math.round(aiStats.getAvgResponseTimeMs() * 100.0) / 100.0
+                );
+                stats.setMaxResponseTimeMs(aiStats.getMaxResponseTimeMs());
+                stats.setAvgTokensPerChat(
+                        aiMessages > 0 && aiStats.getTotalTokens() != null
+                                ? Math.round((double) aiStats.getTotalTokens() / aiMessages * 100.0) / 100.0
+                                : 0.0
+                );
+            }
+
+            // 安全防护统计
+            stats.setBlockedMessages(blockedMessages);
+            stats.setBlockRate(
+                    userMessages > 0
+                            ? Math.round((double) blockedMessages / userMessages * 10000.0) / 100.0
+                            : 0.0
+            );
+        } catch (Exception e) {
+            log.error("并发查询统计数据异常", e);
+            throw new RuntimeException("获取统计数据失败：" + e.getMessage());
+        }
+
+        return stats;
     }
 
     @Override

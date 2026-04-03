@@ -1,8 +1,9 @@
 docker run -d \
   --name redis-stack \
+  --restart on-failure \
   -p 6379:6379 \
   -p 8001:8001 \
   -v ./data:/data \
   -e REDIS_ARGS="--requirepass maretu" \
   --network maretu \
-  redis/redis-stack:latest
+  redis/redis-stack:7.4.0-v8

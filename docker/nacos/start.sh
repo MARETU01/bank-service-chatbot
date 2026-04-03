@@ -14,4 +14,4 @@ docker run --name nacos -d \
     -p 8848:8848 \
     -p 9848:9848 \
      --network maretu \
-    nacos/nacos-server:latest
+    nacos/nacos-server:v2.5.2

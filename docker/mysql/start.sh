@@ -8,4 +8,4 @@ docker run -d \
   -v ./conf:/etc/mysql/conf.d \
   -v ./init:/docker-entrypoint-initdb.d \
   --network maretu \
-  mysql
+  mysql:9.6.0

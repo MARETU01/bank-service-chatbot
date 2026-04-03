@@ -65,7 +65,7 @@
           <span class="col-roles">
             <span
               class="role-tag"
-              v-for="role in user.roles"
+              v-for="role in sortRoles(user.roles)"
               :key="role"
               :class="getRoleClass(role)"
             >
@@ -76,7 +76,7 @@
             <span class="status-dot" :class="user.active ? 'online' : 'offline'"></span>
             {{ user.active ? '正常' : '禁用' }}
           </span>
-          <span class="col-time">{{ user.createdAt }}</span>
+          <span class="col-time">{{ formatTime(user.createdAt) }}</span>
           <span class="col-action">
             <button class="btn-sm btn-role" @click="showRoleDialog(user)">角色</button>
             <button class="btn-sm btn-toggle" @click="handleToggleStatus(user)">
@@ -224,6 +224,42 @@ export default {
     }
 
     /**
+     * 角色排序优先级：USER > ADMIN > CUSTOMER_SERVICE
+     * @param {string[]} roles - 角色数组
+     * @returns {string[]} 排序后的角色数组
+     */
+    const sortRoles = (roles) => {
+      if (!roles || !Array.isArray(roles)) return []
+      const priority = { USER: 0, ADMIN: 1, CUSTOMER_SERVICE: 2 }
+      return [...roles].sort((a, b) => {
+        const priorityA = priority[a] !== undefined ? priority[a] : 999
+        const priorityB = priority[b] !== undefined ? priority[b] : 999
+        return priorityA - priorityB
+      })
+    }
+
+    /**
+     * 格式化时间
+     * @param {string} timeStr - ISO 格式的时间字符串
+     * @returns {string} 格式化后的时间字符串
+     */
+    const formatTime = (timeStr) => {
+      if (!timeStr) return '-'
+      try {
+        const date = new Date(timeStr)
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        const hours = String(date.getHours()).padStart(2, '0')
+        const minutes = String(date.getMinutes()).padStart(2, '0')
+        const seconds = String(date.getSeconds()).padStart(2, '0')
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+      } catch (e) {
+        return timeStr
+      }
+    }
+
+    /**
      * 搜索 - 重置到第一页并重新请求
      */
     const handleSearch = () => {
@@ -315,6 +351,8 @@ export default {
       totalPage,
       getRoleName,
       getRoleClass,
+      sortRoles,
+      formatTime,
       handleSearch,
       handleFilter,
       changePage,

@@ -49,7 +49,7 @@ public class ChatController {
 
     @DeleteMapping("/session/{sessionId}")
     public Result<Boolean> deleteSession(@PathVariable("sessionId") String sessionId,
-                                      @RequestHeader("user-info") String userJson) throws JsonProcessingException {
+                                         @RequestHeader("user-info") String userJson) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
             return Result.success(sessionService.deleteSession(context.getUserId(), sessionId));
@@ -89,8 +89,8 @@ public class ChatController {
 
     @GetMapping("/stats")
     public Result<ChatStatsDTO> getChatStats(@RequestHeader("user-info") String userJson,
-                                              @RequestParam(value = "startDate", required = false) String startDate,
-                                              @RequestParam(value = "endDate", required = false) String endDate) {
+                                             @RequestParam(value = "startDate", required = false) String startDate,
+                                             @RequestParam(value = "endDate", required = false) String endDate) {
         try {
             return Result.success(messageService.getChatStats(userJson, startDate, endDate));
         } catch (Exception e) {

@@ -10,7 +10,6 @@ import com.maretu.user.dto.AssignRolesReq;
 import com.maretu.user.dto.PayPasswordReq;
 import com.maretu.user.dto.ResetPasswordReq;
 import com.maretu.user.dto.UpdateProfileReq;
-import com.maretu.user.dto.VerifyPayPasswordReq;
 import com.maretu.user.pojo.Users;
 import com.maretu.user.service.IUserRolesService;
 import com.maretu.user.service.IUserSecurityService;
@@ -19,9 +18,7 @@ import com.maretu.user.vo.AdminUserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController

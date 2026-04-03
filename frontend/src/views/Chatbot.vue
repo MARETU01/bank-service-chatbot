@@ -77,9 +77,26 @@
         >
           <div class="session-icon">💬</div>
           <div class="session-content">
-            <div class="session-title">{{ session.title || '新会话' }}</div>
-            <div class="session-time">{{ formatSessionTime(session.updatedAt) }}</div>
+            <!-- 编辑状态：显示输入框 -->
+            <div v-if="editingSessionId === session.sessionId" class="session-title-edit" @click.stop>
+              <input
+                ref="renameInput"
+                v-model="editingTitle"
+                class="rename-input"
+                @keyup.enter="confirmRename(session.sessionId)"
+                @keyup.esc="cancelRename"
+                @blur="confirmRename(session.sessionId)"
+                maxlength="50"
+                placeholder="输入会话名称"
+              />
+            </div>
+            <!-- 正常状态：显示标题 -->
+            <template v-else>
+              <div class="session-title">{{ session.title || '新会话' }}</div>
+              <div class="session-time">{{ formatSessionTime(session.updatedAt) }}</div>
+            </template>
           </div>
+          <button class="rename-btn" @click.stop="startRename(session)" title="重命名" v-if="editingSessionId !== session.sessionId">✏️</button>
           <button class="delete-btn" @click.stop="deleteSession(session.sessionId)" title="删除会话">🗑️</button>
         </div>
       </div>
@@ -135,6 +152,9 @@ export default {
     const isTyping = ref(false)
     const currentSessionId = ref(null)
     const sessions = ref([])
+    const editingSessionId = ref(null)
+    const editingTitle = ref('')
+    const renameInput = ref(null)
 
     const messages = ref([])
 
@@ -271,6 +291,61 @@ export default {
       }
     }
 
+    // 开始重命名
+    function startRename(session) {
+      editingSessionId.value = session.sessionId
+      editingTitle.value = session.title || ''
+      // 等待 DOM 更新后聚焦输入框
+      nextTick(() => {
+        if (renameInput.value) {
+          // ref 在 v-for 中返回数组
+          const input = Array.isArray(renameInput.value) ? renameInput.value[0] : renameInput.value
+          if (input) {
+            input.focus()
+            input.select()
+          }
+        }
+      })
+    }
+
+    // 确认重命名
+    async function confirmRename(sessionId) {
+      const newTitle = editingTitle.value.trim()
+      if (!newTitle || editingSessionId.value !== sessionId) {
+        cancelRename()
+        return
+      }
+
+      // 检查标题是否有变化
+      const session = sessions.value.find(s => s.sessionId === sessionId)
+      if (session && session.title === newTitle) {
+        cancelRename()
+        return
+      }
+
+      try {
+        const res = await chatApi.renameSession(sessionId, newTitle)
+        if (res.data.code === 1 || res.data.code === 200) {
+          // 更新本地数据
+          if (session) {
+            session.title = newTitle
+          }
+          Message.success('重命名成功')
+        }
+      } catch (error) {
+        console.error('重命名失败:', error)
+        Message.error('重命名失败')
+      } finally {
+        cancelRename()
+      }
+    }
+
+    // 取消重命名
+    function cancelRename() {
+      editingSessionId.value = null
+      editingTitle.value = ''
+    }
+
     // 删除会话
     async function deleteSession(sessionId) {
       try {
@@ -372,6 +447,9 @@ export default {
       quickQuestions,
       sessions,
       currentSessionId,
+      editingSessionId,
+      editingTitle,
+      renameInput,
       getCurrentTime,
       formatSessionTime,
       scrollToBottom,
@@ -379,6 +457,9 @@ export default {
       createNewSession,
       selectSession,
       deleteSession,
+      startRename,
+      confirmRename,
+      cancelRename,
       sendMessage,
       sendQuickQuestion,
       renderMarkdown
@@ -724,6 +805,7 @@ export default {
   margin-top: 2px;
 }
 
+.rename-btn,
 .delete-btn {
   background: transparent;
   border: none;
@@ -732,14 +814,43 @@ export default {
   opacity: 0;
   transition: all var(--transition-normal);
   padding: 4px;
+  flex-shrink: 0;
 }
 
+.session-item:hover .rename-btn,
 .session-item:hover .delete-btn {
   opacity: 1;
 }
 
+.rename-btn:hover,
 .delete-btn:hover {
   transform: scale(1.2);
+}
+
+/* 重命名输入框 */
+.session-title-edit {
+  width: 100%;
+}
+
+.rename-input {
+  width: 100%;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border-hover);
+  border-radius: var(--radius-md);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: all var(--transition-normal);
+}
+
+.rename-input:focus {
+  border-color: var(--input-border-focus);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.rename-input::placeholder {
+  color: var(--input-placeholder);
 }
 
 .contact-list {

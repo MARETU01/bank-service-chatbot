@@ -1,0 +1,9 @@
+git -c http.proxy="" -c https.proxy="" pull
+
+git -c http.proxy="" -c https.proxy="" push
+
+git -c http.proxy="192.168.1.9:9910" -c https.proxy="192.168.1.9:9910" pull
+git -c http.proxy="192.168.1.9:9910" -c https.proxy="192.168.1.9:9910" push
+
+git -c http.proxy="ipv6.maretu.top:9910" -c https.proxy="ipv6.maretu.top:9910" pull
+git -c http.proxy="ipv6.maretu.top:9910" -c https.proxy="ipv6.maretu.top:9910" push

@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -50,6 +51,24 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Lazy
     @Autowired
     private UsersServiceImpl self;
+
+    /**
+     * Lua脚本：原子性地校验验证码并删除
+     * 返回值：-1=key不存在, 0=验证码不匹配, 1=验证成功并已删除
+     */
+    private static final DefaultRedisScript<Long> VERIFY_AND_DELETE_SCRIPT;
+    static {
+        VERIFY_AND_DELETE_SCRIPT = new DefaultRedisScript<>();
+        VERIFY_AND_DELETE_SCRIPT.setScriptText(
+                "local stored = redis.call('GET', KEYS[1]) " +
+                "if stored == false then return -1 end " +
+                "if stored == ARGV[1] then " +
+                "  redis.call('DEL', KEYS[1]) " +
+                "  return 1 " +
+                "else return 0 end"
+        );
+        VERIFY_AND_DELETE_SCRIPT.setResultType(Long.class);
+    }
 
     @Override
     public String login(Users user, String ip) {
@@ -118,17 +137,20 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         } else if (lambdaQuery().eq(Users::getUsername, user.getUsername()).one() != null) {
             throw new RuntimeException("username already registered");
         }
-        String storedCode = stringRedisTemplate.opsForValue().get(
-                RedisConstants.VERIFY_CODE_KEY + user.getEmail()
+        // 使用Lua脚本原子性地校验验证码并删除，防止并发重复消费
+        String verifyKey = RedisConstants.VERIFY_CODE_KEY + user.getEmail();
+        Long verifyResult = stringRedisTemplate.execute(
+                VERIFY_AND_DELETE_SCRIPT,
+                List.of(verifyKey),
+                verifyCode
         );
-        if (!Objects.equals(storedCode, verifyCode)) {
+        if (verifyResult == null || verifyResult != 1L) {
             throw new RuntimeException("verification code not correct");
         }
         String encodedPassword = HashUtil.encodePassword(user.getPassword());
         user.setPassword(encodedPassword)
                 .setEmailVerified(true);
         save(user);
-        stringRedisTemplate.delete(RedisConstants.VERIFY_CODE_KEY + user.getEmail());
         userRolesService.assignDefaultRole(user.getId());
         return true;
     }
@@ -156,17 +178,20 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             throw new RuntimeException("user's status is not active");
         }
 
-        String storedCode = stringRedisTemplate.opsForValue().get(
-                RedisConstants.RESET_PASSWORD_KEY + req.getEmail()
+        // 使用Lua脚本原子性地校验验证码并删除，防止并发重复消费
+        String resetKey = RedisConstants.RESET_PASSWORD_KEY + req.getEmail();
+        Long verifyResult = stringRedisTemplate.execute(
+                VERIFY_AND_DELETE_SCRIPT,
+                List.of(resetKey),
+                verifyCode
         );
-        if (!Objects.equals(storedCode, verifyCode)) {
+        if (verifyResult == null || verifyResult != 1L) {
             throw new RuntimeException("verification code not correct");
         }
 
         String encodedPassword = HashUtil.encodePassword(req.getNewPassword());
         userInfo.setPassword(encodedPassword);
         updateById(userInfo);
-        stringRedisTemplate.delete(RedisConstants.RESET_PASSWORD_KEY + req.getEmail());
         return true;
     }
 

@@ -286,45 +286,45 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
             Long blockedMessages = blockedMessagesFuture.get();
 
             // 基础对话统计
-            stats.setTotalSessions(totalSessions);
-            stats.setTotalMessages(totalMessages);
-            stats.setUserMessages(userMessages);
-            stats.setAiMessages(aiMessages);
-            stats.setActiveUsers(activeUsersFuture.get());
-            stats.setTodaySessions(todaySessionsFuture.get());
-            stats.setTodayMessages(todayMessagesFuture.get());
-            stats.setAvgMessagesPerSession(
-                    totalSessions > 0
-                            ? Math.round((double) totalMessages / totalSessions * 100.0) / 100.0
-                            : 0.0
-            );
+            stats.setTotalSessions(totalSessions)
+                    .setTotalMessages(totalMessages)
+                    .setUserMessages(userMessages)
+                    .setAiMessages(aiMessages)
+                    .setActiveUsers(activeUsersFuture.get())
+                    .setTodaySessions(todaySessionsFuture.get())
+                    .setTodayMessages(todayMessagesFuture.get())
+                    .setAvgMessagesPerSession(
+                            totalSessions > 0
+                                    ? Math.round((double) totalMessages / totalSessions * 100.0) / 100.0
+                                    : 0.0
+                    );
 
             // AI 性能统计
             AiMetadataStatsDTO aiStats = aiStatsFuture.get();
             if (aiStats != null) {
-                stats.setModelName(aiStats.getModelName());
-                stats.setTotalTokens(aiStats.getTotalTokens());
-                stats.setTotalPromptTokens(aiStats.getTotalPromptTokens());
-                stats.setTotalCompletionTokens(aiStats.getTotalCompletionTokens());
-                stats.setTodayTokens(aiStats.getTodayTokens());
-                stats.setAvgResponseTimeMs(
-                        Math.round(aiStats.getAvgResponseTimeMs() * 100.0) / 100.0
-                );
-                stats.setMaxResponseTimeMs(aiStats.getMaxResponseTimeMs());
-                stats.setAvgTokensPerChat(
-                        aiMessages > 0 && aiStats.getTotalTokens() != null
-                                ? Math.round((double) aiStats.getTotalTokens() / aiMessages * 100.0) / 100.0
-                                : 0.0
-                );
+                stats.setModelName(aiStats.getModelName())
+                        .setTotalTokens(aiStats.getTotalTokens())
+                        .setTotalPromptTokens(aiStats.getTotalPromptTokens())
+                        .setTotalCompletionTokens(aiStats.getTotalCompletionTokens())
+                        .setTodayTokens(aiStats.getTodayTokens())
+                        .setAvgResponseTimeMs(
+                                Math.round(aiStats.getAvgResponseTimeMs() * 100.0) / 100.0
+                        )
+                        .setMaxResponseTimeMs(aiStats.getMaxResponseTimeMs())
+                        .setAvgTokensPerChat(
+                                aiMessages > 0 && aiStats.getTotalTokens() != null
+                                        ? Math.round((double) aiStats.getTotalTokens() / aiMessages * 100.0) / 100.0
+                                        : 0.0
+                        );
             }
 
             // 安全防护统计
-            stats.setBlockedMessages(blockedMessages);
-            stats.setBlockRate(
-                    userMessages > 0
-                            ? Math.round((double) blockedMessages / userMessages * 10000.0) / 100.0
-                            : 0.0
-            );
+            stats.setBlockedMessages(blockedMessages)
+                    .setBlockRate(
+                            userMessages > 0
+                                    ? Math.round((double) blockedMessages / userMessages * 100.0) / 100.0
+                                    : 0.0
+                    );
         } catch (Exception e) {
             log.error("并发查询统计数据异常", e);
             throw new RuntimeException("获取统计数据失败：" + e.getMessage());

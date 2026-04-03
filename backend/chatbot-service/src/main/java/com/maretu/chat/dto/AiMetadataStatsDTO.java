@@ -1,6 +1,7 @@
 package com.maretu.chat.dto;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * AI 元数据聚合统计结果（Mapper 查询映射用）
@@ -8,6 +9,7 @@ import lombok.Data;
  * @author maretu
  */
 @Data
+@Accessors(chain = true)
 public class AiMetadataStatsDTO {
 
     /** 模型名称 */

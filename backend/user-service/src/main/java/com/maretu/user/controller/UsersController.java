@@ -201,7 +201,7 @@ public class UsersController {
 
     @PutMapping("/status/{userId}")
     public Result<Boolean> toggleUserStatus(@RequestHeader("user-info") String userJson,
-                                            @PathVariable Long userId) throws JsonProcessingException {
+                                            @PathVariable("userId") Long userId) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {
             return Result.success(usersService.toggleUserStatus(userId, context.getUserId()));
@@ -212,7 +212,7 @@ public class UsersController {
 
     @PutMapping("/roles/{userId}")
     public Result<Boolean> assignUserRoles(@RequestHeader("user-info") String userJson,
-									       @PathVariable Long userId,
+									       @PathVariable("userId") Long userId,
 									       @RequestBody AssignRolesReq req) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         try {

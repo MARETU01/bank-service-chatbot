@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -51,9 +50,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     private final ChatClient chatClient;
     private final Executor virtualThreadPoolExecutor;
     private final UserClient userClient;
-
-    @Value("${spring.ai.openai.chat.options.model:unknown}")
-    private String modelName;
 
     @Override
     public List<Message> getMessages(Integer userId, String sessionId) {
@@ -95,6 +91,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
         // ===== 调用 LLM =====
         StringBuilder fullResponse = new StringBuilder();
+        String[] modelName = new String[1];
         long startTime = System.currentTimeMillis();
         AtomicLong promptTokens = new AtomicLong(0);
         AtomicLong completionTokens = new AtomicLong(0);
@@ -106,6 +103,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 .stream()
                 .chatResponse()
                 .doOnNext(chatResponse -> {
+                    if (modelName[0] == null) {
+                        modelName[0] = chatResponse.getMetadata().getModel();
+                    }
                     // 累积 token 统计信息
                     if (chatResponse != null && chatResponse.getMetadata().getUsage() != null) {
                         var usage = chatResponse.getMetadata().getUsage();
@@ -142,7 +142,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                     String aiMetadataJson = null;
                     try {
                         Map<String, Object> metadata = new HashMap<>();
-                        metadata.put("model", modelName);
+                        metadata.put("model", modelName[0]);
                         metadata.put("promptTokens", promptTokens.get());
                         metadata.put("completionTokens", completionTokens.get());
                         metadata.put("totalTokens", promptTokens.get() + completionTokens.get());

@@ -186,7 +186,7 @@
             <div class="stat-icon rate">📉</div>
             <div class="stat-info">
               <h4>拦截率</h4>
-              <p class="stat-value">{{ stats.blockRate != null ? stats.blockRate + '%' : '-' }}</p>
+              <p class="stat-value">{{ stats.blockRate != null ? (stats.blockRate * 100).toFixed(2) + '%' : '-' }}</p>
             </div>
           </div>
         </div>

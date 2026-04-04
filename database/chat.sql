@@ -37,16 +37,3 @@ CREATE TABLE message (
     INDEX idx_session_id (session_id),
     FOREIGN KEY (session_id) REFERENCES session(session_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天消息表';
-
--- ========================================
--- 插入示例数据
--- ========================================
-
--- 示例聊天会话
-INSERT INTO session (session_id, user_id, title) VALUES
-('550e8400-e29b-41d4-a716-446655440001', 1, '账户余额查询');
-
--- 示例聊天消息
-INSERT INTO message (session_id, sender_type, content) VALUES
-('550e8400-e29b-41d4-a716-446655440001', 1, '你好，我想查询一下我的账户余额'),
-('550e8400-e29b-41d4-a716-446655440001', 2, '您好！您可以登录手机银行 APP 查看账户余额，或者告诉我您的账号，我帮您查询。');

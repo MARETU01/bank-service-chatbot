@@ -36,6 +36,7 @@ public interface MessageMapper extends BaseMapper<Message> {
             "WHERE sender_type = 2 AND ai_metadata IS NOT NULL" +
             "<if test='startDate != null'> AND created_at &gt;= #{startDate}</if>" +
             "<if test='endDate != null'> AND created_at &lt;= #{endDate}</if>" +
+            "GROUP BY modelName" +
             "</script>")
     AiMetadataStatsDTO selectAiMetadataStats(@Param("startDate") String startDate,
                                              @Param("endDate") String endDate);

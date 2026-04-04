@@ -1,21 +1,20 @@
 package com.maretu.chat.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maretu.api.client.UserClient;
 import com.maretu.chat.dto.AiMetadataStatsDTO;
-import com.maretu.chat.pojo.Message;
+import com.maretu.chat.dto.ChatStatsDTO;
 import com.maretu.chat.mapper.MessageMapper;
+import com.maretu.chat.pojo.Message;
 import com.maretu.chat.pojo.Session;
 import com.maretu.chat.service.IMessageService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.maretu.chat.service.ISessionService;
-import com.maretu.chat.dto.ChatStatsDTO;
 import com.maretu.common.dto.Context;
 import com.maretu.common.utils.ChatGuardUtils;
 import com.maretu.common.utils.Result;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -43,7 +42,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author maretu
  * @since 2026-03-14
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements IMessageService {
@@ -80,7 +78,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         if (!guardResult.isPassed()) {
             // 输入未通过安全检查，直接返回拒绝原因，同时保存对话记录
             String rejectReason = guardResult.getRejectReason();
-            log.warn("用户 [{}] 输入未通过安全检查：{}", context.getUserId(), rejectReason);
             virtualThreadPoolExecutor.execute(() -> {
                 List<Message> saveMessages = new ArrayList<>();
                 saveMessages.add(message.setSenderType(1).setMessageType("TEXT"));
@@ -138,7 +135,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                     // 对完整回答进行输出审核
                     String reviewedResponse = ChatGuardUtils.reviewOutput(fullResponse.toString());
                     if (!reviewedResponse.contentEquals(fullResponse)) {
-                        log.warn("用户 [{}] 的 AI 回答未通过输出审核，已替换为安全回答", context.getUserId());
+                        System.out.printf("用户 [%s] 的 AI 回答未通过输出审核，已替换为安全回答%n", context.getUserId());
                     }
 
                     // 构建 AI 元数据

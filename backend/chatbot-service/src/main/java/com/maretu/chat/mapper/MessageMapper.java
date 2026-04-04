@@ -38,5 +38,5 @@ public interface MessageMapper extends BaseMapper<Message> {
             "<if test='endDate != null'> AND created_at &lt;= #{endDate}</if>" +
             "</script>")
     AiMetadataStatsDTO selectAiMetadataStats(@Param("startDate") String startDate,
-                                              @Param("endDate") String endDate);
+                                             @Param("endDate") String endDate);
 }

@@ -110,8 +110,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 .chatResponse()
                 .doOnNext(chatResponse -> {
                     // 累积 token 统计信息
-                    if (chatResponse != null && chatResponse.getMetadata() != null
-                            && chatResponse.getMetadata().getUsage() != null) {
+                    if (chatResponse != null && chatResponse.getMetadata().getUsage() != null) {
                         var usage = chatResponse.getMetadata().getUsage();
                         if (usage.getPromptTokens() > 0) {
                             promptTokens.set(usage.getPromptTokens());
@@ -123,9 +122,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 })
                 // 提取文本内容用于前端流式输出
                 .map(chatResponse -> {
-                    if (chatResponse.getResult() != null
-                            && chatResponse.getResult().getOutput() != null
-                            && chatResponse.getResult().getOutput().getText() != null) {
+                    chatResponse.getResult();
+                    chatResponse.getResult();
+                    if (chatResponse.getResult().getOutput().getText() != null) {
                         String text = chatResponse.getResult().getOutput().getText();
                         fullResponse.append(text);
                         return text;
@@ -138,7 +137,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                     long durationMs = System.currentTimeMillis() - startTime;
                     // 对完整回答进行输出审核
                     String reviewedResponse = ChatGuardUtils.reviewOutput(fullResponse.toString());
-                    if (!reviewedResponse.equals(fullResponse.toString())) {
+                    if (!reviewedResponse.contentEquals(fullResponse)) {
                         log.warn("用户 [{}] 的 AI 回答未通过输出审核，已替换为安全回答", context.getUserId());
                     }
 

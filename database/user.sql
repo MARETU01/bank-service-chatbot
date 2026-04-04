@@ -85,6 +85,10 @@ INSERT INTO roles (role_name, role_code, description) VALUES
 INSERT INTO users (username, password, email, real_name, status) VALUES
 ('admin', '$2a$10$n42hHjQwpbYA/IDml3mdR.MA0RqUdegjnHxbrx/MYQsMODM1GYiLS', 'admin@bank.com', '系统管理员', 1);
 
+INSERT INTO users (username, password, email, real_name, status) VALUES
+    ('ld', '$2a$10$/FjrgOJRoUd2ACvQ1KJLFeMgC.xVBUW.M6aaY0HVGm5xG9zTK2.ce', '2636064351@qq.com', '罗鼎', 1);
+
+
 -- 关联管理员角色
 INSERT INTO user_roles (user_id, role_id) 
 SELECT u.id, r.id FROM users u, roles r 
@@ -93,3 +97,7 @@ WHERE u.username = 'admin' AND r.role_code = 'USER';
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id FROM users u, roles r
 WHERE u.username = 'admin' AND r.role_code = 'ADMIN';
+
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u, roles r
+WHERE u.username = 'ld' AND r.role_code = 'USER';

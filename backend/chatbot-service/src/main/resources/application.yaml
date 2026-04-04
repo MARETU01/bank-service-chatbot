@@ -21,6 +21,7 @@ spring:
       chat:
         options:
           model: "deepseek-ai/DeepSeek-V3.2"
+          stream-usage: true
       embedding:
         options:
           model: "Qwen/Qwen3-Embedding-8B"

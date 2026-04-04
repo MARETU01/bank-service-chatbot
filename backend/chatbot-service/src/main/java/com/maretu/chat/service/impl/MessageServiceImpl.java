@@ -109,15 +109,19 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                     // 累积 token 统计信息
                     var usage = chatResponse.getMetadata().getUsage();
                     if (usage.getPromptTokens() > 0) {
+                        System.out.println("输入token: " + usage.getPromptTokens());
                         promptTokens.set(usage.getPromptTokens());
                     }
                     if (usage.getCompletionTokens() > 0) {
-                        completionTokens.addAndGet(usage.getCompletionTokens());
+                        System.out.println("ai token: " + usage.getCompletionTokens());
+                        completionTokens.set(usage.getCompletionTokens());
                     }
                 })
                 // 提取文本内容用于前端流式输出
                 .map(chatResponse -> {
-                    if (chatResponse.getResult().getOutput().getText() != null) {
+                    if (chatResponse.getResult() != null &&
+                            chatResponse.getResult().getOutput() != null &&
+                            chatResponse.getResult().getOutput().getText() != null) {
                         String text = chatResponse.getResult().getOutput().getText();
                         fullResponse.append(text);
                         return text;

@@ -5,46 +5,46 @@ import { userApi } from '@/api/api'
 
 export default createStore({
   state: {
-    // 用户信息
+    // User info
     user: null,
     // Token
     token: localStorage.getItem('token') || null,
-    // 是否已登录
+    // Login status
     isLoggedIn: !!localStorage.getItem('token'),
-    // 加载状态
+    // Loading state
     loading: false,
-    // 用户角色列表
+    // User roles list
     roles: [],
-    // 是否已加载动态路由
+    // Whether dynamic routes have been added
     dynamicRoutesAdded: false
   },
   
   getters: {
-    // 获取用户 ID
+    // Get user ID
     userId: state => state.user?.userId,
-    // 获取用户名
+    // Get username
     username: state => state.user?.username,
-    // 获取用户邮箱
+    // Get user email
     email: state => state.user?.email,
-    // 获取 token
+    // Get token
     token: state => state.token,
-    // 是否已登录
+    // Is logged in
     isLoggedIn: state => state.isLoggedIn,
-    // 是否正在加载
+    // Is loading
     loading: state => state.loading,
-    // 获取用户角色
+    // Get user roles
     roles: state => state.roles,
-    // 是否是管理员
+    // Is admin
     isAdmin: state => state.roles.includes('ADMIN'),
   },
   
   mutations: {
-    // 设置用户信息
+    // Set user info
     SET_USER(state, user) {
       state.user = user
     },
     
-    // 设置 token
+    // Set token
     SET_TOKEN(state, token) {
       state.token = token
       state.isLoggedIn = !!token
@@ -55,17 +55,17 @@ export default createStore({
       }
     },
     
-    // 设置登录状态
+    // Set login status
     SET_LOGIN_STATUS(state, status) {
       state.isLoggedIn = status
     },
     
-    // 设置加载状态
+    // Set loading state
     SET_LOADING(state, loading) {
       state.loading = loading
     },
     
-    // 清除用户信息（登出）
+    // Clear user info (logout)
     CLEAR_USER(state) {
       state.user = null
       state.token = null
@@ -76,21 +76,21 @@ export default createStore({
       localStorage.removeItem('roles')
     },
 
-    // 设置用户角色
+    // Set user roles
     SET_ROLES(state, roles) {
       state.roles = roles
-      // 将角色保存到 localStorage 供路由守卫使用
+      // Save roles to localStorage for route guards
       localStorage.setItem('roles', JSON.stringify(roles))
     },
 
-    // 设置动态路由已加载标记
+    // Set dynamic routes added flag
     SET_DYNAMIC_ROUTES_ADDED(state, value) {
       state.dynamicRoutesAdded = value
     }
   },
   
   actions: {
-    // 登录动作
+    // Login action
     async login({ commit }, loginData) {
       commit('SET_LOADING', true)
       try {
@@ -98,13 +98,13 @@ export default createStore({
         const { code, data, message } = response.data
         
         if (code === 1 || code === 200) {
-          // 保存 token
+          // Save token
           commit('SET_TOKEN', data)
           
-          // 获取用户信息
+          // Fetch user info
           await this.dispatch('fetchUserInfo')
           
-          // 获取用户角色并添加动态路由
+          // Fetch user roles and add dynamic routes
           await this.dispatch('fetchUserRoles')
           
           return { success: true, message }
@@ -113,14 +113,14 @@ export default createStore({
         }
       } catch (error) {
         console.error('Login error:', error)
-        const message = error.response?.data?.message || '登录失败，请重试'
+        const message = error.response?.data?.message || 'Login failed, please try again'
         return { success: false, message }
       } finally {
         commit('SET_LOADING', false)
       }
     },
     
-    // 获取用户信息
+    // Fetch user info
     async fetchUserInfo({ commit, state }) {
       if (!state.token) {
         return
@@ -135,7 +135,7 @@ export default createStore({
         }
       } catch (error) {
         console.error('Fetch user info error:', error)
-        // 如果获取用户信息失败（可能是 token 过期），清除登录状态
+        // If fetching user info fails (possibly token expired), clear login status
         if (error.response?.status === 401) {
           commit('CLEAR_USER')
           router.push('/login')
@@ -143,7 +143,7 @@ export default createStore({
       }
     },
     
-    // 刷新 token
+    // Refresh token
     async refreshToken({ commit, state }) {
       if (!state.token) {
         return null
@@ -160,14 +160,14 @@ export default createStore({
         return null
       } catch (error) {
         console.error('Refresh token error:', error)
-        // 刷新失败，清除登录状态
+        // Refresh failed, clear login status
         commit('CLEAR_USER')
         router.push('/login')
         return null
       }
     },
     
-    // 获取用户角色
+    // Fetch user roles
     async fetchUserRoles({ commit, state }) {
       if (!state.token) {
         return
@@ -182,18 +182,18 @@ export default createStore({
         }
       } catch (error) {
         console.error('Fetch user roles error:', error)
-        // 角色获取失败不影响正常使用，默认为普通用户
+        // Role fetch failure doesn't affect normal use, default to regular user
         commit('SET_ROLES', ['USER'])
       }
     },
 
-    // 登出动作
+    // Logout action
     async logout({ commit, state }) {
       commit('CLEAR_USER')
       router.push('/')
     },
     
-    // 初始化用户状态（应用启动时调用）
+    // Initialize user state (called when app starts)
     async initAuth({ commit, dispatch }) {
       const token = localStorage.getItem('token')
       if (token) {

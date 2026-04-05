@@ -7,25 +7,25 @@ const routes = [
     path: '/',
     name: 'Home',
     component: () => import('@/views/HomeView'),
-    meta: { title: '首页', requiresAuth: false }
+    meta: { title: 'Home', requiresAuth: false }
   },
   {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/LoginView'),
-    meta: { title: '登录页面', requiresAuth: false }
+    meta: { title: 'Login', requiresAuth: false }
   },
   {
     path: '/register',
     name: 'Register',
     component: () => import('@/views/RegisterView'),
-    meta: { title: '注册页面', requiresAuth: false }
+    meta: { title: 'Register', requiresAuth: false }
   },
   {
     path: '/reset-password',
     name: 'ResetPassword',
     component: () => import('@/views/ResetPasswordView'),
-    meta: { title: '重设密码', requiresAuth: false }
+    meta: { title: 'Reset Password', requiresAuth: false }
   },
   {
     path: '/',
@@ -35,55 +35,55 @@ const routes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/Dashboard'),
-        meta: { title: '仪表盘', icon: '📊', requiresAuth: true }
+        meta: { title: 'Dashboard', icon: '📊', requiresAuth: true }
       },
       {
         path: 'accounts',
         name: 'Accounts',
         component: () => import('@/views/Accounts'),
-        meta: { title: '我的账户', icon: '💳', requiresAuth: true }
+        meta: { title: 'My Accounts', icon: '💳', requiresAuth: true }
       },
       {
         path: 'transactions',
         name: 'Transactions',
         component: () => import('@/views/Transactions'),
-        meta: { title: '交易记录', icon: '📋', requiresAuth: true }
+        meta: { title: 'Transactions', icon: '📋', requiresAuth: true }
       },
       {
         path: 'transfers',
         name: 'Transfers',
         component: () => import('@/views/Transfers'),
-        meta: { title: '转账服务', icon: '💸', requiresAuth: true }
+        meta: { title: 'Transfer Service', icon: '💸', requiresAuth: true }
       },
       {
         path: 'chatbot',
         name: 'Chatbot',
         component: () => import('@/views/Chatbot'),
-        meta: { title: '在线客服', icon: '🤖', requiresAuth: true }
+        meta: { title: 'Online Support', icon: '🤖', requiresAuth: true }
       },
       {
         path: 'profile',
         name: 'Profile',
         component: () => import('@/views/Profile'),
-        meta: { title: '个人中心', icon: '👤', requiresAuth: true }
+        meta: { title: 'Profile', icon: '👤', requiresAuth: true }
       },
       {
         path: 'admin/knowledge',
         name: 'KnowledgeManage',
         component: () => import('@/views/admin/KnowledgeManage'),
-        meta: { title: '知识库管理', icon: '📚', requiresAuth: true, requiresAdmin: true }
+        meta: { title: 'Knowledge Base', icon: '📚', requiresAuth: true, requiresAdmin: true }
       },
       {
         path: 'admin/chat-stats',
         name: 'ChatStats',
         component: () => import('@/views/admin/ChatStats'),
-        meta: { title: '对话统计', icon: '📈', requiresAuth: true, requiresAdmin: true }
+        meta: { title: 'Chat Statistics', icon: '📈', requiresAuth: true, requiresAdmin: true }
       },
       {
         path: 'admin/users',
         name: 'UserManage',
         component: () => import('@/views/admin/UserManage'),
-        meta: { title: '用户管理', icon: '👥', requiresAuth: true, requiresAdmin: true }
+        meta: { title: 'User Management', icon: '👥', requiresAuth: true, requiresAdmin: true }
       }
     ]
   }
@@ -102,53 +102,53 @@ const router = createRouter({
   }
 })
 
-// 全局前置守卫
+// Global before guard
 router.beforeEach((to, from, next) => {
-  // 设置页面标题
-  document.title = to.meta.title || '银行服务机器人'
+  // Set page title
+  document.title = to.meta.title || 'Bank Service Chatbot'
   
-  // 获取 token
+  // Get token
   const token = localStorage.getItem('token')
   const requiresAuth = to.meta.requiresAuth !== false
   
-  // 检查是否需要登录
+  // Check if login is required
   if (requiresAuth && !token) {
-    // 未登录，重定向到登录页
+    // Not logged in, redirect to login page
     next({
       path: '/login',
-      query: { redirect: to.fullPath } // 保存原始目标路径
+      query: { redirect: to.fullPath } // Save original target path
     })
     return
   }
   
-  // 检查是否是管理员专属页面
+  // Check if it's an admin-only page
   if (to.meta.requiresAdmin) {
     const roles = JSON.parse(localStorage.getItem('roles') || '[]')
     const isAdmin = roles.includes('ADMIN')
     
     if (!isAdmin) {
-      // 普通用户尝试访问管理员页面，显示错误提示并重定向到首页
-      Message.error('无权访问管理员页面')
+      // Regular user trying to access admin page, show error and redirect to home
+      Message.error('Access denied: Admin access required')
       next('/dashboard')
       return
     }
   }
   
-  // 检查已登录用户访问登录页
+  // Check if logged-in user accesses login page
   if (to.path === '/login' && token) {
-    // 已登录用户访问登录页，重定向到首页
+    // Logged-in user accessing login page, redirect to home
     next('/')
     return
   }
   
-  // 允许访问
+  // Allow access
   next()
 })
 
-// 全局后置守卫
+// Global after guard
 router.afterEach((to, from) => {
-  // 可以在这里进行页面分析等操作
-  console.log(`路由从 ${from.path} 切换到 ${to.path}`)
+  // Can perform page analysis here, etc.
+  console.log(`Route changed from ${from.path} to ${to.path}`)
 })
 
 export default router

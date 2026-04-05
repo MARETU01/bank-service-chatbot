@@ -12,6 +12,7 @@ spring:
   config:
     import:
       - "nacos:shared-log.yaml?group=DEFAULT_GROUP&refresh=true"
+      - "nacos:shared-thread.yaml?group=DEFAULT_GROUP&refresh=true"
       - "nacos:shared-jdbc.yaml?group=DEFAULT_GROUP&refresh=true"
       - "nacos:shared-redis.yaml?group=DEFAULT_GROUP&refresh=true"
       - "nacos:email-config.yaml?group=DEFAULT_GROUP&refresh=true"

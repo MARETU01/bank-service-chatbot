@@ -6,25 +6,13 @@ spring:
     name: gateway
   cloud:
     gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOriginPatterns: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: true
     nacos:
       server-addr: ipv6.maretu.top:8848
       username: nacos
       password: maretu
   config:
     import:
-      - "nacos:gateway-routes.yaml?group=DEFAULT_GROUP&refresh=true"
+      - "nacos:gateway-config.yaml?group=DEFAULT_GROUP&refresh=true"
 
 maretu:
   auth:

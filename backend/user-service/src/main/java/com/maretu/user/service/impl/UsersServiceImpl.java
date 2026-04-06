@@ -72,17 +72,20 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     @Override
     public String login(Users user, String ip) {
+        Users userToLogin;
         String email = user.getEmail();
         String phone = user.getPhone();
-        if (!StringUtils.hasText(email) && !StringUtils.hasText(phone)) {
+        if (!StringUtils.hasText(email)) {
+            userToLogin = lambdaQuery()
+                    .eq(Users::getEmail, email)
+                    .one();
+        } else  if (!StringUtils.hasText(phone)) {
+            userToLogin = lambdaQuery()
+                    .eq(Users::getPhone, phone)
+                    .one();
+        } else {
             throw new RuntimeException("email or phone is required");
         }
-
-        Users userToLogin = lambdaQuery()
-                .and(q -> q.eq(StringUtils.hasText(email), Users::getEmail, email)
-                .or()
-                .eq(StringUtils.hasText(phone), Users::getPhone, phone))
-                .one();
 
         if (userToLogin == null || !HashUtil.checkPassword(user.getPassword(), userToLogin.getPassword())) {
             throw new RuntimeException("email/phone or password not correct");

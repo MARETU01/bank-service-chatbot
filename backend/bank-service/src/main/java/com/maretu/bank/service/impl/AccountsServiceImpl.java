@@ -131,7 +131,7 @@ public class AccountsServiceImpl extends ServiceImpl<AccountsMapper, Accounts> i
     public Accounts updateAccount(Long accountId, Long userId, Accounts req) {
         Accounts account = getAccountByIdAndUserId(accountId, userId);
         if (account == null) {
-            throw new RuntimeException("账户不存在或无权访问");
+            throw new RuntimeException("Account does not exist or no permission to access");
         }
 
         lambdaUpdate().eq(Accounts::getId, account.getId())
@@ -147,17 +147,17 @@ public class AccountsServiceImpl extends ServiceImpl<AccountsMapper, Accounts> i
     public Accounts updateStatus(Long accountId, Long userId, Integer status) {
         Accounts account = getAccountByIdAndUserId(accountId, userId);
         if (account == null) {
-            throw new RuntimeException("账户不存在或无权访问");
+            throw new RuntimeException("Account does not exist or no permission to access");
         }
         
-        // 验证状态值
+        // Validate status value
         if (status < 0 || status > 2) {
-            throw new RuntimeException("无效的状态值");
+            throw new RuntimeException("Invalid status value");
         }
         
         // 不允许将状态改为关闭(2)，关闭需要单独的流程
         if (status == 2) {
-            throw new RuntimeException("不支持直接关闭账户，请联系客服");
+            throw new RuntimeException("Closing accounts directly is not supported, please contact customer service");
         }
         
         account.setStatus(status);

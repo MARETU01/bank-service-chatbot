@@ -1,10 +1,10 @@
 <template>
   <div class="chatbot">
     <div class="chatbot-container">
-      <!-- 聊天窗口 -->
+      <!-- Chat Window -->
       <div class="chat-window" ref="chatWindow">
         <div class="chat-messages" ref="chatMessages">
-          <!-- 欢迎消息 -->
+          <!-- Welcome Message -->
           <div class="message bot-message" v-for="(msg, index) in messages" :key="index" :class="msg.type">
             <div class="message-avatar">
               <span v-if="msg.type === 'bot'">🤖</span>
@@ -16,7 +16,7 @@
             </div>
           </div>
 
-          <!-- 正在输入 -->
+          <!-- Typing Indicator -->
           <div class="message bot-message" v-if="isTyping && messages.length > 0 && messages[messages.length - 1].text === ''">
             <div class="message-avatar">🤖</div>
             <div class="message-content">
@@ -30,9 +30,9 @@
         </div>
       </div>
 
-      <!-- 快捷问题 -->
+      <!-- Quick Questions -->
       <div class="quick-questions">
-        <span class="quick-label">快捷问题：</span>
+        <span class="quick-label">Quick Questions:</span>
         <button 
           class="quick-btn" 
           v-for="(q, index) in quickQuestions" 
@@ -44,28 +44,28 @@
         </button>
       </div>
 
-      <!-- 输入区域 -->
+      <!-- Input Area -->
       <div class="chat-input-area">
         <div class="input-wrapper">
           <input 
             type="text" 
             v-model="inputMessage" 
-            placeholder="请输入您的问题..."
+            placeholder="Please enter your question..."
             @keyup.enter="sendMessage"
             :disabled="isTyping"
           />
           <button class="send-btn" @click="sendMessage" :disabled="!inputMessage.trim() || isTyping">
-            <span>📤</span> 发送
+            <span>📤</span> Send
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 侧边栏 - 聊天记录 -->
+    <!-- Sidebar - Chat History -->
     <div class="chat-sidebar">
       <div class="sidebar-header">
-        <h3>💬 会话列表</h3>
-        <button class="new-chat-btn" @click="createNewSession" title="新建会话">➕</button>
+        <h3>💬 Chat History</h3>
+        <button class="new-chat-btn" @click="createNewSession" title="New Chat">➕</button>
       </div>
       <div class="session-list">
         <div 
@@ -77,7 +77,7 @@
         >
           <div class="session-icon">💬</div>
           <div class="session-content">
-            <!-- 编辑状态：显示输入框 -->
+            <!-- Edit Mode: Show Input -->
             <div v-if="editingSessionId === session.sessionId" class="session-title-edit" @click.stop>
               <input
                 ref="renameInput"
@@ -87,43 +87,43 @@
                 @keyup.esc="cancelRename"
                 @blur="confirmRename(session.sessionId)"
                 maxlength="50"
-                placeholder="输入会话名称"
+                placeholder="Enter session name"
               />
             </div>
-            <!-- 正常状态：显示标题 -->
+            <!-- Normal Mode: Show Title -->
             <template v-else>
-              <div class="session-title">{{ session.title || '新会话' }}</div>
+              <div class="session-title">{{ session.title || 'New Chat' }}</div>
               <div class="session-time">{{ formatSessionTime(session.updatedAt) }}</div>
             </template>
           </div>
-          <button class="rename-btn" @click.stop="startRename(session)" title="重命名" v-if="editingSessionId !== session.sessionId">✏️</button>
-          <button class="delete-btn" @click.stop="deleteSession(session.sessionId)" title="删除会话">🗑️</button>
+          <button class="rename-btn" @click.stop="startRename(session)" title="Rename" v-if="editingSessionId !== session.sessionId">✏️</button>
+          <button class="delete-btn" @click.stop="deleteSession(session.sessionId)" title="Delete Chat">🗑️</button>
         </div>
       </div>
 
       <div class="sidebar-header contact-info">
-        <h3>📞 联系方式</h3>
+        <h3>📞 Contact Us</h3>
       </div>
       <div class="contact-list">
         <div class="contact-item">
           <span class="contact-icon">☎️</span>
           <div>
-            <div class="contact-label">客服热线</div>
+            <div class="contact-label">Customer Service Hotline</div>
             <div class="contact-value">95588</div>
           </div>
         </div>
         <div class="contact-item">
           <span class="contact-icon">📧</span>
           <div>
-            <div class="contact-label">在线客服</div>
+            <div class="contact-label">Online Support</div>
             <div class="contact-value">9:00 - 18:00</div>
           </div>
         </div>
         <div class="contact-item">
           <span class="contact-icon">🏦</span>
           <div>
-            <div class="contact-label">网点查询</div>
-            <div class="contact-value">查看附近网点</div>
+            <div class="contact-label">Branch Locator</div>
+            <div class="contact-value">Find nearby branches</div>
           </div>
         </div>
       </div>
@@ -137,7 +137,7 @@ import { chatApi } from '@/api/api'
 import Message from '@/utils/message'
 import { marked } from 'marked'
 
-// 配置 marked 选项
+// Configure marked options
 marked.setOptions({
   breaks: true,
   gfm: true
@@ -159,13 +159,13 @@ export default {
     const messages = ref([])
 
     const quickQuestions = [
-      '如何查询余额？',
-      '如何转账？',
-      '如何修改密码？',
-      '如何挂失银行卡？'
+      'How to check balance?',
+      'How to transfer money?',
+      'How to change password?',
+      'How to report a lost card?'
     ]
 
-    // 获取当前时间
+    // Get current time
     function getCurrentTime() {
       const now = new Date()
       return now.toLocaleTimeString('zh-CN', { 
@@ -174,23 +174,23 @@ export default {
       })
     }
 
-    // 渲染 Markdown
+    // Render Markdown
     function renderMarkdown(text) {
       if (!text) return ''
       return marked.parse(text)
     }
 
-    // 格式化会话时间
+    // Format session time
     function formatSessionTime(timeStr) {
       if (!timeStr) return ''
       const date = new Date(timeStr)
       const now = new Date()
       const diff = now - date
       
-      if (diff < 60000) return '刚刚'
-      if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前'
-      if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前'
-      if (diff < 604800000) return Math.floor(diff / 86400000) + '天前'
+      if (diff < 60000) return 'Just now'
+      if (diff < 3600000) return Math.floor(diff / 60000) + ' min ago'
+      if (diff < 86400000) return Math.floor(diff / 3600000) + ' hours ago'
+      if (diff < 604800000) return Math.floor(diff / 86400000) + ' days ago'
       
       return date.toLocaleDateString('zh-CN', { 
         month: '2-digit', 
@@ -198,7 +198,7 @@ export default {
       })
     }
 
-    // 滚动到底部
+    // Scroll to bottom
     function scrollToBottom() {
       nextTick(() => {
         if (chatMessages.value) {
@@ -207,32 +207,32 @@ export default {
       })
     }
 
-    // 获取会话列表
+    // Load session list
     async function loadSessions() {
       try {
         const res = await chatApi.getSessions()
         if (res.data.code === 1 || res.data.code === 200) {
           sessions.value = res.data.data || []
-          // 如果有会话且当前没有选中，选择第一个
+          // If there are sessions and none selected, select the first one
           if (sessions.value.length > 0 && !currentSessionId.value) {
             selectSession(sessions.value[0].sessionId)
           }
         }
       } catch (error) {
-        console.error('加载会话列表失败:', error)
+        console.error('Failed to load session list:', error)
       }
     }
 
-    // 判断当前会话是否为空会话（只有欢迎语，没有用户消息）
+    // Check if current session is empty (only welcome message, no user messages)
     function isCurrentSessionEmpty() {
       return messages.value.every(msg => msg.type === 'bot')
     }
 
-    // 创建新会话（如果当前已是空会话则复用，不重复创建）
+    // Create new session (reuse if current is empty, don't create duplicate)
     async function createNewSession() {
-      // 如果当前已有会话且是空会话（没有用户消息），直接复用，不创建新的
+      // If current session exists and is empty (no user messages), reuse it
       if (currentSessionId.value && isCurrentSessionEmpty()) {
-        // 已经在空会话中，无需创建
+        // Already in empty session, no need to create new
         return
       }
 
@@ -241,23 +241,23 @@ export default {
         if (res.data.code === 1 || res.data.code === 200) {
           const newSession = res.data.data
           sessions.value.unshift(newSession)
-          // 直接设置当前会话ID，不调用 selectSession（避免异步加载消息覆盖 messages）
+          // Directly set current session ID, don't call selectSession (avoid async loading overwriting messages)
           currentSessionId.value = newSession.sessionId
-          // 清空消息，显示欢迎语
+          // Clear messages, show welcome message
           messages.value = [{
             type: 'bot',
-            text: '您好！我是您的智能银行助手，请问有什么可以帮助您的？',
+            text: 'Hello! I am your intelligent banking assistant. How can I help you?',
             time: getCurrentTime()
           }]
-          Message.success('新建会话成功')
+          Message.success('New chat created successfully')
         }
       } catch (error) {
-        console.error('创建会话失败:', error)
-        Message.error('创建会话失败')
+        console.error('Failed to create session:', error)
+        Message.error('Failed to create session')
       }
     }
 
-    // 选择会话
+    // Select session
     async function selectSession(sessionId) {
       currentSessionId.value = sessionId
       messages.value = []
@@ -275,30 +275,30 @@ export default {
               minute: '2-digit' 
             }) : getCurrentTime()
           }))
-          // 如果是空会话（没有消息），显示欢迎语
+          // If empty session (no messages), show welcome message
           if (messages.value.length === 0) {
             messages.value = [{
               type: 'bot',
-              text: '您好！我是您的智能银行助手，请问有什么可以帮助您的？',
+              text: 'Hello! I am your intelligent banking assistant. How can I help you?',
               time: getCurrentTime()
             }]
           }
           scrollToBottom()
         }
       } catch (error) {
-        console.error('加载消息失败:', error)
-        Message.error('加载消息失败')
+        console.error('Failed to load messages:', error)
+        Message.error('Failed to load messages')
       }
     }
 
-    // 开始重命名
+    // Start renaming
     function startRename(session) {
       editingSessionId.value = session.sessionId
       editingTitle.value = session.title || ''
-      // 等待 DOM 更新后聚焦输入框
+      // Wait for DOM update then focus input
       nextTick(() => {
         if (renameInput.value) {
-          // ref 在 v-for 中返回数组
+          // ref in v-for returns array
           const input = Array.isArray(renameInput.value) ? renameInput.value[0] : renameInput.value
           if (input) {
             input.focus()
@@ -308,7 +308,7 @@ export default {
       })
     }
 
-    // 确认重命名
+    // Confirm rename
     async function confirmRename(sessionId) {
       const newTitle = editingTitle.value.trim()
       if (!newTitle || editingSessionId.value !== sessionId) {
@@ -316,7 +316,7 @@ export default {
         return
       }
 
-      // 检查标题是否有变化
+      // Check if title has changed
       const session = sessions.value.find(s => s.sessionId === sessionId)
       if (session && session.title === newTitle) {
         cancelRename()
@@ -326,27 +326,27 @@ export default {
       try {
         const res = await chatApi.renameSession(sessionId, newTitle)
         if (res.data.code === 1 || res.data.code === 200) {
-          // 更新本地数据
+          // Update local data
           if (session) {
             session.title = newTitle
           }
-          Message.success('重命名成功')
+          Message.success('Rename successful')
         }
       } catch (error) {
-        console.error('重命名失败:', error)
-        Message.error('重命名失败')
+        console.error('Failed to rename:', error)
+        Message.error('Failed to rename')
       } finally {
         cancelRename()
       }
     }
 
-    // 取消重命名
+    // Cancel rename
     function cancelRename() {
       editingSessionId.value = null
       editingTitle.value = ''
     }
 
-    // 删除会话
+    // Delete session
     async function deleteSession(sessionId) {
       try {
         const res = await chatApi.deleteSession(sessionId)
@@ -356,30 +356,30 @@ export default {
             currentSessionId.value = null
             messages.value = [{
               type: 'bot',
-              text: '您好！我是您的智能银行助手，请问有什么可以帮助您的？',
+              text: 'Hello! I am your intelligent banking assistant. How can I help you?',
               time: getCurrentTime()
             }]
           }
-          Message.success('删除会话成功')
+          Message.success('Session deleted successfully')
         }
       } catch (error) {
-        console.error('删除会话失败:', error)
-        Message.error('删除会话失败')
+        console.error('Failed to delete session:', error)
+        Message.error('Failed to delete session')
       }
     }
 
-    // 发送消息
+    // Send message
     async function sendMessage() {
       const text = inputMessage.value.trim()
       if (!text || isTyping.value) return
 
-      // 如果没有当前会话，先创建
+      // If no current session, create one first
       if (!currentSessionId.value) {
         await createNewSession()
         if (!currentSessionId.value) return
       }
 
-      // 添加用户消息
+      // Add user message
       messages.value.push({
         type: 'user',
         text: text,
@@ -391,13 +391,13 @@ export default {
       isTyping.value = true
 
       try {
-        // 发送消息到后端（使用 fetch 实现流式响应）
+        // Send message to backend (use fetch for streaming response)
         const response = await chatApi.sendMessage({
           sessionId: currentSessionId.value,
           content: text
         })
 
-        // 处理流式响应
+        // Handle streaming response
         const reader = response.body.pipeThrough(new TextDecoderStream('utf-8')).getReader()
         let botResponse = ''
         const botMessage = {
@@ -418,22 +418,22 @@ export default {
 
         isTyping.value = false
       } catch (error) {
-        console.error('发送消息失败:', error)
+        console.error('Failed to send message:', error)
         isTyping.value = false
-        Message.error('发送消息失败，请重试')
+        Message.error('Failed to send message, please try again')
         
-        // 移除失败的消息
+        // Remove failed message
         messages.value.pop()
       }
     }
 
-    // 发送快捷问题
+    // Send quick question
     function sendQuickQuestion(question) {
       inputMessage.value = question
       sendMessage()
     }
 
-    // 组件挂载时加载会话列表
+    // Load session list on component mount
     onMounted(() => {
       loadSessions()
     })
@@ -575,7 +575,7 @@ export default {
   align-items: flex-end;
 }
 
-/* 输入指示器 */
+/* Typing Indicator */
 .typing-indicator {
   display: flex;
   gap: var(--spacing-xs);
@@ -607,7 +607,7 @@ export default {
   }
 }
 
-/* 快捷问题 */
+/* Quick Questions */
 .quick-questions {
   display: flex;
   flex-wrap: wrap;
@@ -647,7 +647,7 @@ export default {
   cursor: not-allowed;
 }
 
-/* 输入区域 */
+/* Input Area */
 .chat-input-area {
   padding: var(--spacing-lg) var(--spacing-2xl);
   background: var(--glass-bg-light);
@@ -705,7 +705,7 @@ export default {
   cursor: not-allowed;
 }
 
-/* 侧边栏 */
+/* Sidebar */
 .chat-sidebar {
   width: 300px;
   background: var(--glass-bg);
@@ -827,7 +827,7 @@ export default {
   transform: scale(1.2);
 }
 
-/* 重命名输入框 */
+/* Rename Input */
 .session-title-edit {
   width: 100%;
 }
@@ -888,7 +888,7 @@ export default {
   margin-top: var(--spacing-2xl);
 }
 
-/* Markdown 内容样式 */
+/* Markdown Content Styles */
 .markdown-content {
   color: var(--color-white);
   line-height: var(--line-height-normal);
@@ -989,7 +989,7 @@ export default {
   margin: var(--spacing-lg) 0;
 }
 
-/* 数学公式样式 */
+/* Math Formula Styles */
 .markdown-content :deep(.math) {
   font-family: 'Times New Roman', serif;
   font-style: italic;

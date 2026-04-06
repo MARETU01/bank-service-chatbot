@@ -1,63 +1,63 @@
 <template>
   <div class="dashboard">
-    <!-- 统计卡片 -->
+    <!-- Statistics Cards -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon balance">💰</div>
         <div class="stat-info">
-          <h3>总余额</h3>
+          <h3>Total Balance</h3>
           <p class="stat-value">¥ {{ formatNumber(stats.totalBalance) }}</p>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon income">📈</div>
         <div class="stat-info">
-          <h3>总收入</h3>
+          <h3>Total Income</h3>
           <p class="stat-value">¥ {{ formatNumber(stats.income) }}</p>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon expense">📉</div>
         <div class="stat-info">
-          <h3>总支出</h3>
+          <h3>Total Expense</h3>
           <p class="stat-value">¥ {{ formatNumber(stats.expense) }}</p>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon transfer">💸</div>
         <div class="stat-info">
-          <h3>账户数量</h3>
-          <p class="stat-value">{{ stats.accountCount }} 个</p>
+          <h3>Account Count</h3>
+          <p class="stat-value">{{ stats.accountCount }}</p>
         </div>
       </div>
     </div>
 
-    <!-- 快捷操作 -->
+    <!-- Quick Actions -->
     <div class="quick-actions">
-      <h2>快捷服务</h2>
+      <h2>Quick Services</h2>
       <div class="actions-grid">
         <button class="action-btn" @click="navigateTo('/transfers')">
           <span class="action-icon">💸</span>
-          <span>转账汇款</span>
+          <span>Transfer</span>
         </button>
         <button class="action-btn" @click="navigateTo('/transactions')">
           <span class="action-icon">📝</span>
-          <span>交易查询</span>
+          <span>Transactions</span>
         </button>
         <button class="action-btn" @click="navigateTo('/accounts')">
           <span class="action-icon">💳</span>
-          <span>账户管理</span>
+          <span>Accounts</span>
         </button>
         <button class="action-btn" @click="navigateTo('/chatbot')">
           <span class="action-icon">🤖</span>
-          <span>智能客服</span>
+          <span>AI Support</span>
         </button>
       </div>
     </div>
 
-    <!-- 最近交易 -->
+    <!-- Recent Transactions -->
     <div class="recent-transactions">
-      <h2>最近交易</h2>
+      <h2>Recent Transactions</h2>
       <div class="transaction-list" v-if="recentTransactions.length > 0">
         <div class="transaction-item" v-for="item in recentTransactions" :key="item.id">
           <div class="transaction-icon" :class="item.type">
@@ -73,13 +73,13 @@
         </div>
       </div>
       <div class="empty-state" v-else>
-        <p>暂无交易记录</p>
+        <p>No transaction records</p>
       </div>
     </div>
 
-    <!-- 通知公告 -->
+    <!-- Notices -->
     <div class="notices">
-      <h2>通知公告</h2>
+      <h2>Notices</h2>
       <div class="notice-list">
         <div class="notice-item" v-for="notice in notices" :key="notice.id">
           <span class="notice-tag" :class="notice.type">{{ notice.typeName }}</span>
@@ -114,10 +114,10 @@ export default {
     const loading = ref(false)
 
     const notices = ref([
-      { id: 1, type: 'important', typeName: '重要', title: '关于系统升级维护的通知', date: '2024-01-15' },
-      { id: 2, type: 'normal', typeName: '公告', title: '2024 年第一季度理财产品推荐', date: '2024-01-14' },
-      { id: 3, type: 'normal', typeName: '公告', title: '防范电信诈骗温馨提示', date: '2024-01-12' },
-      { id: 4, type: 'activity', typeName: '活动', title: '新用户开户送好礼', date: '2024-01-10' }
+      { id: 1, type: 'important', typeName: 'Important', title: 'System Upgrade and Maintenance Notice', date: '2024-01-15' },
+      { id: 2, type: 'normal', typeName: 'Notice', title: '2024 Q1 Financial Product Recommendations', date: '2024-01-14' },
+      { id: 3, type: 'normal', typeName: 'Notice', title: 'Telecom Fraud Prevention Tips', date: '2024-01-12' },
+      { id: 4, type: 'activity', typeName: 'Activity', title: 'New User Registration Bonus', date: '2024-01-10' }
     ])
 
     const formatNumber = (num) => {
@@ -152,11 +152,11 @@ export default {
         if (code === 1 || code === 200) {
           stats.value = data
         } else {
-          proxy.$message.error(message || '获取统计数据失败')
+          proxy.$message.error(message || 'Failed to get statistics')
         }
       } catch (error) {
         console.error('Load dashboard stats error:', error)
-        proxy.$message.error('获取统计数据失败')
+        proxy.$message.error('Failed to get statistics')
       } finally {
         loading.value = false
       }

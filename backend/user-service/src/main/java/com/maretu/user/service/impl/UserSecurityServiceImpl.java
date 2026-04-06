@@ -33,12 +33,12 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     @Transactional
     public void setPayPassword(Long userId, String payPassword) {
         if (userId == null || !StringUtils.hasText(payPassword)) {
-            throw new RuntimeException("用户ID和支付密码不能为空");
+            throw new RuntimeException("User ID and payment password cannot be empty");
         }
 
-        // 检查密码长度
+        // Check password length
         if (payPassword.length() != 6) {
-            throw new RuntimeException("支付密码必须为6位数字");
+            throw new RuntimeException("Payment password must be 6 digits");
         }
 
         UserSecurity userSecurity = lambdaQuery()
@@ -54,7 +54,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
                     .setPayPasswordAttempts(0);
             save(userSecurity);
         } else {
-            throw new RuntimeException("支付密码已设置，请使用修改功能更新密码");
+            throw new RuntimeException("Payment password already set, please use update function to change password");
         }
     }
 
@@ -62,12 +62,12 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     @Transactional
     public void updatePayPassword(Long userId, String oldPassword, String newPassword) {
         if (userId == null || !StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
-            throw new RuntimeException("用户ID和密码不能为空");
+            throw new RuntimeException("User ID and password cannot be empty");
         }
 
-        // 验证旧密码
+        // Verify old password
         if (!verifyPayPassword(userId, oldPassword)) {
-            throw new RuntimeException("原支付密码错误");
+            throw new RuntimeException("Original payment password incorrect");
         }
 
         // 设置新密码
@@ -78,20 +78,20 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     @Transactional
     public Boolean verifyPayPassword(Long userId, String payPassword) {
         if (userId == null || !StringUtils.hasText(payPassword)) {
-            throw new RuntimeException("用户ID和支付密码不能为空");
+            throw new RuntimeException("User ID and payment password cannot be empty");
         }
 
         UserSecurity userSecurity = lambdaQuery()
                 .eq(UserSecurity::getUserId, userId)
                 .one();
         if (userSecurity == null || !StringUtils.hasText(userSecurity.getPayPassword())) {
-            throw new RuntimeException("请先设置支付密码");
+            throw new RuntimeException("Please set payment password first");
         }
 
-        // 检查是否锁定
+        // Check if locked
         if (userSecurity.getPayPasswordLockedUntil() != null 
                 && userSecurity.getPayPasswordLockedUntil().isAfter(LocalDateTime.now())) {
-            throw new RuntimeException("支付密码已被锁定，请" + LOCK_MINUTES + "分钟后再试");
+            throw new RuntimeException("Payment password is locked, please try again after " + LOCK_MINUTES + " minutes");
         }
 
         // 验证密码
@@ -110,13 +110,13 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
             userSecurity.setPayPasswordAttempts(attempts);
 
             if (attempts >= MAX_ATTEMPTS) {
-                // 锁定
+                // Lock
                 userSecurity.setPayPasswordLockedUntil(LocalDateTime.now().plusMinutes(LOCK_MINUTES));
                 updateById(userSecurity);
-                throw new RuntimeException("支付密码错误次数过多，已锁定" + LOCK_MINUTES + "分钟");
+                throw new RuntimeException("Too many incorrect password attempts, locked for " + LOCK_MINUTES + " minutes");
             } else {
                 updateById(userSecurity);
-                throw new RuntimeException("支付密码错误，还剩" + (MAX_ATTEMPTS - attempts) + "次机会");
+                throw new RuntimeException("Incorrect payment password, " + (MAX_ATTEMPTS - attempts) + " attempts remaining");
             }
         }
 

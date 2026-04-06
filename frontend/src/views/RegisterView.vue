@@ -1,64 +1,64 @@
 <template>
   <div class="register-page">
     <div class="register-container">
-      <!-- 左侧品牌区域 -->
+      <!-- Left Brand Section -->
       <div class="register-brand">
         <div class="brand-content">
           <div class="brand-logo">🏦</div>
-          <h1>银行服务机器人</h1>
-          <p class="brand-slogan">智能服务 · 安全便捷 · 随时相伴</p>
+          <h1>Bank Service Chatbot</h1>
+          <p class="brand-slogan">Intelligent Service · Secure & Convenient · Always Here</p>
           <p class="brand-description">
-            立即注册，体验 AI 驱动的全新银行服务，
-            让金融服务变得更简单、更智能。
+            Register now to experience AI-powered banking services,
+            making financial services simpler and smarter.
           </p>
           <div class="brand-features">
             <div class="feature-item">
               <span class="feature-icon">🎯</span>
-              <span>快速开户</span>
+              <span>Quick Setup</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon">🛡️</span>
-              <span>资金安全</span>
+              <span>Fund Security</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon">📊</span>
-              <span>智能理财</span>
+              <span>Smart Finance</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon">💬</span>
-              <span>24h 客服</span>
+              <span>24h Support</span>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- 右侧表单区域 -->
+      <!-- Right Form Section -->
       <div class="register-form-section">
         <div class="register-form-wrapper">
           <div class="form-header">
-            <router-link to="/" class="home-link" title="返回首页">
+            <router-link to="/" class="home-link" title="Back to Home">
               <span class="home-icon">←</span>
-              <span>返回首页</span>
+              <span>Back to Home</span>
             </router-link>
           </div>
           
           <div class="form-title-section">
-            <h1>创建账户</h1>
-            <p>填写以下信息，开启智能银行之旅</p>
+            <h1>Create Account</h1>
+            <p>Fill in the information below to start your intelligent banking journey</p>
           </div>
           
           <form @submit.prevent="handleRegister">
-            <!-- 个人信息部分 -->
+            <!-- Personal Information Section -->
             <div class="form-section-title">
               <span class="section-number">01</span>
-              <span>个人信息</span>
+              <span>Personal Information</span>
             </div>
             
             <div class="form-row">
               <div class="form-group">
                 <label for="register-username">
                   <span class="label-icon">👤</span>
-                  用户名
+                  Username
                   <span class="required">*</span>
                 </label>
                 <div class="input-wrapper">
@@ -66,7 +66,7 @@
                     v-model="registerForm.username" 
                     type="text" 
                     id="register-username" 
-                    placeholder="请设置用户名"
+                    placeholder="Set your username"
                     required
                   >
                 </div>
@@ -75,7 +75,7 @@
               <div class="form-group">
                 <label for="register-realname">
                   <span class="label-icon">📝</span>
-                  真实姓名
+                  Real Name
                   <span class="required">*</span>
                 </label>
                 <div class="input-wrapper">
@@ -83,7 +83,7 @@
                     v-model="registerForm.realName" 
                     type="text" 
                     id="register-realname" 
-                    placeholder="请输入真实姓名"
+                    placeholder="Enter your real name"
                     required
                   >
                 </div>
@@ -94,7 +94,7 @@
               <div class="form-group">
                 <label for="register-email">
                   <span class="label-icon">📧</span>
-                  邮箱
+                  Email
                   <span class="required">*</span>
                 </label>
                 <div class="input-wrapper">
@@ -102,7 +102,7 @@
                     v-model="registerForm.email" 
                     type="email" 
                     id="register-email" 
-                    placeholder="请输入邮箱"
+                    placeholder="Enter your email"
                     required
                     :class="{ 'input-error': emailError }"
                     @blur="validateEmail"
@@ -119,7 +119,7 @@
               <div class="form-group">
                 <label for="register-phone">
                   <span class="label-icon">📱</span>
-                  手机号
+                  Phone Number
                   <span class="required">*</span>
                 </label>
                 <div class="input-wrapper">
@@ -127,24 +127,24 @@
                     v-model="registerForm.phone" 
                     type="tel" 
                     id="register-phone" 
-                    placeholder="请输入手机号"
+                    placeholder="Enter your phone number"
                     required
                   >
                 </div>
               </div>
             </div>
             
-            <!-- 账户安全部分 -->
+            <!-- Account Security Section -->
             <div class="form-section-title">
               <span class="section-number">02</span>
-              <span>账户安全</span>
+              <span>Account Security</span>
             </div>
             
             <div class="form-row">
               <div class="form-group">
                 <label for="register-password">
                   <span class="label-icon">🔒</span>
-                  密码
+                  Password
                   <span class="required">*</span>
                 </label>
                 <div class="input-wrapper password-input">
@@ -152,7 +152,7 @@
                     v-model="registerForm.password" 
                     :type="showPassword ? 'text' : 'password'" 
                     id="register-password" 
-                    placeholder="请设置密码"
+                    placeholder="Set your password"
                     required
                     :class="{ 'input-error': passwordError }"
                     @blur="validatePassword"
@@ -177,7 +177,7 @@
               <div class="form-group">
                 <label for="register-confirm-password">
                   <span class="label-icon">🔐</span>
-                  确认密码
+                  Confirm Password
                   <span class="required">*</span>
                 </label>
                 <div class="input-wrapper password-input">
@@ -185,7 +185,7 @@
                     v-model="registerForm.confirmPassword" 
                     :type="showConfirmPassword ? 'text' : 'password'" 
                     id="register-confirm-password" 
-                    placeholder="请再次输入密码"
+                    placeholder="Confirm your password"
                     required
                     :class="{ 'input-error': confirmPasswordError }"
                     @blur="validateConfirmPassword"
@@ -208,11 +208,11 @@
               </div>
             </div>
             
-            <!-- 验证码 -->
+            <!-- Verification Code -->
             <div class="form-group verification-group">
               <label for="register-verification">
                 <span class="label-icon">🔑</span>
-                验证码
+                Verification Code
                 <span class="required">*</span>
               </label>
               <div class="verification-input-wrapper">
@@ -220,7 +220,7 @@
                   v-model="verification" 
                   type="text" 
                   id="register-verification" 
-                  placeholder="请输入验证码"
+                  placeholder="Enter verification code"
                   required
                 >
                 <button 
@@ -229,28 +229,28 @@
                   class="verification-btn"
                   :disabled="countdown > 0 || isLoading"
                 >
-                  {{ countdown > 0 ? `重新发送 (${countdown})` : '获取验证码' }}
+                  {{ countdown > 0 ? `Resend (${countdown})` : 'Get Code' }}
                 </button>
               </div>
             </div>
             
-            <!-- 服务条款 -->
+            <!-- Terms of Service -->
             <div class="terms-checkbox">
               <label class="checkbox-label">
                 <input type="checkbox" v-model="agreeTerms">
                 <span class="checkmark"></span>
-                <span>我已阅读并同意 <a href="#" class="terms-link">《服务条款》</a> 和 <a href="#" class="terms-link">《隐私政策》</a></span>
+                <span>I have read and agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a></span>
               </label>
             </div>
             
             <button type="submit" class="register-btn" :disabled="isLoading">
               <span v-if="isLoading" class="loading-spinner"></span>
-              <span>{{ isLoading ? '注册中...' : '立即注册' }}</span>
+              <span>{{ isLoading ? 'Registering...' : 'Register Now' }}</span>
             </button>
           </form>
           
           <div class="register-footer">
-            <p>已有账号？<router-link to="/login">返回登录</router-link></p>
+            <p>Already have an account? <router-link to="/login">Sign In</router-link></p>
           </div>
         </div>
       </div>
@@ -291,7 +291,7 @@ export default {
       }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        this.emailError = '请输入正确的邮箱格式';
+        this.emailError = 'Please enter a valid email address';
       } else {
         this.emailError = '';
       }
@@ -304,7 +304,7 @@ export default {
         return;
       }
       if (password.length < 6) {
-        this.passwordError = '密码长度不能少于 6 位';
+        this.passwordError = 'Password must be at least 6 characters';
       } else {
         this.passwordError = '';
       }
@@ -318,7 +318,7 @@ export default {
         return;
       }
       if (password !== confirmPassword) {
-        this.confirmPasswordError = '两次输入的密码不一致';
+        this.confirmPasswordError = 'Passwords do not match';
       } else {
         this.confirmPasswordError = '';
       }
@@ -348,8 +348,8 @@ export default {
           this.$message.error(response.data.message || '验证码发送失败');
         }
       } catch (error) {
-        console.error('验证码请求错误:', error);
-        this.$message.error('网络错误，请稍后重试');
+        console.error('Verification code request error:', error);
+        this.$message.error('Network error, please try again later');
       } finally {
         this.isLoading = false;
       }
@@ -375,7 +375,7 @@ export default {
       }
 
       if (!this.agreeTerms) {
-        this.$message.warning('请先同意服务条款和隐私政策');
+        this.$message.warning('Please agree to the Terms of Service and Privacy Policy first');
         return;
       }
 
@@ -397,16 +397,16 @@ export default {
         });
         console.log('注册返回数据:', response.data);
         if (response.data.code === 1) {
-          this.$message.success(response.data.message || '注册成功，请登录');
+          this.$message.success(response.data.message || 'Registration successful, please sign in');
           setTimeout(() => {
             this.$router.push('/login');
           }, 1500);
         } else {
-          this.$message.error(response.data.message || '注册失败');
+          this.$message.error(response.data.message || 'Registration failed');
         }
       } catch (error) {
-        console.error('注册请求错误:', error);
-        this.$message.error(error.response?.data?.message || '注册失败，请检查网络后重试');
+        console.error('Registration request error:', error);
+        this.$message.error(error.response?.data?.message || 'Registration failed, please check your network and try again');
       } finally {
         this.isLoading = false;
       }

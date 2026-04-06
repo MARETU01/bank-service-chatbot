@@ -350,13 +350,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
         // 2. 不能禁用自己
         if (Objects.equals(userId, Long.valueOf(adminUserId))) {
-            throw new RuntimeException("不能修改自己的状态");
+            throw new RuntimeException("Cannot modify your own status");
         }
 
         // 3. 查询目标用户
         Users targetUser = lambdaQuery().eq(Users::getId, userId).one();
         if (targetUser == null) {
-            throw new RuntimeException("用户不存在");
+            throw new RuntimeException("User does not exist");
         }
 
         // 4. 切换状态：1→0, 0→1
@@ -371,7 +371,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     private void checkAdminRole(Integer userId) {
         List<String> roles = userRolesService.getUserRoles(userId);
         if (roles == null || !roles.contains(RoleCode.ADMIN.getCode())) {
-            throw new RuntimeException("权限不足：需要管理员角色");
+            throw new RuntimeException("Insufficient permissions: admin role required");
         }
     }
 

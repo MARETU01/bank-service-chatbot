@@ -1,12 +1,12 @@
 <template>
   <div class="profile">
     <div class="profile-container">
-      <!-- 个人信息卡片 -->
+      <!-- Profile Card -->
       <div class="profile-card">
         <div class="card-header">
-          <h2>👤 个人信息</h2>
+          <h2>👤 Profile</h2>
           <button class="edit-btn" @click="toggleEdit">
-            {{ isEditing ? '💾 保存' : '✏️ 编辑' }}
+            {{ isEditing ? '💾 Save' : '✏️ Edit' }}
           </button>
         </div>
         <div class="card-body">
@@ -15,17 +15,17 @@
               <span>{{ userAvatar }}</span>
             </div>
             <div class="user-info">
-              <h3>{{ userInfo.realName || userInfo.username || '用户' }}</h3>
-              <p class="user-id">用户 ID: {{ userInfo.id }}</p>
-              <span class="user-level" v-if="userInfo.status === 1">✓ 正常</span>
-              <span class="user-level warning" v-else>⚠ 异常</span>
+              <h3>{{ userInfo.realName || userInfo.username || 'User' }}</h3>
+              <p class="user-id">User ID: {{ userInfo.id }}</p>
+              <span class="user-level" v-if="userInfo.status === 1">✓ Active</span>
+              <span class="user-level warning" v-else>⚠ Inactive</span>
             </div>
           </div>
           
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label-row">
-                <label>👤 用户名</label>
+                <label>👤 Username</label>
               </div>
               <div class="info-value">
                 <span v-if="!isEditing">{{ userInfo.username }}</span>
@@ -34,32 +34,32 @@
             </div>
             <div class="info-item">
               <div class="info-label-row">
-                <label>📝 真实姓名</label>
-                <button class="eye-btn" @click="showRealName = !showRealName" :title="showRealName ? '隐藏' : '显示'" v-if="userInfo.realName && !isEditing">
+                <label>📝 Real Name</label>
+                <button class="eye-btn" @click="showRealName = !showRealName" :title="showRealName ? 'Hide' : 'Show'" v-if="userInfo.realName && !isEditing">
                   {{ showRealName ? '👁️' : '👁️‍🗨️' }}
                 </button>
               </div>
               <div class="info-value">
-                <span v-if="!isEditing">{{ getMaskedRealName() || '未设置' }}</span>
+                <span v-if="!isEditing">{{ getMaskedRealName() || 'Not set' }}</span>
                 <input v-if="isEditing" v-model="editForm.realName" type="text" class="edit-input" />
               </div>
             </div>
             <div class="info-item">
               <div class="info-label-row">
-                <label>📱 手机号码</label>
-                <button class="eye-btn" @click="showPhone = !showPhone" :title="showPhone ? '隐藏' : '显示'" v-if="userInfo.phone && !isEditing">
+                <label>📱 Phone</label>
+                <button class="eye-btn" @click="showPhone = !showPhone" :title="showPhone ? 'Hide' : 'Show'" v-if="userInfo.phone && !isEditing">
                   {{ showPhone ? '👁️' : '👁️‍🗨️' }}
                 </button>
               </div>
               <div class="info-value">
-                <span v-if="!isEditing">{{ getMaskedPhone() || '未设置' }}</span>
+                <span v-if="!isEditing">{{ getMaskedPhone() || 'Not set' }}</span>
                 <input v-if="isEditing" v-model="editForm.phone" type="text" class="edit-input" />
               </div>
             </div>
             <div class="info-item">
               <div class="info-label-row">
-                <label>📧 电子邮箱</label>
-                <button class="eye-btn" @click="showEmail = !showEmail" :title="showEmail ? '隐藏' : '显示'" v-if="userInfo.email && !isEditing">
+                <label>📧 Email</label>
+                <button class="eye-btn" @click="showEmail = !showEmail" :title="showEmail ? 'Hide' : 'Show'" v-if="userInfo.email && !isEditing">
                   {{ showEmail ? '👁️' : '👁️‍🗨️' }}
                 </button>
               </div>
@@ -69,7 +69,7 @@
             </div>
             <div class="info-item">
               <div class="info-label-row">
-                <label>📅 注册时间</label>
+                <label>📅 Registration Date</label>
               </div>
               <div class="info-value">
                 <span>{{ formatDateTime(userInfo.createdAt) }}</span>
@@ -77,7 +77,7 @@
             </div>
             <div class="info-item">
               <div class="info-label-row">
-                <label>🔐 账号状态</label>
+                <label>🔐 Account Status</label>
               </div>
               <div class="info-value">
                 <span :class="getStatusClass(userInfo.status)">{{ getStatusText(userInfo.status) }}</span>
@@ -87,229 +87,229 @@
         </div>
       </div>
 
-      <!-- 安全设置 -->
+      <!-- Security Settings -->
       <div class="profile-card">
         <div class="card-header">
-          <h2>🔒 安全设置</h2>
+          <h2>🔒 Security Settings</h2>
         </div>
         <div class="card-body">
           <div class="security-item">
             <div class="security-info">
               <span class="security-icon">🔑</span>
               <div>
-                <h4>登录密码</h4>
-                <p>定期修改密码可提高账户安全性</p>
+                <h4>Login Password</h4>
+                <p>Change password regularly to improve account security</p>
               </div>
             </div>
-            <button class="action-btn" @click="showChangePassword = true">修改</button>
+            <button class="action-btn" @click="showChangePassword = true">Change</button>
           </div>
           <div class="security-item">
             <div class="security-info">
               <span class="security-icon">📱</span>
               <div>
-                <h4>手机验证</h4>
-                <p>{{ userInfo.phoneVerified ? '已验证：' + formatPhone(userInfo.phone) : '未验证' }}</p>
+                <h4>Phone Verification</h4>
+                <p>{{ userInfo.phoneVerified ? 'Verified: ' + formatPhone(userInfo.phone) : 'Not verified' }}</p>
               </div>
             </div>
-            <button class="action-btn" v-if="!userInfo.phoneVerified" @click="showVerifyPhone = true">验证</button>
-            <span class="verified-badge" v-else>✓ 已验证</span>
+            <button class="action-btn" v-if="!userInfo.phoneVerified" @click="showVerifyPhone = true">Verify</button>
+            <span class="verified-badge" v-else>✓ Verified</span>
           </div>
           <div class="security-item">
             <div class="security-info">
               <span class="security-icon">📧</span>
               <div>
-                <h4>邮箱验证</h4>
-                <p>{{ userInfo.emailVerified ? '已验证：' + userInfo.email : '未验证' }}</p>
+                <h4>Email Verification</h4>
+                <p>{{ userInfo.emailVerified ? 'Verified: ' + userInfo.email : 'Not verified' }}</p>
               </div>
             </div>
-            <button class="action-btn" v-if="!userInfo.emailVerified" @click="showVerifyEmail = true">验证</button>
-            <span class="verified-badge" v-else>✓ 已验证</span>
+            <button class="action-btn" v-if="!userInfo.emailVerified" @click="showVerifyEmail = true">Verify</button>
+            <span class="verified-badge" v-else>✓ Verified</span>
           </div>
           <div class="security-item">
             <div class="security-info">
               <span class="security-icon">🔐</span>
               <div>
-                <h4>支付密码</h4>
-                <p>{{ hasPayPassword ? '已设置支付密码' : '未设置，转账时需要验证' }}</p>
+                <h4>Payment Password</h4>
+                <p>{{ hasPayPassword ? 'Payment password set' : 'Not set, verification required for transfers' }}</p>
               </div>
             </div>
-            <button class="action-btn" @click="openPayPasswordModal">{{ hasPayPassword ? '修改' : '设置' }}</button>
+            <button class="action-btn" @click="openPayPasswordModal">{{ hasPayPassword ? 'Change' : 'Set' }}</button>
           </div>
         </div>
       </div>
 
-      <!-- 账户概览 -->
+      <!-- Account Overview -->
       <div class="profile-card">
         <div class="card-header">
-          <h2>💳 我的账户</h2>
-          <router-link to="/accounts" class="view-all">查看全部</router-link>
+          <h2>💳 My Accounts</h2>
+          <router-link to="/accounts" class="view-all">View All</router-link>
         </div>
         <div class="card-body">
           <div class="account-summary" v-if="accounts.length > 0">
             <div class="summary-item">
-              <div class="summary-label">总资产</div>
+              <div class="summary-label">Total Assets</div>
               <div class="summary-value">¥ {{ totalAssets }}</div>
             </div>
             <div class="summary-item" v-for="account in accounts" :key="account.id">
-              <div class="summary-label">{{ account.accountName || '账户' }}</div>
+              <div class="summary-label">{{ account.accountName || 'Account' }}</div>
               <div class="summary-value">¥ {{ formatNumber(account.balance) }}</div>
             </div>
           </div>
           <div class="empty-state" v-else>
-            <p>暂无账户信息</p>
+            <p>No account information</p>
           </div>
         </div>
       </div>
 
-      <!-- 快捷操作 -->
+      <!-- Quick Actions -->
       <div class="quick-actions">
-        <h3>⚡ 快捷操作</h3>
+        <h3>⚡ Quick Actions</h3>
         <div class="action-grid">
           <router-link to="/transfers" class="action-card">
             <span class="action-icon">💸</span>
-            <span>转账汇款</span>
+            <span>Transfer</span>
           </router-link>
           <router-link to="/transactions" class="action-card">
             <span class="action-icon">📋</span>
-            <span>交易记录</span>
+            <span>Transactions</span>
           </router-link>
           <router-link to="/chatbot" class="action-card">
             <span class="action-icon">🤖</span>
-            <span>在线客服</span>
+            <span>Online Support</span>
           </router-link>
           <router-link to="/accounts" class="action-card">
             <span class="action-icon">📄</span>
-            <span>账户管理</span>
+            <span>Accounts</span>
           </router-link>
         </div>
       </div>
     </div>
 
-    <!-- 修改密码弹窗 -->
+    <!-- Change Password Modal -->
     <div class="modal-overlay" v-if="showChangePassword" @click="showChangePassword = false">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>🔑 修改密码</h3>
+          <h3>🔑 Change Password</h3>
           <button class="close-btn" @click="showChangePassword = false">×</button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label>验证码</label>
+            <label>Verification Code</label>
             <div class="code-input-group">
-              <input type="text" v-model="passwordForm.verifyCode" placeholder="请输入验证码" maxlength="6" />
+              <input type="text" v-model="passwordForm.verifyCode" placeholder="Please enter verification code" maxlength="6" />
               <button class="send-code-btn" @click="sendPasswordCode" :disabled="passwordCountdown > 0">
-                {{ passwordCountdown > 0 ? passwordCountdown + 's' : '获取验证码' }}
+                {{ passwordCountdown > 0 ? passwordCountdown + 's' : 'Get Code' }}
               </button>
             </div>
-            <p class="form-hint">验证码将发送至您的注册邮箱</p>
+            <p class="form-hint">Verification code will be sent to your registered email</p>
           </div>
           <div class="form-group">
-            <label>新密码</label>
-            <input type="password" v-model="passwordForm.newPassword" placeholder="请输入新密码" />
+            <label>New Password</label>
+            <input type="password" v-model="passwordForm.newPassword" placeholder="Please enter new password" />
           </div>
           <div class="form-group">
-            <label>确认新密码</label>
-            <input type="password" v-model="passwordForm.confirmPassword" placeholder="请再次输入新密码" />
+            <label>Confirm New Password</label>
+            <input type="password" v-model="passwordForm.confirmPassword" placeholder="Please enter new password again" />
           </div>
         </div>
         <div class="modal-footer">
-          <button class="cancel-btn" @click="showChangePassword = false">取消</button>
+          <button class="cancel-btn" @click="showChangePassword = false">Cancel</button>
           <button class="confirm-btn" @click="changePassword" :disabled="changePasswordLoading">
-            {{ changePasswordLoading ? '修改中...' : '确认修改' }}
+            {{ changePasswordLoading ? 'Changing...' : 'Confirm' }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 手机验证弹窗 -->
+    <!-- Phone Verification Modal -->
     <div class="modal-overlay" v-if="showVerifyPhone" @click="showVerifyPhone = false">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>📱 手机验证</h3>
+          <h3>📱 Phone Verification</h3>
           <button class="close-btn" @click="showVerifyPhone = false">×</button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label>手机号码</label>
-            <input type="text" v-model="verifyPhoneForm.phone" placeholder="请输入手机号码" />
+            <label>Phone Number</label>
+            <input type="text" v-model="verifyPhoneForm.phone" placeholder="Please enter phone number" />
           </div>
           <div class="form-group">
-            <label>验证码</label>
+            <label>Verification Code</label>
             <div class="code-input-group">
-              <input type="text" v-model="verifyPhoneForm.code" placeholder="请输入验证码" maxlength="6" />
+              <input type="text" v-model="verifyPhoneForm.code" placeholder="Please enter verification code" maxlength="6" />
               <button class="send-code-btn" @click="sendPhoneCode" :disabled="countdown > 0">
-                {{ countdown > 0 ? countdown + 's' : '发送验证码' }}
+                {{ countdown > 0 ? countdown + 's' : 'Send Code' }}
               </button>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="cancel-btn" @click="showVerifyPhone = false">取消</button>
+          <button class="cancel-btn" @click="showVerifyPhone = false">Cancel</button>
           <button class="confirm-btn" @click="submitPhoneVerify" :disabled="verifyPhoneLoading">
-            {{ verifyPhoneLoading ? '验证中...' : '确认验证' }}
+            {{ verifyPhoneLoading ? 'Verifying...' : 'Verify' }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 支付密码弹窗 -->
+    <!-- Payment Password Modal -->
     <div class="modal-overlay" v-if="showPayPassword" @click="showPayPassword = false">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>🔐 {{ hasPayPassword ? '修改支付密码' : '设置支付密码' }}</h3>
+          <h3>🔐 {{ hasPayPassword ? 'Change Payment Password' : 'Set Payment Password' }}</h3>
           <button class="close-btn" @click="showPayPassword = false">×</button>
         </div>
         <div class="modal-body">
-          <!-- 修改时需要输入旧密码 -->
+          <!-- Enter old password when changing -->
           <div class="form-group" v-if="hasPayPassword">
-            <label>原支付密码</label>
-            <input type="password" v-model="payPasswordForm.oldPayPassword" placeholder="请输入原支付密码" maxlength="6" />
+            <label>Old Payment Password</label>
+            <input type="password" v-model="payPasswordForm.oldPayPassword" placeholder="Please enter old payment password" maxlength="6" />
           </div>
           <div class="form-group">
-            <label>{{ hasPayPassword ? '新支付密码' : '支付密码' }}</label>
-            <input type="password" v-model="payPasswordForm.payPassword" placeholder="请输入6位数字支付密码" maxlength="6" />
+            <label>{{ hasPayPassword ? 'New Payment Password' : 'Payment Password' }}</label>
+            <input type="password" v-model="payPasswordForm.payPassword" placeholder="Please enter 6-digit payment password" maxlength="6" />
           </div>
           <div class="form-group">
-            <label>确认支付密码</label>
-            <input type="password" v-model="payPasswordForm.confirmPassword" placeholder="请再次输入支付密码" maxlength="6" />
+            <label>Confirm Payment Password</label>
+            <input type="password" v-model="payPasswordForm.confirmPassword" placeholder="Please enter payment password again" maxlength="6" />
           </div>
-          <p class="form-hint">支付密码用于转账、取款等敏感操作的验证</p>
+          <p class="form-hint">Payment password is used for verification of sensitive operations such as transfers and withdrawals</p>
         </div>
         <div class="modal-footer">
-          <button class="cancel-btn" @click="showPayPassword = false">取消</button>
+          <button class="cancel-btn" @click="showPayPassword = false">Cancel</button>
           <button class="confirm-btn" @click="submitPayPassword" :disabled="payPasswordLoading">
-            {{ payPasswordLoading ? '处理中...' : '确认' }}
+            {{ payPasswordLoading ? 'Processing...' : 'Confirm' }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 邮箱验证弹窗 -->
+    <!-- Email Verification Modal -->
     <div class="modal-overlay" v-if="showVerifyEmail" @click="showVerifyEmail = false">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>📧 邮箱验证</h3>
+          <h3>📧 Email Verification</h3>
           <button class="close-btn" @click="showVerifyEmail = false">×</button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label>邮箱地址</label>
-            <input type="email" v-model="verifyEmailForm.email" placeholder="请输入邮箱地址" />
+            <label>Email Address</label>
+            <input type="email" v-model="verifyEmailForm.email" placeholder="Please enter email address" />
           </div>
           <div class="form-group">
-            <label>验证码</label>
+            <label>Verification Code</label>
             <div class="code-input-group">
-              <input type="text" v-model="verifyEmailForm.code" placeholder="请输入验证码" maxlength="6" />
+              <input type="text" v-model="verifyEmailForm.code" placeholder="Please enter verification code" maxlength="6" />
               <button class="send-code-btn" @click="sendEmailCode" :disabled="emailCountdown > 0">
-                {{ emailCountdown > 0 ? emailCountdown + 's' : '发送验证码' }}
+                {{ emailCountdown > 0 ? emailCountdown + 's' : 'Send Code' }}
               </button>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="cancel-btn" @click="showVerifyEmail = false">取消</button>
+          <button class="cancel-btn" @click="showVerifyEmail = false">Cancel</button>
           <button class="confirm-btn" @click="submitEmailVerify" :disabled="verifyEmailLoading">
-            {{ verifyEmailLoading ? '验证中...' : '确认验证' }}
+            {{ verifyEmailLoading ? 'Verifying...' : 'Verify' }}
           </button>
         </div>
       </div>
@@ -338,7 +338,7 @@ export default {
     const countdown = ref(0)
     const emailCountdown = ref(0)
     
-    // 敏感信息显示状态
+    // Sensitive information display status
     const showRealName = ref(false)
     const showPhone = ref(false)
     const showEmail = ref(false)
@@ -357,7 +357,7 @@ export default {
 
     const accounts = ref([])
 
-    // 编辑表单 - 对应 UpdateProfileReq {username, phone, realName}
+    // Edit form - corresponds to UpdateProfileReq {username, phone, realName}
     const editForm = reactive({
       username: '',
       phone: '',
@@ -370,7 +370,7 @@ export default {
       confirmPassword: ''
     })
     
-    // 修改密码验证码倒计时
+    // Change password countdown
     const passwordCountdown = ref(0)
 
     const verifyPhoneForm = reactive({
@@ -383,7 +383,7 @@ export default {
       code: ''
     })
 
-    // 支付密码相关
+    // Payment password related
     const showPayPassword = ref(false)
     const hasPayPassword = ref(false)
     const payPasswordLoading = ref(false)
@@ -394,7 +394,7 @@ export default {
     })
 
     const userAvatar = computed(() => {
-      const name = userInfo.value.realName || userInfo.value.username || '用'
+      const name = userInfo.value.realName || userInfo.value.username || 'U'
       return name.charAt(0).toUpperCase()
     })
 
@@ -415,24 +415,24 @@ export default {
 
     const formatPhone = (phone) => {
       if (!phone) return ''
-      // 隐藏中间 4 位
+      // Hide middle 4 digits
       if (phone.length >= 7) {
         return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
       }
       return phone
     }
     
-    // 获取脱敏后的真实姓名
+    // Get masked real name
     const getMaskedRealName = () => {
       return showRealName.value ? userInfo.value.realName : maskRealName(userInfo.value.realName)
     }
     
-    // 获取脱敏后的手机号
+    // Get masked phone
     const getMaskedPhone = () => {
       return showPhone.value ? userInfo.value.phone : maskPhone(userInfo.value.phone)
     }
     
-    // 获取脱敏后的邮箱
+    // Get masked email
     const getMaskedEmail = () => {
       return showEmail.value ? userInfo.value.email : maskEmail(userInfo.value.email)
     }
@@ -454,10 +454,10 @@ export default {
     }
 
     const getStatusText = (status) => {
-      return status === 1 ? '正常' : '异常'
+      return status === 1 ? 'Active' : 'Inactive'
     }
 
-    // 倒计时定时器
+    // Countdown timer
     let countdownTimer = null
 
     const startCountdown = () => {
@@ -498,7 +498,7 @@ export default {
 
     const loadUserInfo = async () => {
       try {
-        // 从 Vuex 获取用户信息
+        // Get user info from Vuex
         await store.dispatch('fetchUserInfo')
         const user = store.state.user
         if (user) {
@@ -513,11 +513,11 @@ export default {
             phoneVerified: user.phoneVerified,
             createdAt: user.createdAt
           }
-          // 同步编辑表单
+          // Sync edit form
           editForm.username = user.username || ''
           editForm.phone = user.phone || ''
           editForm.realName = user.realName || ''
-          // 同步验证表单
+          // Sync verification form
           verifyPhoneForm.phone = user.phone || ''
           verifyEmailForm.email = user.email || ''
         }
@@ -546,16 +546,16 @@ export default {
       }
     }
 
-    // 保存个人资料 - 调用后端 /users/profile 接口
+    // Save profile - call backend /users/profile API
     const saveProfile = async () => {
-      // 验证必填字段
+      // Validate required fields
       if (!editForm.username) {
-        proxy.$message.warning('用户名不能为空')
+        proxy.$message.warning('Username cannot be empty')
         return
       }
 
       try {
-        // 使用 userApi.updateProfile 调用后端接口
+        // Use userApi.updateProfile to call backend API
         // UpdateProfileReq: {username, phone, realName}
         const response = await userApi.updateProfile({
           username: editForm.username,
@@ -564,168 +564,168 @@ export default {
         })
         const { code, data, message } = response.data
         if (code === 1 || code === 200) {
-          // 更新本地用户信息
+          // Update local user info
           userInfo.value.username = editForm.username
           userInfo.value.phone = editForm.phone
           userInfo.value.realName = editForm.realName
-          // 更新 Vuex 中的用户信息
+          // Update user info in Vuex
           store.commit('SET_USER', data)
-          proxy.$message.success('个人信息保存成功！')
+          proxy.$message.success('Profile saved successfully!')
         } else {
-          proxy.$message.error(message || '保存失败')
+          proxy.$message.error(message || 'Save failed')
         }
       } catch (error) {
         console.error('Save profile error:', error)
-        proxy.$message.error(error.response?.data?.message || '保存失败，请重试')
+        proxy.$message.error(error.response?.data?.message || 'Save failed, please try again')
       } finally {
         isEditing.value = false
       }
     }
 
-    // 发送手机验证码
+    // Send phone verification code
     const sendPhoneCode = async () => {
       if (!verifyPhoneForm.phone) {
-        proxy.$message.warning('请输入手机号码')
+        proxy.$message.warning('Please enter phone number')
         return
       }
       try {
         const response = await userApi.sendCode('phone', verifyPhoneForm.phone)
         const { code, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success('验证码已发送')
+          proxy.$message.success('Verification code sent')
           startCountdown()
         } else {
-          proxy.$message.error(message || '发送失败')
+          proxy.$message.error(message || 'Send failed')
         }
       } catch (error) {
         console.error('Send phone code error:', error)
-        proxy.$message.error(error.response?.data?.message || '发送验证码失败')
+        proxy.$message.error(error.response?.data?.message || 'Failed to send verification code')
       }
     }
 
-    // 发送邮箱验证码
+    // Send email verification code
     const sendEmailCode = async () => {
       if (!verifyEmailForm.email) {
-        proxy.$message.warning('请输入邮箱地址')
+        proxy.$message.warning('Please enter email address')
         return
       }
       try {
         const response = await userApi.sendCode('email', null, verifyEmailForm.email)
         const { code, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success('验证码已发送到邮箱')
+          proxy.$message.success('Verification code sent to email')
           startEmailCountdown()
         } else {
-          proxy.$message.error(message || '发送失败')
+          proxy.$message.error(message || 'Send failed')
         }
       } catch (error) {
         console.error('Send email code error:', error)
-        proxy.$message.error(error.response?.data?.message || '发送验证码失败')
+        proxy.$message.error(error.response?.data?.message || 'Failed to send verification code')
       }
     }
 
-    // 提交手机验证
+    // Submit phone verification
     const submitPhoneVerify = async () => {
       if (!verifyPhoneForm.phone || !verifyPhoneForm.code) {
-        proxy.$message.warning('请填写完整信息')
+        proxy.$message.warning('Please fill in all fields')
         return
       }
       verifyPhoneLoading.value = true
       try {
-        // 后端接口需要验证码参数
+        // Backend API requires verification code parameter
         const response = await userApi.sendCode('phone', verifyPhoneForm.phone)
-        // 注意：这里需要后端提供验证验证码的接口
-        // 暂时调用发送验证码接口作为示例，实际应该调用验证接口
-        proxy.$message.success('手机验证功能待完善，请联系管理员')
+        // Note: This requires backend API to verify the code
+        // Temporarily call send code API as example, should call verification API in production
+        proxy.$message.success('Phone verification feature pending, please contact administrator')
         showVerifyPhone.value = false
       } catch (error) {
         console.error('Phone verify error:', error)
-        proxy.$message.error(error.response?.data?.message || '验证失败')
+        proxy.$message.error(error.response?.data?.message || 'Verification failed')
       } finally {
         verifyPhoneLoading.value = false
       }
     }
 
-    // 提交邮箱验证
+    // Submit email verification
     const submitEmailVerify = async () => {
       if (!verifyEmailForm.email || !verifyEmailForm.code) {
-        proxy.$message.warning('请填写完整信息')
+        proxy.$message.warning('Please fill in all fields')
         return
       }
       verifyEmailLoading.value = true
       try {
         const response = await userApi.sendCode('email', null, verifyEmailForm.email)
-        proxy.$message.success('邮箱验证功能待完善，请联系管理员')
+        proxy.$message.success('Email verification feature pending, please contact administrator')
         showVerifyEmail.value = false
       } catch (error) {
         console.error('Email verify error:', error)
-        proxy.$message.error(error.response?.data?.message || '验证失败')
+        proxy.$message.error(error.response?.data?.message || 'Verification failed')
       } finally {
         verifyEmailLoading.value = false
       }
     }
 
-    // 发送修改密码验证码
+    // Send change password verification code
     const sendPasswordCode = async () => {
       try {
         const response = await userApi.sendResetPasswordCode()
         const { code, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success('验证码已发送至您的注册邮箱')
+          proxy.$message.success('Verification code sent to your registered email')
           startPasswordCountdown()
         } else {
-          proxy.$message.error(message || '发送失败')
+          proxy.$message.error(message || 'Send failed')
         }
       } catch (error) {
         console.error('Send password code error:', error)
-        proxy.$message.error(error.response?.data?.message || '发送验证码失败')
+        proxy.$message.error(error.response?.data?.message || 'Failed to send verification code')
       }
     }
 
-    // 修改密码 - 调用后端 /users/reset-password 接口
+    // Change password - call backend /users/reset-password API
     const changePassword = async () => {
       if (!passwordForm.verifyCode) {
-        proxy.$message.warning('请输入验证码')
+        proxy.$message.warning('Please enter verification code')
         return
       }
       if (!passwordForm.newPassword || !passwordForm.confirmPassword) {
-        proxy.$message.warning('请填写所有密码字段')
+        proxy.$message.warning('Please fill in all password fields')
         return
       }
       if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-        proxy.$message.error('两次输入的新密码不一致')
+        proxy.$message.error('New passwords do not match')
         return
       }
       if (passwordForm.newPassword.length < 6) {
-        proxy.$message.warning('密码长度不能少于 6 位')
+        proxy.$message.warning('Password must be at least 6 characters')
         return
       }
 
       changePasswordLoading.value = true
       try {
-        // 登录后修改密码需要验证码
+        // Change password after login requires verification code
         const response = await userApi.resetPassword({
           newPassword: passwordForm.newPassword
         }, passwordForm.verifyCode)
         const { code, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success('密码修改成功！')
+          proxy.$message.success('Password changed successfully!')
           showChangePassword.value = false
           passwordForm.verifyCode = ''
           passwordForm.newPassword = ''
           passwordForm.confirmPassword = ''
         } else {
-          proxy.$message.error(message || '修改失败')
+          proxy.$message.error(message || 'Change failed')
         }
       } catch (error) {
         console.error('Change password error:', error)
-        proxy.$message.error(error.response?.data?.message || '修改失败，请检查验证码是否正确')
+        proxy.$message.error(error.response?.data?.message || 'Change failed, please check if verification code is correct')
       } finally {
         changePasswordLoading.value = false
       }
     }
 
-    // 加载支付密码状态
+    // Load payment password status
     const loadPayPasswordStatus = async () => {
       try {
         const response = await userApi.getPayPasswordStatus()
@@ -738,32 +738,32 @@ export default {
       }
     }
 
-    // 打开支付密码弹窗
+    // Open payment password modal
     const openPayPasswordModal = () => {
-      // 重置表单
+      // Reset form
       payPasswordForm.oldPayPassword = ''
       payPasswordForm.payPassword = ''
       payPasswordForm.confirmPassword = ''
       showPayPassword.value = true
     }
 
-    // 提交支付密码
+    // Submit payment password
     const submitPayPassword = async () => {
-      // 验证输入
+      // Validate input
       if (hasPayPassword.value && !payPasswordForm.oldPayPassword) {
-        proxy.$message.warning('请输入原支付密码')
+        proxy.$message.warning('Please enter old payment password')
         return
       }
       if (!payPasswordForm.payPassword) {
-        proxy.$message.warning('请输入支付密码')
+        proxy.$message.warning('Please enter payment password')
         return
       }
       if (!/^\d{6}$/.test(payPasswordForm.payPassword)) {
-        proxy.$message.warning('支付密码必须为6位数字')
+        proxy.$message.warning('Payment password must be 6 digits')
         return
       }
       if (payPasswordForm.payPassword !== payPasswordForm.confirmPassword) {
-        proxy.$message.error('两次输入的支付密码不一致')
+        proxy.$message.error('Payment passwords do not match')
         return
       }
 
@@ -771,31 +771,31 @@ export default {
       try {
         let response
         if (hasPayPassword.value) {
-          // 修改支付密码
+          // Change payment password
           response = await userApi.updatePayPassword(
             payPasswordForm.oldPayPassword,
             payPasswordForm.payPassword
           )
         } else {
-          // 设置支付密码
+          // Set payment password
           response = await userApi.setPayPassword(payPasswordForm.payPassword)
         }
 
         const { code, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success(hasPayPassword.value ? '支付密码修改成功！' : '支付密码设置成功！')
+          proxy.$message.success(hasPayPassword.value ? 'Payment password changed successfully!' : 'Payment password set successfully!')
           showPayPassword.value = false
           hasPayPassword.value = true
-          // 重置表单
+          // Reset form
           payPasswordForm.oldPayPassword = ''
           payPasswordForm.payPassword = ''
           payPasswordForm.confirmPassword = ''
         } else {
-          proxy.$message.error(message || '操作失败')
+          proxy.$message.error(message || 'Operation failed')
         }
       } catch (error) {
         console.error('Submit pay password error:', error)
-        proxy.$message.error(error.response?.data?.message || '操作失败，请重试')
+        proxy.$message.error(error.response?.data?.message || 'Operation failed, please try again')
       } finally {
         payPasswordLoading.value = false
       }
@@ -807,7 +807,7 @@ export default {
       loadPayPasswordStatus()
     })
 
-    // 清理定时器
+    // Clean up timer
     onMounted(() => {
       return () => {
         if (countdownTimer) clearInterval(countdownTimer)
@@ -852,7 +852,7 @@ export default {
       submitPhoneVerify,
       submitEmailVerify,
       changePassword,
-      // 支付密码相关
+      // Payment password related
       showPayPassword,
       hasPayPassword,
       payPasswordLoading,
@@ -903,7 +903,7 @@ export default {
   padding: 20px;
 }
 
-/* 头像区域 */
+/* Avatar Section */
 .avatar-section {
   display: flex;
   align-items: center;
@@ -954,7 +954,7 @@ export default {
   color: var(--status-warning);
 }
 
-/* 信息网格 */
+/* Info Grid */
 .info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -973,7 +973,7 @@ export default {
   font-weight: 500;
 }
 
-/* label行 - 包含label和眼睛按钮 */
+/* Label row - contains label and eye button */
 .info-label-row {
   display: flex;
   align-items: center;
@@ -992,7 +992,7 @@ export default {
   font-weight: 500;
 }
 
-/* 小眼睛按钮样式 */
+/* Eye Button Styles */
 .eye-btn {
   background: transparent;
   border: none;
@@ -1056,7 +1056,7 @@ export default {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* 安全设置 */
+/* Security Settings */
 .security-item {
   display: flex;
   justify-content: space-between;
@@ -1118,7 +1118,7 @@ export default {
   font-weight: 600;
 }
 
-/* 账户概览 */
+/* Account Overview */
 .view-all {
   color: var(--text-on-gradient-secondary);
   text-decoration: none;
@@ -1162,7 +1162,7 @@ export default {
   color: var(--text-on-gradient-muted);
 }
 
-/* 快捷操作 */
+/* Quick Actions */
 .quick-actions {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -1208,7 +1208,7 @@ export default {
   font-size: 32px;
 }
 
-/* 弹窗 */
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1387,7 +1387,7 @@ export default {
   cursor: not-allowed;
 }
 
-/* 响应式设计 */
+/* Responsive */
 @media (max-width: 768px) {
   .info-grid {
     grid-template-columns: 1fr;

@@ -8,45 +8,45 @@
       <nav class="menu">
         <router-link to="/dashboard" class="menu-item">
           <span class="icon">📊</span>
-          <span>仪表盘</span>
+          <span>Dashboard</span>
         </router-link>
         <router-link to="/accounts" class="menu-item">
           <span class="icon">💳</span>
-          <span>账户管理</span>
+          <span>Accounts</span>
         </router-link>
         <router-link to="/transactions" class="menu-item">
           <span class="icon">📝</span>
-          <span>交易记录</span>
+          <span>Transactions</span>
         </router-link>
         <router-link to="/transfers" class="menu-item">
           <span class="icon">💸</span>
-          <span>转账服务</span>
+          <span>Transfers</span>
         </router-link>
         <router-link to="/chatbot" class="menu-item">
           <span class="icon">🤖</span>
-          <span>智能客服</span>
+          <span>Chatbot</span>
         </router-link>
         <router-link to="/profile" class="menu-item">
           <span class="icon">👤</span>
-          <span>个人中心</span>
+          <span>Profile</span>
         </router-link>
 
-        <!-- 管理员菜单 -->
+        <!-- Admin Menu -->
         <template v-if="isAdmin">
           <div class="menu-divider">
-            <span class="divider-text">管理功能</span>
+            <span class="divider-text">Admin</span>
           </div>
           <router-link to="/admin/knowledge" class="menu-item admin-item">
             <span class="icon">📚</span>
-            <span>知识库管理</span>
+            <span>Knowledge Base</span>
           </router-link>
           <router-link to="/admin/chat-stats" class="menu-item admin-item">
             <span class="icon">📈</span>
-            <span>对话统计</span>
+            <span>Chat Stats</span>
           </router-link>
           <router-link to="/admin/users" class="menu-item admin-item">
             <span class="icon">👥</span>
-            <span>用户管理</span>
+            <span>User Management</span>
           </router-link>
         </template>
       </nav>
@@ -57,14 +57,14 @@
       <!-- 顶部导航 -->
       <header class="header">
         <div class="header-left">
-          <h1><span class="logo-icon">🏦</span> 银行服务机器人</h1>
+          <h1><span class="logo-icon">🏦</span> Banking Assistant</h1>
         </div>
         <div class="header-right">
           <span class="user-info">
             <span class="avatar">👤</span>
             <span>{{ currentUser.name }}</span>
           </span>
-          <button class="logout-btn" @click="handleLogout">退出</button>
+          <button class="logout-btn" @click="handleLogout">Logout</button>
         </div>
       </header>
 
@@ -92,18 +92,18 @@ export default {
     const isAdmin = computed(() => store.getters.isAdmin)
 
     const pageTitle = computed(() => {
-      const titles = {
-        '/dashboard': '仪表盘',
-        '/accounts': '账户管理',
-        '/transactions': '交易记录',
-        '/transfers': '转账服务',
-        '/chatbot': '智能客服',
-        '/profile': '个人中心',
-        '/admin/knowledge': '知识库管理',
-        '/admin/chat-stats': '对话统计',
-        '/admin/users': '用户管理'
+    const titles = {
+        '/dashboard': 'Dashboard',
+        '/accounts': 'Accounts',
+        '/transactions': 'Transactions',
+        '/transfers': 'Transfers',
+        '/chatbot': 'Chatbot',
+        '/profile': 'Profile',
+        '/admin/knowledge': 'Knowledge Base',
+        '/admin/chat-stats': 'Chat Stats',
+        '/admin/users': 'User Management'
       }
-      return titles[route.path] || '银行服务'
+      return titles[route.path] || 'Banking Service'
     })
 
     // 从 Vuex 获取用户信息

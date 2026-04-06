@@ -87,7 +87,7 @@ public class RolesServiceImpl extends ServiceImpl<RolesMapper, Roles> implements
         try {
             return objectMapper.writeValueAsString(role);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("序列化角色失败", e);
+            throw new RuntimeException("Failed to serialize role", e);
         }
     }
 
@@ -95,7 +95,7 @@ public class RolesServiceImpl extends ServiceImpl<RolesMapper, Roles> implements
         try {
             return objectMapper.readValue(json, Roles.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("反序列化角色失败", e);
+            throw new RuntimeException("Failed to deserialize role", e);
         }
     }
 }

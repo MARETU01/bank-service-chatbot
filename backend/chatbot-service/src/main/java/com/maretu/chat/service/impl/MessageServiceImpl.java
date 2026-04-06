@@ -54,7 +54,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     @Override
     public List<Message> getMessages(Integer userId, String sessionId) {
         if (!sessionService.isSessionOwner(userId, sessionId)) {
-            throw new RuntimeException("无权访问该会话的消息");
+            throw new RuntimeException("No permission to access messages for this session");
         }
         return lambdaQuery()
                 .eq(Message::getSessionId, sessionId)
@@ -66,7 +66,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     public Flux<String> chat(String userJson, Message message) throws JsonProcessingException {
         Context context = jacksonObjectMapper.readValue(userJson, Context.class);
         if (!sessionService.isSessionOwner(context.getUserId(), message.getSessionId())) {
-            throw new RuntimeException("无权访问该会话的消息");
+            throw new RuntimeException("No permission to access messages for this session");
         }
 
         // ===== 输入安全防护 =====
@@ -170,11 +170,11 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     private void checkAdminRole(String userJson) {
         Result<List<String>> result = userClient.getUserRoles(userJson);
         if (result == null || result.getData() == null) {
-            throw new RuntimeException("获取用户角色失败");
+            throw new RuntimeException("Failed to get user roles");
         }
         List<String> roles = result.getData();
         if (roles.isEmpty() || !roles.contains("ADMIN")) {
-            throw new RuntimeException("权限不足：需要 admin 角色才能执行此操作");
+            throw new RuntimeException("Insufficient permissions: admin role required to perform this action");
         }
     }
 
@@ -323,7 +323,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                     );
         } catch (Exception e) {
             log.error("并发查询统计数据异常", e);
-            throw new RuntimeException("获取统计数据失败：" + e.getMessage());
+            throw new RuntimeException("Failed to get statistics: " + e.getMessage());
         }
 
         return stats;

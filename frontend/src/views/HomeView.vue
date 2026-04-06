@@ -1,53 +1,53 @@
 <template>
   <div class="home-container">
-    <!-- 导航栏 -->
+    <!-- Navigation Bar -->
     <nav class="navbar">
       <div class="nav-brand">
         <span class="logo">🏦</span>
-        <span class="brand-name">银行服务机器人</span>
+        <span class="brand-name">Bank Service Chatbot</span>
       </div>
       <div class="nav-links">
-        <!-- 未登录状态 -->
+        <!-- Not Logged In -->
         <template v-if="!isLoggedIn">
-          <router-link to="/login" class="nav-btn login-btn">登录</router-link>
-          <router-link to="/register" class="nav-btn register-btn">注册</router-link>
+          <router-link to="/login" class="nav-btn login-btn">Sign In</router-link>
+          <router-link to="/register" class="nav-btn register-btn">Register</router-link>
         </template>
-        <!-- 已登录状态 -->
+        <!-- Logged In -->
         <template v-else>
           <router-link to="/dashboard" class="nav-btn dashboard-btn">
             <span class="btn-icon">📊</span>
-            仪表盘
+            Dashboard
           </router-link>
           <span class="user-info">
             <span class="avatar">👤</span>
             <span class="username">{{ userName }}</span>
           </span>
-          <button class="nav-btn logout-btn" @click="handleLogout">退出</button>
+          <button class="nav-btn logout-btn" @click="handleLogout">Sign Out</button>
         </template>
       </div>
     </nav>
 
-    <!-- 主要内容区 -->
+    <!-- Main Content -->
     <main class="main-content">
       <div class="hero-section">
         <div class="hero-content">
           <h1 class="hero-title">
-            欢迎使用
-            <span class="highlight">银行服务机器人</span>
+            Welcome to
+            <span class="highlight">Bank Service Chatbot</span>
           </h1>
           <p class="hero-subtitle">
-            智能、便捷、安全的银行服务体验
+            Intelligent, Convenient, and Secure Banking Experience
           </p>
           <p class="hero-description">
-            我们的智能客服机器人为您提供 7×24 小时全天候服务，<br />
-            无论是账户查询、转账汇款还是业务咨询，都能快速响应您的需求。
+            Our intelligent chatbot provides 24/7 service,<br />
+            Whether it's account inquiry, money transfer, or business consultation, we respond quickly to your needs.
           </p>
           <div class="hero-buttons">
             <router-link to="/login" class="btn btn-primary">
-              立即登录
+              Sign In
             </router-link>
             <router-link to="/register" class="btn btn-secondary">
-              免费注册
+              Free Register
             </router-link>
           </div>
         </div>
@@ -69,37 +69,37 @@
         </div>
       </div>
 
-      <!-- 功能特性 -->
+      <!-- Features -->
       <section class="features-section">
-        <h2 class="section-title">我们的服务</h2>
+        <h2 class="section-title">Our Services</h2>
         <div class="features-grid">
           <div class="feature-card">
             <div class="feature-icon">💳</div>
-            <h3>账户管理</h3>
-            <p>随时查看账户余额、交易明细，管理您的个人资产</p>
+            <h3>Account Management</h3>
+            <p>Check account balance and transaction details anytime, manage your personal assets</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">💸</div>
-            <h3>转账汇款</h3>
-            <p>快速安全的转账服务，支持行内及跨行转账</p>
+            <h3>Money Transfer</h3>
+            <p>Fast and secure transfer service, supporting intra-bank and inter-bank transfers</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">📋</div>
-            <h3>交易记录</h3>
-            <p>完整的交易历史记录，方便您随时核对账目</p>
+            <h3>Transaction History</h3>
+            <p>Complete transaction history for your reference and account verification</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">🤖</div>
-            <h3>智能客服</h3>
-            <p>AI 智能客服 7×24 小时在线，解答您的各类问题</p>
+            <h3>Intelligent Support</h3>
+            <p>AI-powered customer service available 24/7 to answer your questions</p>
           </div>
         </div>
       </section>
     </main>
 
-    <!-- 页脚 -->
+    <!-- Footer -->
     <footer class="footer">
-      <p>&copy; 2024 银行服务机器人。All rights reserved.</p>
+      <p>&copy; 2024 Bank Service Chatbot. All rights reserved.</p>
     </footer>
   </div>
 </template>

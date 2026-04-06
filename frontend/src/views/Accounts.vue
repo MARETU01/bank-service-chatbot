@@ -1,10 +1,10 @@
 <template>
   <div class="accounts">
-    <!-- 账户列表 -->
+    <!-- Account List -->
     <div class="accounts-header">
-      <h2>我的账户</h2>
+      <h2>My Accounts</h2>
       <button class="add-btn" @click="showCreateModal = true">
-        <span>+</span> 新建账户
+        <span>+</span> New Account
       </button>
     </div>
 
@@ -13,14 +13,14 @@
         <div class="account-header">
           <div class="account-type">
             <span class="type-icon">💳</span>
-            <span class="type-name">{{ account.accountName || '银行账户' }}</span>
+            <span class="type-name">{{ account.accountName || 'Bank Account' }}</span>
           </div>
           <span class="account-status" :class="getStatusClass(account.status)">{{ getStatusText(account.status) }}</span>
         </div>
         <div class="account-number">
           <div class="account-number-row">
             <span>{{ getDisplayAccountNumber(account) }}</span>
-            <button class="eye-btn" @click.stop="toggleAccountNumber(account.id)" :title="showAccountNumber[account.id] ? '隐藏' : '显示'">
+            <button class="eye-btn" @click.stop="toggleAccountNumber(account.id)" :title="showAccountNumber[account.id] ? 'Hide' : 'Show'">
               {{ showAccountNumber[account.id] ? '👁️' : '👁️‍🗨️' }}
             </button>
           </div>
@@ -28,8 +28,8 @@
         <div class="account-balance">
           <div class="balance-row">
             <div class="balance-label-row">
-              <span class="balance-label">可用余额</span>
-              <button class="eye-btn" @click.stop="toggleBalance(account.id)" :title="showBalance[account.id] ? '隐藏' : '显示'">
+              <span class="balance-label">Available Balance</span>
+              <button class="eye-btn" @click.stop="toggleBalance(account.id)" :title="showBalance[account.id] ? 'Hide' : 'Show'">
                 {{ showBalance[account.id] ? '👁️' : '👁️‍🗨️' }}
               </button>
             </div>
@@ -38,52 +38,52 @@
         </div>
         <div class="account-info">
           <div class="info-item">
-            <span class="info-label">币种</span>
+            <span class="info-label">Currency</span>
             <span class="info-value">{{ account.currency || 'CNY' }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">日限额</span>
+            <span class="info-label">Daily Limit</span>
             <span class="info-value">¥ {{ formatNumber(account.dailyLimit) }}</span>
           </div>
         </div>
         <div class="account-actions">
-          <button class="action-btn primary" @click="viewDetail(account)">详情</button>
-          <button class="action-btn secondary" @click="transfer(account)">转账</button>
+        <button class="action-btn primary" @click="viewDetail(account)">Details</button>
+        <button class="action-btn secondary" @click="transfer(account)">Transfer</button>
         </div>
       </div>
     </div>
     <div class="empty-state" v-else>
-      <p>暂无账户信息</p>
+      <p>No account information</p>
     </div>
 
-    <!-- 账户详情弹窗 -->
+    <!-- Account Details Modal -->
     <div class="modal-overlay" v-if="selectedAccount" @click="selectedAccount = null">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>账户详情</h3>
+          <h3>Account Details</h3>
           <button class="close-btn" @click="selectedAccount = null">×</button>
         </div>
         <div class="modal-body">
           <div class="detail-grid">
             <div class="detail-item">
-              <span class="label">账户 ID</span>
+              <span class="label">Account ID</span>
               <span class="value">{{ selectedAccount.id }}</span>
             </div>
             <div class="detail-item">
               <div class="label-row">
-                <span class="label">账户号码</span>
-                <button class="eye-btn" @click="toggleDetailAccountNumber" :title="showAccountNumber[selectedAccount.id] ? '隐藏' : '显示'">
+                <span class="label">Account Number</span>
+                <button class="eye-btn" @click="toggleDetailAccountNumber" :title="showAccountNumber[selectedAccount.id] ? 'Hide' : 'Show'">
                   {{ showAccountNumber[selectedAccount.id] ? '👁️' : '👁️‍🗨️' }}
                 </button>
               </div>
               <span class="value">{{ getDetailAccountNumber() }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">账户名称</span>
+              <span class="label">Account Name</span>
               <span class="value">{{ selectedAccount.accountName || '银行账户' }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">账户状态</span>
+              <span class="label">Account Status</span>
               <span class="value">
                 <span class="status-badge" :class="getStatusClass(selectedAccount.status)">
                   {{ getStatusText(selectedAccount.status) }}
@@ -92,33 +92,33 @@
             </div>
             <div class="detail-item">
               <div class="label-row">
-                <span class="label">账户余额</span>
-                <button class="eye-btn" @click="toggleDetailBalance" :title="showBalance[selectedAccount.id] ? '隐藏' : '显示'">
+                <span class="label">Account Balance</span>
+                <button class="eye-btn" @click="toggleDetailBalance" :title="showBalance[selectedAccount.id] ? 'Hide' : 'Show'">
                   {{ showBalance[selectedAccount.id] ? '👁️' : '👁️‍🗨️' }}
                 </button>
               </div>
               <span class="value amount">¥ {{ getDetailBalance() }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">币种</span>
+              <span class="label">Currency</span>
               <span class="value">{{ selectedAccount.currency || 'CNY' }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">单日交易限额</span>
+              <span class="label">Daily Transaction Limit</span>
               <span class="value">¥ {{ formatNumber(selectedAccount.dailyLimit) }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">创建时间</span>
+              <span class="label">Created At</span>
               <span class="value">{{ formatDateTime(selectedAccount.createdAt) }}</span>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn cancel" @click="selectedAccount = null">关闭</button>
-          <button class="btn warning" @click="editAccount(selectedAccount)" v-if="selectedAccount.status === 1">编辑</button>
-          <button class="btn danger" @click="freezeAccount(selectedAccount)" v-if="selectedAccount.status === 1">冻结</button>
-          <button class="btn success" @click="unfreezeAccount(selectedAccount)" v-if="selectedAccount.status === 0">解冻</button>
-          <button class="btn primary" @click="transfer(selectedAccount)" v-if="selectedAccount.status === 1">转账</button>
+          <button class="btn cancel" @click="selectedAccount = null">Close</button>
+          <button class="btn warning" @click="editAccount(selectedAccount)" v-if="selectedAccount.status === 1">Edit</button>
+          <button class="btn danger" @click="freezeAccount(selectedAccount)" v-if="selectedAccount.status === 1">Freeze</button>
+          <button class="btn success" @click="unfreezeAccount(selectedAccount)" v-if="selectedAccount.status === 0">Unfreeze</button>
+          <button class="btn primary" @click="transfer(selectedAccount)" v-if="selectedAccount.status === 1">Transfer</button>
         </div>
       </div>
     </div>
@@ -127,36 +127,36 @@
     <div class="modal-overlay" v-if="showCreateModal" @click="showCreateModal = false">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>新建账户</h3>
+          <h3>New Account</h3>
           <button class="close-btn" @click="showCreateModal = false">×</button>
         </div>
         <div class="modal-body">
           <form @submit.prevent="createAccount">
             <div class="form-group">
-              <label>账户名称 <span class="required">*</span></label>
-              <input type="text" v-model="newAccount.accountName" placeholder="请输入账户名称" required />
+              <label>Account Name <span class="required">*</span></label>
+              <input type="text" v-model="newAccount.accountName" placeholder="Enter account name" required />
             </div>
             <div class="form-group">
-              <label>币种</label>
+              <label>Currency</label>
               <select v-model="newAccount.currency">
-                <option value="CNY">人民币 (CNY)</option>
-                <option value="USD">美元 (USD)</option>
-                <option value="EUR">欧元 (EUR)</option>
+                <option value="CNY">CNY (Chinese Yuan)</option>
+                <option value="USD">USD (US Dollar)</option>
+                <option value="EUR">EUR (Euro)</option>
               </select>
             </div>
             <div class="form-group">
-              <label>单日交易限额</label>
+              <label>Daily Transaction Limit</label>
               <div class="amount-input">
                 <span class="currency">¥</span>
-                <input type="number" v-model="newAccount.dailyLimit" placeholder="请输入限额" step="0.01" min="0" />
+                <input type="number" v-model="newAccount.dailyLimit" placeholder="Enter limit" step="0.01" min="0" />
               </div>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button class="btn cancel" @click="showCreateModal = false">取消</button>
+          <button class="btn cancel" @click="showCreateModal = false">Cancel</button>
           <button class="btn primary" @click="createAccount" :disabled="createLoading">
-            {{ createLoading ? '创建中...' : '确认创建' }}
+            {{ createLoading ? 'Creating...' : 'Confirm Create' }}
           </button>
         </div>
       </div>
@@ -166,35 +166,35 @@
     <div class="modal-overlay" v-if="showEditModal" @click="showEditModal = false">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>编辑账户</h3>
+          <h3>Edit Account</h3>
           <button class="close-btn" @click="showEditModal = false">×</button>
         </div>
         <div class="modal-body">
           <form @submit.prevent="updateAccount">
             <div class="form-group">
-              <label>账户名称 <span class="required">*</span></label>
-              <input type="text" v-model="editAccountData.accountName" placeholder="请输入账户名称" required />
+              <label>Account Name <span class="required">*</span></label>
+              <input type="text" v-model="editAccountData.accountName" placeholder="Enter account name" required />
             </div>
             <div class="form-group">
-              <label>设置余额 <span class="test-hint">(测试用)</span></label>
+              <label>Set Balance <span class="test-hint">(For Testing)</span></label>
               <div class="amount-input">
                 <span class="currency">¥</span>
-                <input type="number" v-model="editAccountData.balance" placeholder="请输入余额" step="0.01" min="0" />
+                <input type="number" v-model="editAccountData.balance" placeholder="Enter balance" step="0.01" min="0" />
               </div>
             </div>
             <div class="form-group">
-              <label>单日交易限额</label>
+              <label>Daily Transaction Limit</label>
               <div class="amount-input">
                 <span class="currency">¥</span>
-                <input type="number" v-model="editAccountData.dailyLimit" placeholder="请输入限额" step="0.01" min="0" />
+                <input type="number" v-model="editAccountData.dailyLimit" placeholder="Enter limit" step="0.01" min="0" />
               </div>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button class="btn cancel" @click="showEditModal = false">取消</button>
+          <button class="btn cancel" @click="showEditModal = false">Cancel</button>
           <button class="btn primary" @click="updateAccount" :disabled="editLoading">
-            {{ editLoading ? '保存中...' : '保存' }}
+            {{ editLoading ? 'Saving...' : 'Save' }}
           </button>
         </div>
       </div>
@@ -282,11 +282,11 @@ export default {
 
     const getStatusText = (status) => {
       const statusMap = {
-        0: '冻结',
-        1: '正常',
-        2: '关闭'
+        0: 'Frozen',
+        1: 'Active',
+        2: 'Closed'
       }
-      return statusMap[status] || '未知'
+      return statusMap[status] || 'Unknown'
     }
     
     // 切换账号显示状态
@@ -347,11 +347,11 @@ export default {
         if (code === 1 || code === 200) {
           accounts.value = data || []
         } else {
-          proxy.$message.error(message || '获取账户列表失败')
+          proxy.$message.error(message || 'Failed to get account list')
         }
       } catch (error) {
         console.error('Load accounts error:', error)
-        proxy.$message.error('获取账户列表失败')
+        proxy.$message.error('Failed to get account list')
       } finally {
         loading.value = false
       }
@@ -368,7 +368,7 @@ export default {
     // 创建账户
     const createAccount = async () => {
       if (!newAccount.accountName) {
-        proxy.$message.error('请输入账户名称')
+        proxy.$message.error('Please enter account name')
         return
       }
       
@@ -381,7 +381,7 @@ export default {
         })
         const { code, data, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success('账户创建成功')
+          proxy.$message.success('Account created successfully')
           showCreateModal.value = false
           // 重置表单
           newAccount.accountName = ''
@@ -390,11 +390,11 @@ export default {
           // 刷新列表
           await loadAccounts()
         } else {
-          proxy.$message.error(message || '创建账户失败')
+          proxy.$message.error(message || 'Failed to create account')
         }
       } catch (error) {
         console.error('Create account error:', error)
-        proxy.$message.error('创建账户失败')
+        proxy.$message.error('Failed to create account')
       } finally {
         createLoading.value = false
       }
@@ -413,7 +413,7 @@ export default {
     // 更新账户
     const updateAccount = async () => {
       if (!editAccountData.accountName) {
-        proxy.$message.error('请输入账户名称')
+        proxy.$message.error('Please enter account name')
         return
       }
       
@@ -426,16 +426,16 @@ export default {
         })
         const { code, data, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success('账户更新成功')
+          proxy.$message.success('Account updated successfully')
           showEditModal.value = false
           // 刷新列表
           await loadAccounts()
         } else {
-          proxy.$message.error(message || '更新账户失败')
+          proxy.$message.error(message || 'Failed to update account')
         }
       } catch (error) {
         console.error('Update account error:', error)
-        proxy.$message.error('更新账户失败')
+        proxy.$message.error('Failed to update account')
       } finally {
         editLoading.value = false
       }
@@ -443,7 +443,7 @@ export default {
     
     // 冻结账户
     const freezeAccount = async (account) => {
-      if (!confirm('确定要冻结该账户吗？冻结后将无法进行交易。')) {
+      if (!confirm('Are you sure you want to freeze this account? It will be unable to conduct transactions after freezing.')) {
         return
       }
       
@@ -451,15 +451,15 @@ export default {
         const response = await accountApi.updateStatus(account.id, 0)
         const { code, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success('账户已冻结')
+          proxy.$message.success('Account has been frozen')
           selectedAccount.value = null
           await loadAccounts()
         } else {
-          proxy.$message.error(message || '冻结账户失败')
+          proxy.$message.error(message || 'Failed to freeze account')
         }
       } catch (error) {
         console.error('Freeze account error:', error)
-        proxy.$message.error('冻结账户失败')
+        proxy.$message.error('Failed to freeze account')
       }
     }
     
@@ -469,15 +469,15 @@ export default {
         const response = await accountApi.updateStatus(account.id, 1)
         const { code, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success('账户已解冻')
+          proxy.$message.success('Account has been unfrozen')
           selectedAccount.value = null
           await loadAccounts()
         } else {
-          proxy.$message.error(message || '解冻账户失败')
+          proxy.$message.error(message || 'Failed to unfreeze account')
         }
       } catch (error) {
         console.error('Unfreeze account error:', error)
-        proxy.$message.error('解冻账户失败')
+        proxy.$message.error('Failed to unfreeze account')
       }
     }
 

@@ -141,12 +141,12 @@ public class UserRolesServiceImpl extends ServiceImpl<UserRolesMapper, UserRoles
         // 1. 权限校验
         List<String> adminRoles = getUserRoles(adminUserId);
         if (adminRoles == null || !adminRoles.contains(RoleCode.ADMIN.getCode())) {
-            throw new RuntimeException("权限不足：需要管理员角色");
+            throw new RuntimeException("Insufficient permissions: admin role required");
         }
 
-        // 2. 参数校验
+        // Validate parameters
         if (roleCodes == null || roleCodes.isEmpty()) {
-            throw new RuntimeException("至少需要分配一个角色");
+            throw new RuntimeException("At least one role must be assigned");
         }
 
         // 3. 校验角色代码是否合法
@@ -157,14 +157,14 @@ public class UserRolesServiceImpl extends ServiceImpl<UserRolesMapper, UserRoles
         );
         roleCodes.forEach(code -> {
             if (!validCodes.contains(code)) {
-                throw new RuntimeException("无效的角色代码：" + code);
+                throw new RuntimeException("Invalid role code: " + code);
             }
         });
 
-        // 4. 防止管理员移除自己的ADMIN角色
+        // Prevent admin from removing their own ADMIN role
         if (Objects.equals(Long.valueOf(adminUserId), userId)
                 && !roleCodes.contains(RoleCode.ADMIN.getCode())) {
-            throw new RuntimeException("不能移除自己的管理员角色");
+            throw new RuntimeException("Cannot remove your own admin role");
         }
 
         // 5. 删除该用户的所有旧角色

@@ -1,53 +1,53 @@
 <template>
   <div class="user-manage">
     <div class="page-header">
-      <h2>👥 用户管理</h2>
-      <p class="page-desc">管理系统用户，查看用户信息、分配角色等</p>
+      <h2>👥 User Management</h2>
+      <p class="page-desc">Manage system users, view user information, assign roles, etc.</p>
     </div>
 
-    <!-- 操作栏 -->
+    <!-- Toolbar -->
     <div class="toolbar">
       <div class="toolbar-left">
         <input
           v-model="searchKeyword"
           type="text"
           class="search-input"
-          placeholder="搜索用户名或邮箱..."
+          placeholder="Search by username or email..."
           @keyup.enter="handleSearch"
         />
-        <button class="btn btn-primary" @click="handleSearch">搜索</button>
+        <button class="btn btn-primary" @click="handleSearch">Search</button>
         <select v-model="filterRole" class="filter-select" @change="handleFilter">
-          <option value="">全部角色</option>
-          <option value="USER">普通用户</option>
-          <option value="ADMIN">管理员</option>
-          <option value="CUSTOMER_SERVICE">客服</option>
+          <option value="">All Roles</option>
+          <option value="USER">User</option>
+          <option value="ADMIN">Admin</option>
+          <option value="CUSTOMER_SERVICE">Customer Service</option>
         </select>
       </div>
       <div class="toolbar-right">
         <div class="user-count">
-          共 <strong>{{ total }}</strong> 位用户
+          Total <strong>{{ total }}</strong> user(s)
         </div>
       </div>
     </div>
 
-    <!-- 用户列表 -->
+    <!-- User List -->
     <div class="user-list">
       <div class="list-header">
         <span class="col-id">ID</span>
-        <span class="col-username">用户名</span>
-        <span class="col-email">邮箱</span>
-        <span class="col-roles">角色</span>
-        <span class="col-status">状态</span>
-        <span class="col-time">注册时间</span>
-        <span class="col-action">操作</span>
+        <span class="col-username">Username</span>
+        <span class="col-email">Email</span>
+        <span class="col-roles">Roles</span>
+        <span class="col-status">Status</span>
+        <span class="col-time">Registration Date</span>
+        <span class="col-action">Actions</span>
       </div>
 
       <div v-if="loading" class="loading-state">
-        <p>加载中...</p>
+        <p>Loading...</p>
       </div>
 
       <div v-else-if="userList.length === 0" class="empty-state">
-        <p>📭 暂无匹配的用户</p>
+        <p>📭 No matching users found</p>
       </div>
 
       <div v-else>
@@ -74,26 +74,26 @@
           </span>
           <span class="col-status">
             <span class="status-dot" :class="user.active ? 'online' : 'offline'"></span>
-            {{ user.active ? '正常' : '禁用' }}
+            {{ user.active ? 'Active' : 'Disabled' }}
           </span>
           <span class="col-time">{{ formatTime(user.createdAt) }}</span>
           <span class="col-action">
-            <button class="btn-sm btn-role" @click="showRoleDialog(user)">角色</button>
+            <button class="btn-sm btn-role" @click="showRoleDialog(user)">Roles</button>
             <button class="btn-sm btn-toggle" @click="handleToggleStatus(user)">
-              {{ user.active ? '禁用' : '启用' }}
+              {{ user.active ? 'Disable' : 'Enable' }}
             </button>
           </span>
         </div>
       </div>
     </div>
 
-    <!-- 分页 -->
+    <!-- Pagination -->
     <div class="pagination" v-if="totalPage > 1">
       <button
         class="page-btn"
         :disabled="currentPage <= 1"
         @click="changePage(currentPage - 1)"
-      >上一页</button>
+      >Previous</button>
       <button
         class="page-btn"
         v-for="p in totalPage"
@@ -105,18 +105,18 @@
         class="page-btn"
         :disabled="currentPage >= totalPage"
         @click="changePage(currentPage + 1)"
-      >下一页</button>
+      >Next</button>
     </div>
 
-    <!-- 角色分配弹窗 -->
+    <!-- Role Assignment Modal -->
     <div class="modal-overlay" v-if="roleDialogVisible" @click.self="closeRoleDialog">
       <div class="modal">
         <div class="modal-header">
-          <h3>分配角色 - {{ selectedUser?.username }}</h3>
+          <h3>Assign Roles - {{ selectedUser?.username }}</h3>
           <button class="modal-close" @click="closeRoleDialog">✕</button>
         </div>
         <div class="modal-body">
-          <p class="modal-hint">选择要分配给该用户的角色（可多选）：</p>
+          <p class="modal-hint">Select roles to assign to this user (multiple selection allowed):</p>
           <div class="role-options">
             <label
               class="role-option"
@@ -141,8 +141,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-cancel" @click="closeRoleDialog">取消</button>
-          <button class="btn btn-primary" @click="handleSaveRoles">保存</button>
+          <button class="btn btn-cancel" @click="closeRoleDialog">Cancel</button>
+          <button class="btn btn-primary" @click="handleSaveRoles">Save</button>
         </div>
       </div>
     </div>
@@ -165,24 +165,24 @@ export default {
     const selectedUser = ref(null)
     const selectedRoles = ref([])
 
-    // 分页相关
+    // Pagination related
     const currentPage = ref(1)
     const pageSize = ref(10)
     const total = ref(0)
     const totalPage = ref(0)
 
-    // 用户列表（从后端获取）
+    // User list (from backend)
     const userList = ref([])
 
-    // 所有可用角色
+    // Available roles
     const allRoles = ref([
-      { code: 'USER', name: '普通用户', icon: '👤', description: '基本的银行服务功能' },
-      { code: 'ADMIN', name: '管理员', icon: '🛡️', description: '系统管理、用户管理、知识库管理' },
-      { code: 'CUSTOMER_SERVICE', name: '客服', icon: '🎧', description: '处理客户咨询和投诉' }
+      { code: 'USER', name: 'User', icon: '👤', description: 'Basic banking services' },
+      { code: 'ADMIN', name: 'Admin', icon: '🛡️', description: 'System management, user management, knowledge base management' },
+      { code: 'CUSTOMER_SERVICE', name: 'Customer Service', icon: '🎧', description: 'Handle customer inquiries and complaints' }
     ])
 
     /**
-     * 加载用户列表
+     * Load user list
      */
     const fetchUserList = async () => {
       loading.value = true
@@ -199,22 +199,22 @@ export default {
           total.value = data.total || 0
           totalPage.value = data.totalPage || 0
         } else {
-          proxy.$message.error(message || '获取用户列表失败')
+          proxy.$message.error(message || 'Failed to get user list')
         }
       } catch (e) {
-        proxy.$message.error('获取用户列表失败：' + (e.message || '网络异常'))
+        proxy.$message.error('Failed to get user list: ' + (e.message || 'Network error'))
       } finally {
         loading.value = false
       }
     }
 
-    // 页面加载时获取数据
+    // Fetch data on page load
     onMounted(() => {
       fetchUserList()
     })
 
     const getRoleName = (code) => {
-      const map = { USER: '用户', ADMIN: '管理员', CUSTOMER_SERVICE: '客服' }
+      const map = { USER: 'User', ADMIN: 'Admin', CUSTOMER_SERVICE: 'CS' }
       return map[code] || code
     }
 
@@ -224,9 +224,9 @@ export default {
     }
 
     /**
-     * 角色排序优先级：USER > ADMIN > CUSTOMER_SERVICE
-     * @param {string[]} roles - 角色数组
-     * @returns {string[]} 排序后的角色数组
+     * Role sorting priority: USER > ADMIN > CUSTOMER_SERVICE
+     * @param {string[]} roles - Role array
+     * @returns {string[]} Sorted role array
      */
     const sortRoles = (roles) => {
       if (!roles || !Array.isArray(roles)) return []
@@ -239,9 +239,9 @@ export default {
     }
 
     /**
-     * 格式化时间
-     * @param {string} timeStr - ISO 格式的时间字符串
-     * @returns {string} 格式化后的时间字符串
+     * Format time
+     * @param {string} timeStr - ISO format time string
+     * @returns {string} Formatted time string
      */
     const formatTime = (timeStr) => {
       if (!timeStr) return '-'
@@ -260,7 +260,7 @@ export default {
     }
 
     /**
-     * 搜索 - 重置到第一页并重新请求
+     * Search - Reset to first page and reload
      */
     const handleSearch = () => {
       currentPage.value = 1
@@ -268,7 +268,7 @@ export default {
     }
 
     /**
-     * 角色筛选 - 重置到第一页并重新请求
+     * Role filter - Reset to first page and reload
      */
     const handleFilter = () => {
       currentPage.value = 1
@@ -276,7 +276,7 @@ export default {
     }
 
     /**
-     * 切换页码
+     * Change page
      */
     const changePage = (page) => {
       if (page < 1 || page > totalPage.value) return
@@ -285,7 +285,7 @@ export default {
     }
 
     /**
-     * 切换用户启用/禁用状态
+     * Toggle user enable/disable status
      */
     const handleToggleStatus = async (user) => {
       try {
@@ -293,12 +293,12 @@ export default {
         const { code, message } = res.data
         if (code === 1) {
           user.active = !user.active
-          proxy.$message.success(`已${user.active ? '启用' : '禁用'}用户 ${user.username}`)
+          proxy.$message.success(`${user.active ? 'Enabled' : 'Disabled'} user ${user.username}`)
         } else {
-          proxy.$message.error(message || '操作失败')
+          proxy.$message.error(message || 'Operation failed')
         }
       } catch (e) {
-        proxy.$message.error('操作失败：' + (e.message || '网络异常'))
+        proxy.$message.error('Operation failed: ' + (e.message || 'Network error'))
       }
     }
 
@@ -314,11 +314,11 @@ export default {
     }
 
     /**
-     * 保存角色分配
+     * Save role assignment
      */
     const handleSaveRoles = async () => {
       if (selectedRoles.value.length === 0) {
-        proxy.$message.warning('至少需要分配一个角色')
+        proxy.$message.warning('At least one role must be assigned')
         return
       }
       if (!selectedUser.value) return
@@ -327,13 +327,13 @@ export default {
         const { code, message } = res.data
         if (code === 1) {
           selectedUser.value.roles = [...selectedRoles.value]
-          proxy.$message.success(`已更新 ${selectedUser.value.username} 的角色`)
+          proxy.$message.success(`Updated roles for ${selectedUser.value.username}`)
           closeRoleDialog()
         } else {
-          proxy.$message.error(message || '角色分配失败')
+          proxy.$message.error(message || 'Failed to assign roles')
         }
       } catch (e) {
-        proxy.$message.error('角色分配失败：' + (e.message || '网络异常'))
+        proxy.$message.error('Failed to assign roles: ' + (e.message || 'Network error'))
       }
     }
 
@@ -387,7 +387,7 @@ export default {
   margin: 0;
 }
 
-/* 工具栏 */
+/* Toolbar */
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -449,7 +449,7 @@ export default {
   color: var(--color-white);
 }
 
-/* 按钮 */
+/* Buttons */
 .btn {
   padding: var(--spacing-md) var(--spacing-xl);
   border: none;
@@ -481,7 +481,7 @@ export default {
   background: var(--glass-bg-hover);
 }
 
-/* 用户列表 */
+/* User List */
 .user-list {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -520,7 +520,7 @@ export default {
   border-bottom: none;
 }
 
-/* 用户头像 */
+/* User Avatar */
 .col-username {
   display: flex;
   align-items: center;
@@ -547,7 +547,7 @@ export default {
   color: var(--text-on-gradient-muted);
 }
 
-/* 角色标签 */
+/* Role Tags */
 .col-roles {
   display: flex;
   gap: var(--spacing-xs);
@@ -576,7 +576,7 @@ export default {
   color: #6ee7b7;
 }
 
-/* 状态 */
+/* Status */
 .col-status {
   display: flex;
   align-items: center;
@@ -598,12 +598,12 @@ export default {
   background: #6b7280;
 }
 
-  .col-action {
+.col-action {
   display: flex;
   gap: var(--spacing-sm);
 }
 
-/* 分页 */
+/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
@@ -667,14 +667,14 @@ export default {
   background: rgba(245, 158, 11, 0.6);
 }
 
-/* 空状态和加载状态 */
+/* Empty State and Loading State */
 .empty-state, .loading-state {
   text-align: center;
   padding: var(--spacing-4xl);
   color: var(--text-on-gradient-muted);
 }
 
-/* 弹窗 */
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -798,7 +798,7 @@ export default {
   border-top: 1px solid var(--glass-border);
 }
 
-/* 响应式 */
+/* Responsive */
 @media (max-width: 992px) {
   .list-header, .list-item {
     grid-template-columns: 40px 120px 1fr 150px 70px 120px 120px;

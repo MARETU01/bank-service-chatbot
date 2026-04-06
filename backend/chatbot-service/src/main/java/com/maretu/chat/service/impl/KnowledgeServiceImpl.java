@@ -44,11 +44,11 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
     private void checkAdminRole(String userJson) {
         Result<List<String>> result = userClient.getUserRoles(userJson);
         if (result == null || result.getData() == null) {
-            throw new RuntimeException("获取用户角色失败");
+            throw new RuntimeException("Failed to get user roles");
         }
         List<String> roles = result.getData();
         if (roles.isEmpty() || !roles.contains("ADMIN")) {
-            throw new RuntimeException("权限不足：需要 admin 角色才能执行此操作");
+            throw new RuntimeException("Insufficient permissions: admin role required to perform this action");
         }
     }
 
@@ -57,12 +57,12 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
      */
     private Map<String, Object> processDocument(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new RuntimeException("上传文件不能为空");
+            throw new RuntimeException("Uploaded file cannot be empty");
         }
 
         String filename = file.getOriginalFilename();
         if (filename == null) {
-            throw new RuntimeException("文件名不能为空");
+            throw new RuntimeException("Filename cannot be empty");
         }
 
         // 根据文件类型读取文档
@@ -73,14 +73,14 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
             documents = switch (fileType) {
                 case "pdf" -> readPdfDocument(file, filename);
                 case "txt" -> readTextDocument(file, filename);
-                default -> throw new RuntimeException("不支持的文件类型：" + fileType + "，目前仅支持 PDF 和 TXT 文件");
+                default -> throw new RuntimeException("Unsupported file type: " + fileType + ", currently only PDF and TXT files are supported");
             };
         } catch (IOException e) {
-            throw new RuntimeException("读取文件失败：" + e.getMessage(), e);
+            throw new RuntimeException("Failed to read file: " + e.getMessage(), e);
         }
 
         if (documents.isEmpty()) {
-            throw new RuntimeException("文档内容为空，无法入库");
+            throw new RuntimeException("Document content is empty, cannot import to knowledge base");
         }
 
         // 文本切片
@@ -132,7 +132,7 @@ public class KnowledgeServiceImpl implements IKnowledgeService {
         }
 
         if (successCount == 0) {
-            throw new RuntimeException("所有文件入库均失败");
+            throw new RuntimeException("All files failed to import to knowledge base");
         }
 
         return results;

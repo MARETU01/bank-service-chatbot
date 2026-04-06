@@ -1,26 +1,25 @@
-
 <template>
   <div class="chat-stats">
     <div class="page-header">
-      <h2>📈 对话统计概览</h2>
-      <p class="page-desc">查看智能客服的对话数据、AI 性能指标和安全防护统计</p>
+      <h2>📈 Chat Statistics</h2>
+      <p class="page-desc">View chat data, AI performance metrics, and security protection statistics</p>
     </div>
 
-    <!-- 加载状态 -->
+    <!-- Loading State -->
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
-      <p>正在加载统计数据...</p>
+      <p>Loading statistics...</p>
     </div>
 
-    <!-- 错误提示 -->
+    <!-- Error Message -->
     <div v-else-if="error" class="error-container">
       <div class="error-icon">❌</div>
       <p>{{ error }}</p>
-      <button class="btn btn-primary" @click="loadStats">重新加载</button>
+      <button class="btn btn-primary" @click="loadStats">Reload</button>
     </div>
 
     <template v-else>
-      <!-- 工具栏：时间范围筛选 + 刷新 -->
+      <!-- Toolbar: Time Range Filter + Refresh -->
       <div class="toolbar">
         <div class="toolbar-left">
           <div class="date-filter">
@@ -32,160 +31,160 @@
               </button>
             </div>
             <div class="date-inputs">
-              <input type="date" v-model="startDate" class="date-input" placeholder="开始日期" />
+              <input type="date" v-model="startDate" class="date-input" placeholder="Start Date" />
               <span class="date-sep">~</span>
-              <input type="date" v-model="endDate" class="date-input" placeholder="结束日期" />
-              <button class="btn btn-primary btn-sm" @click="loadStats" :disabled="refreshing">查询</button>
+              <input type="date" v-model="endDate" class="date-input" placeholder="End Date" />
+              <button class="btn btn-primary btn-sm" @click="loadStats" :disabled="refreshing">Query</button>
             </div>
           </div>
-          <span class="last-update" v-if="lastUpdateTime">最后更新：{{ lastUpdateTime }}</span>
+          <span class="last-update" v-if="lastUpdateTime">Last Updated: {{ lastUpdateTime }}</span>
         </div>
         <div class="toolbar-right">
-          <button class="btn btn-outline" @click="clearDateFilter" v-if="startDate || endDate">清除筛选</button>
+          <button class="btn btn-outline" @click="clearDateFilter" v-if="startDate || endDate">Clear Filter</button>
           <button class="btn btn-primary" @click="loadStats" :disabled="refreshing">
-            {{ refreshing ? '刷新中...' : '🔄 刷新数据' }}
+            {{ refreshing ? 'Refreshing...' : '🔄 Refresh Data' }}
           </button>
         </div>
       </div>
 
-      <!-- ===== 基础对话统计 ===== -->
+      <!-- ===== Basic Chat Statistics ===== -->
       <div class="section">
-        <h3 class="section-title">💬 基础对话统计</h3>
+        <h3 class="section-title">💬 Basic Chat Statistics</h3>
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon sessions">💬</div>
             <div class="stat-info">
-              <h4>总会话数</h4>
+              <h4>Total Sessions</h4>
               <p class="stat-value">{{ formatNumber(stats.totalSessions) }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon messages">📨</div>
             <div class="stat-info">
-              <h4>总消息数</h4>
+              <h4>Total Messages</h4>
               <p class="stat-value">{{ formatNumber(stats.totalMessages) }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon users">👤</div>
             <div class="stat-info">
-              <h4>用户消息</h4>
+              <h4>User Messages</h4>
               <p class="stat-value">{{ formatNumber(stats.userMessages) }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon ai">🤖</div>
             <div class="stat-info">
-              <h4>AI 回复</h4>
+              <h4>AI Responses</h4>
               <p class="stat-value">{{ formatNumber(stats.aiMessages) }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon active">🧑‍💻</div>
             <div class="stat-info">
-              <h4>活跃用户数</h4>
+              <h4>Active Users</h4>
               <p class="stat-value">{{ formatNumber(stats.activeUsers) }}</p>
             </div>
           </div>
           <div class="stat-card highlight-today">
             <div class="stat-icon today-sessions">📅</div>
             <div class="stat-info">
-              <h4>今日新增会话</h4>
+              <h4>Today's New Sessions</h4>
               <p class="stat-value">{{ formatNumber(stats.todaySessions) }}</p>
             </div>
           </div>
           <div class="stat-card highlight-today">
             <div class="stat-icon today-messages">📬</div>
             <div class="stat-info">
-              <h4>今日消息数</h4>
+              <h4>Today's Messages</h4>
               <p class="stat-value">{{ formatNumber(stats.todayMessages) }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon avg">📊</div>
             <div class="stat-info">
-              <h4>平均每会话消息</h4>
+              <h4>Avg Messages/Session</h4>
               <p class="stat-value">{{ stats.avgMessagesPerSession ?? '-' }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ===== AI 性能统计 ===== -->
+      <!-- ===== AI Performance Statistics ===== -->
       <div class="section">
-        <h3 class="section-title">🤖 AI 性能统计</h3>
+        <h3 class="section-title">🤖 AI Performance Statistics</h3>
         <div class="model-badge" v-if="stats.modelName">
-          <span class="model-label">当前模型</span>
+          <span class="model-label">Current Model</span>
           <span class="model-name">{{ stats.modelName }}</span>
         </div>
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon tokens">🪙</div>
             <div class="stat-info">
-              <h4>总 Token 消耗</h4>
+              <h4>Total Tokens Used</h4>
               <p class="stat-value">{{ formatNumber(stats.totalTokens) }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon prompt">📥</div>
             <div class="stat-info">
-              <h4>输入 Token</h4>
+              <h4>Input Tokens</h4>
               <p class="stat-value">{{ formatNumber(stats.totalPromptTokens) }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon completion">📤</div>
             <div class="stat-info">
-              <h4>输出 Token</h4>
+              <h4>Output Tokens</h4>
               <p class="stat-value">{{ formatNumber(stats.totalCompletionTokens) }}</p>
             </div>
           </div>
           <div class="stat-card highlight-today">
             <div class="stat-icon today-tokens">🔥</div>
             <div class="stat-info">
-              <h4>今日 Token 消耗</h4>
+              <h4>Today's Token Usage</h4>
               <p class="stat-value">{{ formatNumber(stats.todayTokens) }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon avg-tokens">⚡</div>
             <div class="stat-info">
-              <h4>平均每次 Token</h4>
+              <h4>Avg Tokens/Chat</h4>
               <p class="stat-value">{{ stats.avgTokensPerChat ?? '-' }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon avg-time">⏱️</div>
             <div class="stat-info">
-              <h4>平均响应时间</h4>
+              <h4>Avg Response Time</h4>
               <p class="stat-value">{{ formatMs(stats.avgResponseTimeMs) }}</p>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon max-time">🐢</div>
             <div class="stat-info">
-              <h4>最大响应时间</h4>
+              <h4>Max Response Time</h4>
               <p class="stat-value">{{ formatMs(stats.maxResponseTimeMs) }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ===== 安全防护统计 ===== -->
+      <!-- ===== Security Protection Statistics ===== -->
       <div class="section">
-        <h3 class="section-title">🛡️ 安全防护统计</h3>
+        <h3 class="section-title">🛡️ Security Protection Statistics</h3>
         <div class="stats-grid stats-grid-security">
           <div class="stat-card security-card">
             <div class="stat-icon blocked">🚫</div>
             <div class="stat-info">
-              <h4>被拦截消息数</h4>
+              <h4>Blocked Messages</h4>
               <p class="stat-value">{{ formatNumber(stats.blockedMessages) }}</p>
             </div>
           </div>
           <div class="stat-card security-card">
             <div class="stat-icon rate">📉</div>
             <div class="stat-info">
-              <h4>拦截率</h4>
+              <h4>Block Rate</h4>
               <p class="stat-value">{{ stats.blockRate != null ? (stats.blockRate * 100).toFixed(2) + '%' : '-' }}</p>
             </div>
           </div>
@@ -210,22 +209,22 @@ export default {
     const error = ref(null)
     const lastUpdateTime = ref('')
 
-    // 时间范围筛选
+    // Time range filter
     const startDate = ref('')
     const endDate = ref('')
-    const activeQuick = ref('全部')
+    const activeQuick = ref('All')
 
-    // 快捷时间选项
+    // Quick time options
     const quickOptions = [
-      { label: '全部', days: null },
-      { label: '今日', days: 0 },
-      { label: '近7天', days: 7 },
-      { label: '近30天', days: 30 },
-      { label: '近90天', days: 90 }
+      { label: 'All', days: null },
+      { label: 'Today', days: 0 },
+      { label: 'Last 7 Days', days: 7 },
+      { label: 'Last 30 Days', days: 30 },
+      { label: 'Last 90 Days', days: 90 }
     ]
 
     /**
-     * 应用快捷时间选项
+     * Apply quick time option
      */
     const applyQuickOption = (opt) => {
       activeQuick.value = opt.label
@@ -247,17 +246,17 @@ export default {
     }
 
     /**
-     * 清除日期筛选
+     * Clear date filter
      */
     const clearDateFilter = () => {
       startDate.value = ''
       endDate.value = ''
-      activeQuick.value = '全部'
+      activeQuick.value = 'All'
       loadStats()
     }
 
     /**
-     * 格式化日期为 yyyy-MM-dd
+     * Format date as yyyy-MM-dd
      */
     const formatDate = (date) => {
       const y = date.getFullYear()
@@ -267,7 +266,7 @@ export default {
     }
 
     /**
-     * 加载统计数据
+     * Load statistics
      */
     const loadStats = async () => {
       if (!loading.value) {
@@ -286,12 +285,12 @@ export default {
           stats.value = data
           lastUpdateTime.value = new Date().toLocaleString('zh-CN')
         } else {
-          error.value = message || '获取统计数据失败'
+          error.value = message || 'Failed to get statistics'
           proxy.$message.error(error.value)
         }
       } catch (err) {
-        console.error('加载统计数据失败:', err)
-        error.value = '加载统计数据失败：' + (err.response?.data?.message || err.message || '网络错误')
+        console.error('Failed to load statistics:', err)
+        error.value = 'Failed to load statistics: ' + (err.response?.data?.message || err.message || 'Network error')
         proxy.$message.error(error.value)
       } finally {
         loading.value = false
@@ -300,7 +299,7 @@ export default {
     }
 
     /**
-     * 格式化数字（千分位）
+     * Format number (thousands separator)
      */
     const formatNumber = (num) => {
       if (num == null) return '-'
@@ -308,7 +307,7 @@ export default {
     }
 
     /**
-     * 格式化毫秒时间
+     * Format milliseconds
      */
     const formatMs = (ms) => {
       if (ms == null) return '-'
@@ -364,7 +363,7 @@ export default {
   margin: 0;
 }
 
-/* 加载状态 */
+/* Loading State */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -392,7 +391,7 @@ export default {
   to { transform: rotate(360deg); }
 }
 
-/* 错误状态 */
+/* Error State */
 .error-container {
   display: flex;
   flex-direction: column;
@@ -413,7 +412,7 @@ export default {
   color: #f87171;
 }
 
-/* 工具栏 */
+/* Toolbar */
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -428,7 +427,7 @@ export default {
   font-size: var(--font-size-md);
 }
 
-/* 日期筛选 */
+/* Date Filter */
 .date-filter {
   display: flex;
   flex-direction: column;
@@ -520,7 +519,7 @@ export default {
   color: #fca5a5;
 }
 
-/* 按钮 */
+/* Buttons */
 .btn {
   padding: var(--spacing-md) var(--spacing-xl);
   border: none;
@@ -548,7 +547,7 @@ export default {
   box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
 }
 
-/* 区块 */
+/* Section */
 .section {
   margin-bottom: var(--spacing-3xl);
 }
@@ -562,7 +561,7 @@ export default {
   border-bottom: 1px solid var(--glass-border);
 }
 
-/* 模型标识 */
+/* Model Badge */
 .model-badge {
   display: inline-flex;
   align-items: center;
@@ -585,7 +584,7 @@ export default {
   font-weight: var(--font-weight-semibold);
 }
 
-/* 统计卡片网格 */
+/* Stats Grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -645,7 +644,7 @@ export default {
   flex-shrink: 0;
 }
 
-/* 基础统计图标背景 */
+/* Basic Stats Icons */
 .stat-icon.sessions { background: rgba(59, 130, 246, 0.2); }
 .stat-icon.messages { background: rgba(16, 185, 129, 0.2); }
 .stat-icon.users { background: rgba(139, 92, 246, 0.2); }
@@ -655,7 +654,7 @@ export default {
 .stat-icon.today-messages { background: rgba(59, 130, 246, 0.3); }
 .stat-icon.avg { background: rgba(107, 114, 128, 0.2); }
 
-/* AI 性能图标背景 */
+/* AI Performance Icons */
 .stat-icon.tokens { background: rgba(245, 158, 11, 0.2); }
 .stat-icon.prompt { background: rgba(59, 130, 246, 0.2); }
 .stat-icon.completion { background: rgba(16, 185, 129, 0.2); }
@@ -664,7 +663,7 @@ export default {
 .stat-icon.avg-time { background: rgba(16, 185, 129, 0.2); }
 .stat-icon.max-time { background: rgba(245, 158, 11, 0.2); }
 
-/* 安全防护图标背景 */
+/* Security Icons */
 .stat-icon.blocked { background: rgba(239, 68, 68, 0.2); }
 .stat-icon.rate { background: rgba(245, 158, 11, 0.2); }
 
@@ -682,7 +681,7 @@ export default {
   color: var(--color-white);
 }
 
-/* 响应式 */
+/* Responsive */
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));

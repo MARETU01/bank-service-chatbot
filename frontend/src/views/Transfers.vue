@@ -1,27 +1,27 @@
 <template>
   <div class="transfers">
     <div class="page-header">
-      <h2>转账服务</h2>
+      <h2>Transfer Service</h2>
     </div>
 
     <div class="transfer-container">
-      <!-- 转账表单 -->
+      <!-- Transfer Form -->
       <div class="transfer-form-section">
         <div class="form-card">
-          <h3>新建转账</h3>
+          <h3>New Transfer</h3>
           <form @submit.prevent="submitTransfer">
             <div class="form-group">
-              <label>付款账户 <span class="required">*</span></label>
+              <label>From Account <span class="required">*</span></label>
               <select v-model="transfer.fromAccount" required>
-                <option value="">请选择付款账户</option>
+                <option value="">Please select an account</option>
                 <option v-for="account in accounts" :key="account.id" :value="account.id">
-                  {{ account.accountName || '账户' }} (****{{ formatAccountLastFour(account.accountNumber) }}) - 余额：¥{{ formatNumber(account.balance) }}
+                  {{ account.accountName || 'Account' }} (****{{ formatAccountLastFour(account.accountNumber) }}) - Balance: ¥{{ formatNumber(account.balance) }}
                 </option>
               </select>
             </div>
 
             <div class="form-group">
-              <label>转账类型 <span class="required">*</span></label>
+              <label>Transfer Type <span class="required">*</span></label>
               <div class="transfer-type-selector">
                 <button 
                   type="button"
@@ -29,7 +29,7 @@
                   :class="{ active: transferType === 'internal' }"
                   @click="transferType = 'internal'"
                 >
-                  本人账户
+                  My Account
                 </button>
                 <button 
                   type="button"
@@ -37,96 +37,96 @@
                   :class="{ active: transferType === 'external' }"
                   @click="transferType = 'external'"
                 >
-                  他人账户
+                  Others' Account
                 </button>
               </div>
             </div>
 
-            <!-- 本人账户转账 -->
+            <!-- Internal Transfer -->
             <div class="form-group" v-if="transferType === 'internal'">
-              <label>收款账户 <span class="required">*</span></label>
+              <label>To Account <span class="required">*</span></label>
               <select v-model="selectedToAccount" required>
-                <option value="">请选择收款账户</option>
+                <option value="">Please select an account</option>
                 <option v-for="account in availableToAccounts" :key="account.id" :value="account">
-                  {{ account.accountName || '账户' }} ({{ account.accountNumber }}) - 余额：¥{{ formatNumber(account.balance) }}
+                  {{ account.accountName || 'Account' }} ({{ account.accountNumber }}) - Balance: ¥{{ formatNumber(account.balance) }}
                 </option>
               </select>
             </div>
 
-            <!-- 他人账户转账 -->
+            <!-- External Transfer -->
             <div class="form-group" v-if="transferType === 'external'">
-              <label>收款人账号 <span class="required">*</span></label>
+              <label>Recipient Account Number <span class="required">*</span></label>
               <input 
                 type="text" 
                 v-model="transfer.toAccountNumber" 
-                placeholder="请输入收款人账号"
+                placeholder="Please enter recipient account number"
               />
             </div>
 
             <div class="form-group" v-if="transferType === 'external'">
-              <label>收款人姓名 <span class="required">*</span></label>
+              <label>Recipient Name <span class="required">*</span></label>
               <input 
                 type="text" 
                 v-model="transfer.toAccountName" 
-                placeholder="请输入收款人姓名"
+                placeholder="Please enter recipient name"
               />
             </div>
 
             <div class="form-group" v-if="transferType === 'external'">
-              <label>收款银行</label>
+              <label>Recipient Bank</label>
               <input 
                 type="text" 
                 v-model="transfer.toBankName" 
-                placeholder="请输入开户行名称（选填）"
+                placeholder="Please enter bank name (optional)"
               />
             </div>
 
             <div class="form-group">
-              <label>转账金额 <span class="required">*</span></label>
+              <label>Amount <span class="required">*</span></label>
               <div class="amount-input">
                 <span class="currency">¥</span>
                 <input 
                   type="number" 
                   v-model="transfer.amount" 
-                  placeholder="请输入金额"
+                  placeholder="Please enter amount"
                   step="0.01"
                   min="0.01"
                   required
                 />
               </div>
-              <span class="error-msg" v-if="insufficientBalance">余额不足</span>
+              <span class="error-msg" v-if="insufficientBalance">Insufficient balance</span>
             </div>
 
             <div class="form-group">
-              <label>备注</label>
+              <label>Remark</label>
               <textarea 
                 v-model="transfer.remark" 
-                placeholder="请输入备注（选填）"
+                placeholder="Please enter remark (optional)"
                 rows="3"
               ></textarea>
             </div>
 
             <div class="form-actions">
-              <button type="button" class="btn reset" @click="resetForm">重置</button>
+              <button type="button" class="btn reset" @click="resetForm">Reset</button>
               <button type="submit" class="btn primary" :disabled="!canSubmit || loading">
-                {{ loading ? '处理中...' : '确认转账' }}
+                {{ loading ? 'Processing...' : 'Confirm Transfer' }}
               </button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- 右侧区域 -->
+      <!-- Right Sidebar -->
       <div class="payees-section">
-        <!-- 转账记录 -->
+        <!-- Transfer History -->
         <div class="history-card">
           <div class="card-header">
-            <h3>最近转账记录</h3>
+            <h3>Recent Transfers</h3>
           </div>
           <div class="history-list" v-if="recentTransfers.length > 0">
             <div class="history-item" v-for="item in recentTransfers" :key="item.id">
               <div class="history-info">
-                <div class="history-name">{{ item.toAccountName || '收款人' }}</div>
+                <div class="history-name">{{ item.toAccountName || 'Recipient' }}</div>
                 <div class="history-time">{{ formatDateTime(item.createdAt) }}</div>
               </div>
               <div class="history-amount" :class="getStatusClass(item.status)">
@@ -135,68 +135,68 @@
             </div>
           </div>
           <div class="empty-state" v-else>
-            <p>暂无转账记录</p>
+            <p>No transfer records</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 确认弹窗 -->
+    <!-- Confirmation Modal -->
     <div class="modal-overlay" v-if="showConfirm" @click="showConfirm = false">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>确认转账信息</h3>
+          <h3>Confirm Transfer</h3>
           <button class="close-btn" @click="showConfirm = false">×</button>
         </div>
         <div class="modal-body">
           <div class="confirm-info">
             <div class="info-row">
-              <span class="label">付款账户</span>
+              <span class="label">From Account</span>
               <span class="value">{{ selectedAccountName }}</span>
             </div>
             <div class="info-row">
-              <span class="label">收款人</span>
+              <span class="label">Recipient</span>
               <span class="value">{{ transfer.toAccountName }}</span>
             </div>
             <div class="info-row">
-              <span class="label">收款账号</span>
+              <span class="label">Account Number</span>
               <span class="value">{{ transfer.toAccountNumber }}</span>
             </div>
             <div class="info-row">
-              <span class="label">收款银行</span>
+              <span class="label">Bank</span>
               <span class="value">{{ transfer.toBankName || '-' }}</span>
             </div>
             <div class="info-row highlight">
-              <span class="label">转账金额</span>
+              <span class="label">Amount</span>
               <span class="value amount">¥{{ formatNumber(transfer.amount) }}</span>
             </div>
             <div class="info-row">
-              <span class="label">备注</span>
-              <span class="value">{{ transfer.remark || '无' }}</span>
+              <span class="label">Remark</span>
+              <span class="value">{{ transfer.remark || 'None' }}</span>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn cancel" @click="showConfirm = false">返回修改</button>
+          <button class="btn cancel" @click="showConfirm = false">Back</button>
           <button class="btn primary" @click="showPasswordInput" :disabled="confirmLoading">
-            下一步
+            Next
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 支付密码输入弹窗 -->
+    <!-- Password Input Modal -->
     <div class="modal-overlay" v-if="showPasswordModal" @click="showPasswordModal = false">
       <div class="modal password-modal" @click.stop>
         <div class="modal-header">
-          <h3>输入支付密码</h3>
+          <h3>Enter Payment Password</h3>
           <button class="close-btn" @click="closePasswordModal">×</button>
         </div>
         <div class="modal-body">
           <div class="password-info">
-            <p>请验证您的身份以完成转账</p>
+            <p>Please verify your identity to complete the transfer</p>
             <div class="amount-display">
-              <span class="label">转账金额</span>
+              <span class="label">Amount</span>
               <span class="value">¥{{ formatNumber(transfer.amount) }}</span>
             </div>
           </div>
@@ -204,7 +204,7 @@
             <input 
               type="password" 
               v-model="transfer.payPassword" 
-              placeholder="请输入支付密码"
+              placeholder="Please enter payment password"
               maxlength="6"
               ref="passwordInput"
               @keyup.enter="confirmTransfer"
@@ -212,22 +212,22 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn cancel" @click="closePasswordModal">返回</button>
+          <button class="btn cancel" @click="closePasswordModal">Back</button>
           <button class="btn primary" @click="confirmTransfer" :disabled="!transfer.payPassword || confirmLoading">
-            {{ confirmLoading ? '处理中...' : '确认支付' }}
+            {{ confirmLoading ? 'Processing...' : 'Confirm Payment' }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 转账成功弹窗 -->
+    <!-- Success Modal -->
     <div class="modal-overlay" v-if="showSuccess" @click="showSuccess = false">
       <div class="modal success-modal" @click.stop>
         <div class="success-icon">✓</div>
-        <h3>转账成功</h3>
-        <p>已向 {{ transfer.toAccountName }} 转账 ¥{{ formatNumber(transfer.amount) }}</p>
+        <h3>Transfer Successful</h3>
+        <p>Transferred ¥{{ formatNumber(transfer.amount) }} to {{ transfer.toAccountName }}</p>
         <div class="modal-footer">
-          <button class="btn primary" @click="showSuccess = false; resetForm()">完成</button>
+          <button class="btn primary" @click="showSuccess = false; resetForm()">Done</button>
         </div>
       </div>
     </div>
@@ -252,8 +252,8 @@ export default {
     const accounts = ref([])
     const recentTransfers = ref([])
 
-    const transferType = ref('internal') // 'internal' 或 'external'
-    const selectedToAccount = ref(null) // 选中的目标账户对象
+    const transferType = ref('internal') // 'internal' or 'external'
+    const selectedToAccount = ref(null) // selected recipient account object
 
     const transfer = reactive({
       fromAccount: '',
@@ -272,10 +272,10 @@ export default {
     })
 
     const selectedAccountName = computed(() => {
-      return selectedAccount.value ? (selectedAccount.value.accountName || '账户') : ''
+      return selectedAccount.value ? (selectedAccount.value.accountName || 'Account') : ''
     })
 
-    // 可用的目标账户列表（排除当前选中的付款账户）
+    // Available recipient accounts (excluding current from account)
     const availableToAccounts = computed(() => {
       return accounts.value.filter(a => a.id !== transfer.fromAccount)
     })
@@ -338,7 +338,7 @@ export default {
         const { code, data } = response.data
         if (code === 1 || code === 200) {
           accounts.value = data || []
-          // 如果 URL 中有 accountId 参数，默认选中
+          // If URL has accountId parameter, select it by default
           if (route.query.accountId) {
             transfer.fromAccount = parseInt(route.query.accountId)
           } else if (data && data.length > 0) {
@@ -375,24 +375,24 @@ export default {
       selectedToAccount.value = null
     }
 
-    // 监听转账类型变化，同步更新表单数据
+    // Watch transfer type changes, sync form data
     watch(() => transferType.value, (newType) => {
       if (newType === 'internal') {
-        // 切换到本人账户，清空外部转账数据
+        // Switch to internal transfer, clear external data
         transfer.toAccountNumber = ''
         transfer.toAccountName = ''
         transfer.toBankName = ''
       } else {
-        // 切换到外部账户，清空内部选择
+        // Switch to external transfer, clear internal selection
         selectedToAccount.value = null
       }
     })
 
-    // 监听选中的目标账户，同步到 transfer 对象
+    // Watch selected recipient account, sync to transfer object
     watch(() => selectedToAccount.value, (newAccount) => {
       if (newAccount) {
         transfer.toAccountNumber = newAccount.accountNumber
-        transfer.toAccountName = newAccount.accountName || '本人账户'
+        transfer.toAccountName = newAccount.accountName || 'My Account'
         transfer.toBankName = ''
       }
     })
@@ -405,7 +405,7 @@ export default {
     const showPasswordInput = () => {
       showConfirm.value = false
       showPasswordModal.value = true
-      // 自动聚焦到密码输入框
+      // Auto focus password input
       setTimeout(() => {
         if (passwordInput.value) {
           passwordInput.value.focus()
@@ -421,7 +421,7 @@ export default {
     const confirmTransfer = async () => {
       if (!selectedAccount.value) return
       if (!transfer.payPassword) {
-        proxy.$message.error('请输入支付密码')
+        proxy.$message.error('Please enter payment password')
         return
       }
       
@@ -443,15 +443,15 @@ export default {
         if (code === 1 || code === 200) {
           showPasswordModal.value = false
           showSuccess.value = true
-          // 刷新账户列表和转账记录
+          // Refresh account list and transfer records
           await loadAccounts()
           await loadRecentTransfers()
         } else {
-          proxy.$message.error(message || '转账失败')
+          proxy.$message.error(message || 'Transfer failed')
         }
       } catch (error) {
         console.error('Transfer error:', error)
-        const message = error.response?.data?.message || '转账失败，请检查密码是否正确'
+        const message = error.response?.data?.message || 'Transfer failed, please check if password is correct'
         proxy.$message.error(message)
       } finally {
         confirmLoading.value = false
@@ -462,7 +462,7 @@ export default {
       loadAccounts()
     })
 
-    // 监听账户变化，加载转账记录
+    // Watch account changes, load transfer records
     watch(() => transfer.fromAccount, () => {
       loadRecentTransfers()
     })
@@ -650,7 +650,7 @@ export default {
   cursor: not-allowed;
 }
 
-/* 转账类型选择器 */
+/* Transfer Type Selector */
 .transfer-type-selector {
   display: flex;
   gap: var(--spacing-md);
@@ -680,7 +680,7 @@ export default {
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
 }
 
-/* 历史记录 */
+/* History */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -747,7 +747,7 @@ export default {
   color: var(--text-on-gradient-muted);
 }
 
-/* 弹窗 */
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -835,7 +835,7 @@ export default {
   font-weight: var(--font-weight-bold);
 }
 
-/* 支付密码弹窗样式 */
+/* Payment Password Modal */
 .password-modal {
   max-width: 400px;
 }
@@ -902,7 +902,7 @@ export default {
   background: var(--glass-border-hover);
 }
 
-/* 成功弹窗 */
+/* Success Modal */
 .success-modal {
   text-align: center;
 }
@@ -940,7 +940,7 @@ export default {
   padding-top: 0;
 }
 
-/* 响应式设计 */
+/* Responsive */
 @media (max-width: 992px) {
   .transfer-container {
     grid-template-columns: 1fr;

@@ -1,57 +1,57 @@
 <template>
   <div class="reset-page">
     <div class="reset-container">
-      <!-- 左侧品牌区域 -->
+      <!-- Left Brand Section -->
       <div class="reset-brand">
         <div class="brand-content">
           <div class="brand-logo">🔐</div>
-          <h1>重设密码</h1>
-          <p class="brand-slogan">安全验证 · 快速找回 · 安心使用</p>
+          <h1>Reset Password</h1>
+          <p class="brand-slogan">Secure Verification · Quick Recovery · Peace of Mind</p>
           <p class="brand-description">
-            验证您的身份并设置新密码，
-            保障账户安全，我们与您同行。
+            Verify your identity and set a new password,
+            protecting your account security, we're with you.
           </p>
           <div class="brand-features">
             <div class="feature-item">
               <span class="feature-icon">📧</span>
-              <span>邮箱验证</span>
+              <span>Email Verification</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon">🔒</span>
-              <span>安全加密</span>
+              <span>Secure Encryption</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon">⚡</span>
-              <span>快速重置</span>
+              <span>Quick Reset</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon">🛡️</span>
-              <span>账户保护</span>
+              <span>Account Protection</span>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- 右侧表单区域 -->
+      <!-- Right Form Section -->
       <div class="reset-form-section">
         <div class="reset-form-wrapper">
           <div class="form-header">
-            <router-link to="/login" class="back-link" title="返回登录">
+            <router-link to="/login" class="back-link" title="Back to Sign In">
               <span class="back-icon">←</span>
-              <span>返回登录</span>
+              <span>Back to Sign In</span>
             </router-link>
           </div>
           
           <div class="form-title-section">
-            <h1>重设密码</h1>
-            <p>填写以下信息，重置您的密码</p>
+            <h1>Reset Password</h1>
+            <p>Fill in the information below to reset your password</p>
           </div>
           
           <form @submit.prevent="handleSubmit">
             <div class="form-group">
               <label for="reset-email">
                 <span class="label-icon">📧</span>
-                注册邮箱
+                Registered Email
                 <span class="required">*</span>
               </label>
               <div class="input-wrapper">
@@ -59,7 +59,7 @@
                   v-model="resetForm.email" 
                   type="email" 
                   id="reset-email" 
-                  placeholder="请输入注册时使用的邮箱"
+                  placeholder="Enter the email used during registration"
                   required
                   :class="{ 'input-error': emailError }"
                   @blur="validateEmail"
@@ -76,7 +76,7 @@
             <div class="form-group verification-group">
               <label for="reset-verification">
                 <span class="label-icon">🔑</span>
-                验证码
+                Verification Code
                 <span class="required">*</span>
               </label>
               <div class="verification-input-wrapper">
@@ -84,7 +84,7 @@
                   v-model="verification" 
                   type="text" 
                   id="reset-verification" 
-                  placeholder="请输入验证码"
+                  placeholder="Enter verification code"
                   required
                 >
                 <button 
@@ -93,7 +93,7 @@
                   class="verification-btn"
                   :disabled="countdown > 0 || isLoading"
                 >
-                  {{ countdown > 0 ? `重新发送 (${countdown})` : '获取验证码' }}
+                  {{ countdown > 0 ? `Resend (${countdown})` : 'Get Code' }}
                 </button>
               </div>
             </div>
@@ -102,7 +102,7 @@
               <div class="form-group">
                 <label for="reset-password">
                   <span class="label-icon">🔒</span>
-                  新密码
+                  New Password
                   <span class="required">*</span>
                 </label>
                 <div class="input-wrapper password-input">
@@ -110,7 +110,7 @@
                     v-model="resetForm.password" 
                     :type="showPassword ? 'text' : 'password'" 
                     id="reset-password" 
-                    placeholder="请设置新密码"
+                    placeholder="Set your new password"
                     required
                     :class="{ 'input-error': passwordError }"
                     @blur="validatePassword"
@@ -135,7 +135,7 @@
               <div class="form-group">
                 <label for="reset-confirm-password">
                   <span class="label-icon">🔐</span>
-                  确认密码
+                  Confirm Password
                   <span class="required">*</span>
                 </label>
                 <div class="input-wrapper password-input">
@@ -143,7 +143,7 @@
                     v-model="resetForm.confirmPassword" 
                     :type="showConfirmPassword ? 'text' : 'password'" 
                     id="reset-confirm-password" 
-                    placeholder="请再次输入新密码"
+                    placeholder="Confirm your new password"
                     required
                     :class="{ 'input-error': confirmPasswordError }"
                     @blur="validateConfirmPassword"
@@ -160,38 +160,38 @@
                 </div>
                 <transition name="fade">
                   <span v-if="confirmPasswordError" class="error-message">
-                    <span class="error-icon">⚠️</span> {{ confirmPasswordError }}
-                  </span>
+                  <span class="error-icon">⚠️</span> {{ confirmPasswordError }}
+                </span>
                 </transition>
               </div>
             </div>
             
             <div class="password-requirements">
-              <h4>密码要求：</h4>
+              <h4>Password Requirements:</h4>
               <ul>
-                <li :class="{ valid: resetForm.password.length >= 6 }">至少 6 个字符</li>
-                <li :class="{ valid: resetForm.password.length >= 8 }">建议 8 个字符以上更安全</li>
+                <li :class="{ valid: resetForm.password.length >= 6 }">At least 6 characters</li>
+                <li :class="{ valid: resetForm.password.length >= 8 }">8+ characters recommended for better security</li>
               </ul>
             </div>
             
-            <!-- 成功提示 -->
+            <!-- Success Message -->
             <transition name="slide-fade">
               <div v-if="isSuccess" class="success-message">
                 <div class="success-icon">✅</div>
-                <h3>密码重置成功！</h3>
-                <p>请使用新密码登录</p>
+                <h3>Password Reset Successful!</h3>
+                <p>Please sign in with your new password</p>
               </div>
             </transition>
             
             <button type="submit" class="reset-btn" :disabled="isLoading || isSuccess">
               <span v-if="isLoading" class="loading-spinner"></span>
-              <span v-if="isSuccess">重置成功</span>
-              <span v-else>{{ isLoading ? '重置中...' : '确认重置' }}</span>
+              <span v-if="isSuccess">Reset Successful</span>
+              <span v-else>{{ isLoading ? 'Resetting...' : 'Confirm Reset' }}</span>
             </button>
             
             <div v-if="isSuccess" class="success-actions">
               <router-link to="/login" class="login-btn">
-                <span>返回登录</span>
+                <span>Back to Sign In</span>
               </router-link>
             </div>
           </form>
@@ -230,7 +230,7 @@ export default {
       }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        this.emailError = '请输入正确的邮箱格式';
+        this.emailError = 'Please enter a valid email address';
       } else {
         this.emailError = '';
       }
@@ -243,7 +243,7 @@ export default {
         return;
       }
       if (password.length < 6) {
-        this.passwordError = '密码长度不能少于 6 位';
+        this.passwordError = 'Password must be at least 6 characters';
       } else {
         this.passwordError = '';
       }
@@ -257,7 +257,7 @@ export default {
         return;
       }
       if (password !== confirmPassword) {
-        this.confirmPasswordError = '两次输入的密码不一致';
+        this.confirmPasswordError = 'Passwords do not match';
       } else {
         this.confirmPasswordError = '';
       }
@@ -281,14 +281,14 @@ export default {
           }
         });
         if (response.data.code === 1) {
-          this.$message.success(response.data.message || '验证码发送成功');
+          this.$message.success(response.data.message || 'Verification code sent successfully');
           this.startCountdown();
         } else {
-          this.$message.error(response.data.message || '验证码发送失败');
+          this.$message.error(response.data.message || 'Failed to send verification code');
         }
       } catch (error) {
-        console.error('验证码请求错误:', error);
-        this.$message.error('网络错误，请稍后重试');
+        console.error('Verification code request error:', error);
+        this.$message.error('Network error, please try again later');
       } finally {
         this.isLoading = false;
       }
@@ -314,12 +314,12 @@ export default {
       }
 
       if (!this.resetForm.email || !this.verification) {
-        this.$message.warning('请填写邮箱和验证码');
+        this.$message.warning('Please fill in your email and verification code');
         return;
       }
 
       if (this.resetForm.password.length < 6) {
-        this.$message.warning('密码长度不能少于 6 位');
+        this.$message.warning('Password must be at least 6 characters');
         return;
       }
 
@@ -335,16 +335,16 @@ export default {
           }
         });
         
-        console.log('重置密码返回数据:', response.data);
+        console.log('Reset password response:', response.data);
         if (response.data.code === 1) {
           this.isSuccess = true;
-          this.$message.success('密码重置成功！');
+          this.$message.success('Password reset successful!');
         } else {
-          this.$message.error(response.data.message || '重置失败');
+          this.$message.error(response.data.message || 'Reset failed');
         }
       } catch (error) {
-        console.error('重置密码请求错误:', error);
-        this.$message.error(error.response?.data?.message || '重置失败，请检查网络后重试');
+        console.error('Reset password request error:', error);
+        this.$message.error(error.response?.data?.message || 'Reset failed, please check your network and try again');
       } finally {
         this.isLoading = false;
       }

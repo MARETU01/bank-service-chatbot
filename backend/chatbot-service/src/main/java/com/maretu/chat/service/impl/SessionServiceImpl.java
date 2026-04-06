@@ -176,7 +176,7 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
                 .eq(Session::getUserId, userId)
                 .one();
         if (session == null || !session.getUserId().equals(Long.valueOf(userId))) {
-            throw new RuntimeException("会话不存在或无权限删除");
+            throw new RuntimeException("Session does not exist or no permission to delete");
         }
         boolean removed = removeById(session.getId());
 
@@ -191,7 +191,7 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
     @Override
     public Boolean renameSession(Integer userId, String sessionId, Session session) {
         if (!isSessionOwner(userId, sessionId)) {
-            throw new RuntimeException("无权修改该会话");
+            throw new RuntimeException("No permission to modify this session");
         }
         return lambdaUpdate()
                 .eq(Session::getSessionId, sessionId)

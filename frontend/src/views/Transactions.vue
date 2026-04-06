@@ -1,73 +1,73 @@
 <template>
   <div class="transactions">
     <div class="page-header">
-      <h2>交易记录</h2>
+      <h2>Transaction History</h2>
       <div class="header-actions">
         <button class="export-btn" @click="exportTransactions">
-          <span>📥</span> 导出记录
+          <span>📥</span> Export Records
         </button>
       </div>
     </div>
 
-    <!-- 筛选条件 -->
+    <!-- Filter Section -->
     <div class="filter-section">
       <div class="filter-row">
         <div class="filter-group">
-          <label>账户</label>
+          <label>Account</label>
           <select v-model="filters.accountId" @change="onAccountChange">
-            <option value="all">全部账户</option>
+            <option value="all">All Accounts</option>
             <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-              {{ acc.accountName || '账户' }} ({{ acc.accountNumber }})
+              {{ acc.accountName || 'Account' }} ({{ acc.accountNumber }})
             </option>
           </select>
         </div>
         <div class="filter-group">
-          <label>交易类型</label>
+          <label>Transaction Type</label>
           <select v-model="filters.type">
-            <option value="">全部</option>
-            <option value="DEPOSIT">存款</option>
-            <option value="WITHDRAW">取款</option>
-            <option value="TRANSFER_IN">转入</option>
-            <option value="TRANSFER_OUT">转出</option>
-            <option value="PAYMENT">支付</option>
+            <option value="">All</option>
+            <option value="DEPOSIT">Deposit</option>
+            <option value="WITHDRAW">Withdrawal</option>
+            <option value="TRANSFER_IN">Transfer In</option>
+            <option value="TRANSFER_OUT">Transfer Out</option>
+            <option value="PAYMENT">Payment</option>
           </select>
         </div>
         <div class="filter-group">
-          <label>状态</label>
+          <label>Status</label>
           <select v-model="filters.status">
-            <option value="">全部</option>
-            <option value="1">成功</option>
-            <option value="0">失败</option>
-            <option value="2">处理中</option>
+            <option value="">All</option>
+            <option value="1">Success</option>
+            <option value="0">Failed</option>
+            <option value="2">Processing</option>
           </select>
         </div>
         <div class="filter-group">
-          <label>开始日期</label>
+          <label>Start Date</label>
           <input type="date" v-model="filters.startDate" />
         </div>
         <div class="filter-group">
-          <label>结束日期</label>
+          <label>End Date</label>
           <input type="date" v-model="filters.endDate" />
         </div>
         <div class="filter-group">
           <label>&nbsp;</label>
-          <button class="search-btn" @click="searchTransactions">搜索</button>
+          <button class="search-btn" @click="searchTransactions">Search</button>
         </div>
       </div>
     </div>
 
-    <!-- 交易列表 -->
+    <!-- Transaction List -->
     <div class="transactions-table" v-if="transactions.length > 0">
       <table>
         <thead>
           <tr>
-            <th>交易时间</th>
-            <th>交易类型</th>
-            <th>对方账户/商户</th>
-            <th>摘要</th>
-            <th>金额</th>
-            <th>状态</th>
-            <th>操作</th>
+            <th>Time</th>
+            <th>Type</th>
+            <th>Counterparty/Merchant</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -89,72 +89,72 @@
               </span>
             </td>
             <td>
-              <button class="detail-btn" @click="viewDetail(item)">详情</button>
+              <button class="detail-btn" @click="viewDetail(item)">Details</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="empty-state" v-else>
-      <p>暂无交易记录</p>
+      <p>No transaction records</p>
     </div>
 
-    <!-- 分页 -->
+    <!-- Pagination -->
     <div class="pagination" v-if="transactions.length > 0">
-      <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)">上一页</button>
-      <span class="page-info">第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
-      <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">下一页</button>
+      <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)">Previous</button>
+      <span class="page-info">Page {{ currentPage }} / {{ totalPages }}</span>
+      <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">Next</button>
     </div>
 
-    <!-- 交易详情弹窗 -->
+    <!-- Transaction Details Modal -->
     <div class="modal-overlay" v-if="selectedTransaction" @click="selectedTransaction = null">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>交易详情</h3>
+          <h3>Transaction Details</h3>
           <button class="close-btn" @click="selectedTransaction = null">×</button>
         </div>
         <div class="modal-body">
           <div class="detail-grid">
             <div class="detail-item">
-              <span class="label">交易 ID</span>
+              <span class="label">Transaction ID</span>
               <span class="value">{{ selectedTransaction.id }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">交易流水号</span>
+              <span class="label">Transaction Reference</span>
               <span class="value">{{ selectedTransaction.transactionId }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">交易时间</span>
+              <span class="label">Transaction Time</span>
               <span class="value">{{ formatDateTime(selectedTransaction.transactionTime) }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">交易类型</span>
+              <span class="label">Transaction Type</span>
               <span class="value">{{ getTypeText(selectedTransaction.transactionType) }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">交易金额</span>
+              <span class="label">Amount</span>
               <span class="value amount" :class="getAmountClass(selectedTransaction.transactionType)">
                 {{ isIncomeType(selectedTransaction.transactionType) ? '+' : '-' }}¥{{ formatNumber(selectedTransaction.amount) }}
               </span>
             </div>
             <div class="detail-item">
-              <span class="label">交易后余额</span>
+              <span class="label">Balance After</span>
               <span class="value">¥ {{ formatNumber(selectedTransaction.balanceAfter) }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">对方账户</span>
+              <span class="label">Counterparty Account</span>
               <span class="value">{{ selectedTransaction.counterpartyAccount || '-' }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">对方名称</span>
+              <span class="label">Counterparty Name</span>
               <span class="value">{{ selectedTransaction.counterpartyName || '-' }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">摘要</span>
+              <span class="label">Description</span>
               <span class="value">{{ selectedTransaction.description || '-' }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">交易状态</span>
+              <span class="label">Status</span>
               <span class="value">
                 <span class="status-badge" :class="getStatusClass(selectedTransaction.status)">
                   {{ getStatusText(selectedTransaction.status) }}
@@ -164,8 +164,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn cancel" @click="selectedTransaction = null">关闭</button>
-          <button class="btn primary" @click="printReceipt">打印回单</button>
+          <button class="btn cancel" @click="selectedTransaction = null">Close</button>
+          <button class="btn primary" @click="printReceipt">Print Receipt</button>
         </div>
       </div>
     </div>
@@ -237,11 +237,11 @@ export default {
 
     const getTypeText = (type) => {
       const typeMap = {
-        'DEPOSIT': '存款',
-        'WITHDRAW': '取款',
-        'TRANSFER_IN': '转入',
-        'TRANSFER_OUT': '转出',
-        'PAYMENT': '支付'
+        'DEPOSIT': 'Deposit',
+        'WITHDRAW': 'Withdrawal',
+        'TRANSFER_IN': 'Transfer In',
+        'TRANSFER_OUT': 'Transfer Out',
+        'PAYMENT': 'Payment'
       }
       return typeMap[type] || type
     }
@@ -265,11 +265,11 @@ export default {
 
     const getStatusText = (status) => {
       const statusMap = {
-        0: '失败',
-        1: '成功',
-        2: '处理中'
+        0: 'Failed',
+        1: 'Success',
+        2: 'Processing'
       }
-      return statusMap[status] || '未知'
+      return statusMap[status] || 'Unknown'
     }
 
     const loadAccounts = async () => {
@@ -278,7 +278,7 @@ export default {
         const { code, data } = response.data
         if (code === 1 || code === 200) {
           accounts.value = data || []
-          // 如果有账户，默认选择第一个
+          // If there are accounts, select the first one by default
           if (data && data.length > 0) {
             filters.accountId = data[0].id
             loadTransactions()
@@ -290,7 +290,7 @@ export default {
     }
 
     const loadTransactions = async () => {
-      // 当 accountId 为空时，不加载数据
+      // When accountId is empty, do not load data
       if (!filters.accountId) {
         transactions.value = []
         return
@@ -308,7 +308,7 @@ export default {
         if (filters.startDate) params.startDate = filters.startDate
         if (filters.endDate) params.endDate = filters.endDate
 
-        // 当查询所有账户时，不传 accountId
+        // When querying all accounts, do not pass accountId
         if (filters.accountId !== 'all') {
           params.accountId = filters.accountId
         }
@@ -321,7 +321,7 @@ export default {
         }
       } catch (error) {
         console.error('Load transactions error:', error)
-        proxy.$message.error('获取交易记录失败')
+        proxy.$message.error('Failed to get transaction records')
       } finally {
         loading.value = false
       }
@@ -349,11 +349,11 @@ export default {
     }
 
     const exportTransactions = () => {
-      proxy.$message.info('导出功能待实现')
+      proxy.$message.info('Export feature not yet implemented')
     }
 
     const printReceipt = () => {
-      proxy.$message.info('打印回单功能待实现')
+      proxy.$message.info('Print receipt feature not yet implemented')
     }
 
     const totalPages = computed(() => {

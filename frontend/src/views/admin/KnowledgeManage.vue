@@ -1,28 +1,28 @@
 <template>
   <div class="knowledge-manage">
     <div class="page-header">
-      <h2>📚 知识库管理</h2>
-      <p class="page-desc">管理智能客服的知识库内容，上传文档自动向量化入库</p>
+      <h2>📚 Knowledge Base Management</h2>
+      <p class="page-desc">Manage the knowledge base content for the chatbot, upload documents for automatic vectorization</p>
     </div>
 
-    <!-- 重要提示 -->
+    <!-- Important Notice -->
     <div class="notice-card">
       <div class="notice-icon">⚠️</div>
       <div class="notice-content">
-        <h4>文档上传须知</h4>
+        <h4>Document Upload Guidelines</h4>
         <ul>
-          <li><strong>PDF 文件</strong>：按<strong>每一页</strong>进行切片（pagesPerDocument=1），每页作为一个独立文档进行向量化。务必使用此格式提交 PDF，否则会导致知识库切片异常。</li>
-          <li><strong>TXT 文件</strong>：整个文件作为一个文档，经 TokenTextSplitter 按 800 token 切片后入库。</li>
-          <li>上传后文档会自动进行<strong>文本切片 → Embedding 向量化 → 写入 Redis 向量库</strong>，过程可能需要一些时间。</li>
-          <li>目前仅支持 <strong>PDF</strong> 和 <strong>TXT</strong> 格式。</li>
+          <li><strong>PDF Files</strong>: Each <strong>page</strong> is processed separately (pagesPerDocument=1), with each page vectorized as an independent document. Be sure to use this format for PDF submission, otherwise it may cause abnormal knowledge base slicing.</li>
+          <li><strong>TXT Files</strong>: The entire file is treated as one document, sliced by TokenTextSplitter at 800 tokens before being stored.</li>
+          <li>After upload, documents will automatically undergo <strong>text slicing → Embedding vectorization → Writing to Redis vector database</strong>. This process may take some time.</li>
+          <li>Currently only <strong>PDF</strong> and <strong>TXT</strong> formats are supported.</li>
         </ul>
       </div>
     </div>
 
-    <!-- 操作栏 -->
+    <!-- Toolbar -->
     <div class="toolbar">
       <div class="toolbar-left">
-        <button class="btn btn-success" @click="triggerFileInput">📤 上传文档</button>
+        <button class="btn btn-success" @click="triggerFileInput">📤 Upload Documents</button>
         <input
           ref="fileInput"
           type="file"
@@ -31,16 +31,16 @@
           style="display: none"
           @change="handleFileSelect"
         />
-        <span class="file-hint">支持 PDF、TXT，可多选</span>
+        <span class="file-hint">PDF, TXT supported. Multiple files allowed</span>
       </div>
       <div class="toolbar-right">
         <button class="btn btn-danger" @click="handleClearKnowledge" :disabled="clearing">
-          {{ clearing ? '清空中...' : '🗑️ 清空知识库' }}
+          {{ clearing ? 'Clearing...' : '🗑️ Clear Knowledge Base' }}
         </button>
       </div>
     </div>
 
-    <!-- 拖拽上传区域 -->
+    <!-- Drag & Drop Upload Zone -->
     <div
       class="upload-zone"
       :class="{ 'drag-over': isDragOver, 'uploading': uploading }"
@@ -50,8 +50,8 @@
     >
       <div v-if="uploading" class="upload-progress">
         <div class="spinner"></div>
-        <p>正在上传并处理文档，请稍候...</p>
-        <p class="progress-hint">PDF 会按每页切片后进行向量化，可能需要较长时间</p>
+        <p>Uploading and processing documents, please wait...</p>
+        <p class="progress-hint">PDFs will be vectorized after page-by-page slicing, which may take longer</p>
         <div v-if="uploadProgress > 0" class="progress-bar">
           <div class="progress-fill" :style="{ width: uploadProgress + '%' }"></div>
         </div>
@@ -59,20 +59,20 @@
       </div>
       <div v-else>
         <div class="upload-icon">📁</div>
-        <p class="upload-text">将文件拖拽到此处，或点击上方按钮选择文件</p>
-        <p class="upload-hint">支持 PDF（按每页切片）和 TXT 文件，可批量上传</p>
+        <p class="upload-text">Drag and drop files here, or click the button above to select files</p>
+        <p class="upload-hint">PDF (page-by-page slicing) and TXT files supported. Batch upload allowed</p>
       </div>
     </div>
 
-    <!-- 待上传文件列表 -->
+    <!-- Pending Files List -->
     <div v-if="selectedFiles.length > 0" class="pending-files">
       <div class="section-header">
-        <h3>📋 待上传文件（{{ selectedFiles.length }} 个）</h3>
+        <h3>📋 Files to Upload ({{ selectedFiles.length }})</h3>
         <div class="section-actions">
           <button class="btn btn-primary" @click="handleUpload" :disabled="uploading">
-            {{ uploading ? '上传中...' : '确认上传' }}
+            {{ uploading ? 'Uploading...' : 'Confirm Upload' }}
           </button>
-          <button class="btn btn-cancel" @click="clearSelectedFiles" :disabled="uploading">清空列表</button>
+          <button class="btn btn-cancel" @click="clearSelectedFiles" :disabled="uploading">Clear List</button>
         </div>
       </div>
       <div class="file-list">
@@ -84,18 +84,18 @@
             <span class="file-type-tag" :class="getFileTypeClass(file.name)">
               {{ getFileExtension(file.name).toUpperCase() }}
             </span>
-            <span v-if="getFileExtension(file.name) === 'pdf'" class="slice-hint">按每页切片</span>
+            <span v-if="getFileExtension(file.name) === 'pdf'" class="slice-hint">Page-by-page slicing</span>
           </div>
           <button class="btn-sm btn-delete" @click="removeFile(index)" :disabled="uploading">✕</button>
         </div>
       </div>
     </div>
 
-    <!-- 上传结果 -->
+    <!-- Upload Results -->
     <div v-if="uploadResults.length > 0" class="upload-results">
       <div class="section-header">
-        <h3>📊 最近上传结果</h3>
-        <button class="btn-sm btn-clear-results" @click="uploadResults = []">清除记录</button>
+        <h3>📊 Recent Upload Results</h3>
+        <button class="btn-sm btn-clear-results" @click="uploadResults = []">Clear Records</button>
       </div>
       <div class="result-list">
         <div
@@ -108,17 +108,17 @@
           <div class="result-info">
             <span class="result-filename">{{ result.filename }}</span>
             <span v-if="result.status === 'success' && result.detail" class="result-detail">
-              类型: {{ result.detail.fileType?.toUpperCase() }} |
-              原始文档数: {{ result.detail.originalDocCount }} |
-              切片数: {{ result.detail.chunkCount }}
+              Type: {{ result.detail.fileType?.toUpperCase() }} |
+              Original Docs: {{ result.detail.originalDocCount }} |
+              Chunks: {{ result.detail.chunkCount }}
             </span>
             <span v-if="result.status === 'failed'" class="result-error">
-              失败原因: {{ result.error }}
+              Error: {{ result.error }}
             </span>
           </div>
           <div class="result-status">
             <span class="status-badge" :class="result.status === 'success' ? 'active' : 'inactive'">
-              {{ result.status === 'success' ? '成功' : '失败' }}
+              {{ result.status === 'success' ? 'Success' : 'Failed' }}
             </span>
           </div>
         </div>
@@ -148,14 +148,14 @@ export default {
     const ALLOWED_EXTENSIONS = ['pdf', 'txt']
 
     /**
-     * 触发文件选择框
+     * Trigger file selection dialog
      */
     const triggerFileInput = () => {
       fileInput.value?.click()
     }
 
     /**
-     * 处理文件选择
+     * Handle file selection
      */
     const handleFileSelect = (event) => {
       const files = Array.from(event.target.files)
@@ -165,7 +165,7 @@ export default {
     }
 
     /**
-     * 处理拖拽放置
+     * Handle drag and drop
      */
     const handleDrop = (event) => {
       isDragOver.value = false
@@ -174,7 +174,7 @@ export default {
     }
 
     /**
-     * 添加文件到待上传列表（带校验）
+     * Add files to pending upload list (with validation)
      */
     const addFiles = (files) => {
       const validFiles = []
@@ -194,38 +194,38 @@ export default {
       })
 
       if (invalidFiles.length > 0) {
-        proxy.$message.warning(`以下文件格式不支持，已跳过：${invalidFiles.join('、')}。仅支持 PDF 和 TXT 格式。`)
+        proxy.$message.warning(`The following file formats are not supported and have been skipped: ${invalidFiles.join(', ')}. Only PDF and TXT formats are supported.`)
       }
 
       if (validFiles.length > 0) {
         selectedFiles.value.push(...validFiles)
-        proxy.$message.success(`已添加 ${validFiles.length} 个文件`)
+        proxy.$message.success(`${validFiles.length} file(s) added`)
       }
     }
 
     /**
-     * 移除待上传文件
+     * Remove pending file
      */
     const removeFile = (index) => {
       selectedFiles.value.splice(index, 1)
     }
 
     /**
-     * 清空待上传列表
+     * Clear pending list
      */
     const clearSelectedFiles = () => {
       selectedFiles.value = []
     }
 
     /**
-     * 执行上传
-     * 注意：PDF 文件在后端会按每一页进行切片（pagesPerDocument=1），
-     *       务必使用 multipart/form-data 格式，参数名为 "files"，
-     *       不要修改此提交格式，否则会导致知识库切片问题
+     * Execute upload
+     * Note: PDF files will be sliced page by page on the backend (pagesPerDocument=1),
+     *       be sure to use multipart/form-data format with parameter name "files",
+     *       do not modify this submission format, otherwise it will cause knowledge base slicing issues
      */
     const handleUpload = async () => {
       if (selectedFiles.value.length === 0) {
-        proxy.$message.warning('请先选择要上传的文件')
+        proxy.$message.warning('Please select files to upload first')
         return
       }
 
@@ -253,19 +253,19 @@ export default {
           const failCount = data?.filter(r => r.status === 'failed').length || 0
 
           if (failCount === 0) {
-            proxy.$message.success(`全部上传成功！共 ${successCount} 个文件已入库`)
+            proxy.$message.success(`All files uploaded successfully! ${successCount} file(s) stored`)
           } else {
-            proxy.$message.warning(`上传完成：${successCount} 个成功，${failCount} 个失败`)
+            proxy.$message.warning(`Upload completed: ${successCount} successful, ${failCount} failed`)
           }
 
           // 清空待上传列表
           selectedFiles.value = []
         } else {
-          proxy.$message.error(message || '上传失败')
+          proxy.$message.error(message || 'Upload failed')
         }
       } catch (error) {
-        console.error('上传文档失败:', error)
-        proxy.$message.error('上传失败：' + (error.response?.data?.message || error.message || '网络错误'))
+        console.error('Upload documents failed:', error)
+        proxy.$message.error('Upload failed: ' + (error.response?.data?.message || error.message || 'Network error'))
       } finally {
         uploading.value = false
         uploadProgress.value = 0
@@ -273,10 +273,10 @@ export default {
     }
 
     /**
-     * 清空知识库
+     * Clear knowledge base
      */
     const handleClearKnowledge = async () => {
-      if (!confirm('⚠️ 确定要清空整个知识库吗？\n\n此操作将删除所有已入库的向量数据，不可恢复！')) {
+      if (!confirm('⚠️ Are you sure you want to clear the entire knowledge base?\n\nThis operation will delete all vector data in the database and cannot be undone!')) {
         return
       }
 
@@ -285,20 +285,20 @@ export default {
         const response = await knowledgeApi.clearKnowledge()
         const { code, message } = response.data
         if (code === 1 || code === 200) {
-          proxy.$message.success('知识库已清空')
+          proxy.$message.success('Knowledge base cleared')
           uploadResults.value = []
         } else {
-          proxy.$message.error(message || '清空失败')
+          proxy.$message.error(message || 'Clear failed')
         }
       } catch (error) {
-        console.error('清空知识库失败:', error)
-        proxy.$message.error('清空失败：' + (error.response?.data?.message || error.message || '网络错误'))
+        console.error('Clear knowledge base failed:', error)
+        proxy.$message.error('Clear failed: ' + (error.response?.data?.message || error.message || 'Network error'))
       } finally {
         clearing.value = false
       }
     }
 
-    // ==================== 工具方法 ====================
+    // ==================== Utility Methods ====================
 
     const getFileExtension = (filename) => {
       return filename.substring(filename.lastIndexOf('.') + 1).toLowerCase()

@@ -1,57 +1,57 @@
 <template>
   <div class="login-page">
     <div class="login-container">
-      <!-- 左侧品牌区域 -->
+      <!-- Left Brand Section -->
       <div class="login-brand">
         <div class="brand-content">
           <div class="brand-logo">🏦</div>
-          <h1>银行服务机器人</h1>
-          <p class="brand-slogan">智能服务 · 安全便捷 · 随时相伴</p>
+          <h1>Bank Service Chatbot</h1>
+          <p class="brand-slogan">Intelligent Service · Secure & Convenient · Always Here</p>
           <p class="brand-description">
-            体验全新的银行服务方式，AI 智能助手 24 小时在线，
-            为您提供专业、高效、安全的金融服务。
+            Experience a new way of banking with our AI-powered assistant available 24/7,
+            providing professional, efficient, and secure financial services.
           </p>
           <div class="brand-features">
             <div class="feature-item">
               <span class="feature-icon">🔒</span>
-              <span>安全加密</span>
+              <span>Secure & Encrypted</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon">⚡</span>
-              <span>极速响应</span>
+              <span>Fast Response</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon">🤖</span>
-              <span>AI 智能</span>
+              <span>AI-Powered</span>
             </div>
             <div class="feature-item">
               <span class="feature-icon">🌟</span>
-              <span>专业服务</span>
+              <span>Professional Service</span>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- 右侧表单区域 -->
+      <!-- Right Form Section -->
       <div class="login-form-section">
         <div class="login-form-wrapper">
           <div class="form-header">
-            <router-link to="/" class="home-link" title="返回首页">
+            <router-link to="/" class="home-link" title="Back to Home">
               <span class="home-icon">←</span>
-              <span>返回首页</span>
+              <span>Back to Home</span>
             </router-link>
           </div>
           
           <div class="form-title-section">
-            <h1>欢迎回来</h1>
-            <p>登录您的账户，开启智能银行服务</p>
+            <h1>Welcome Back</h1>
+            <p>Sign in to your account to start intelligent banking services</p>
           </div>
           
           <form @submit.prevent="handleLogin">
             <div class="form-group">
               <label for="login-account">
                 <span class="label-icon">📱</span>
-                手机号 / 邮箱
+                Phone / Email
                 <span class="required">*</span>
               </label>
               <div class="input-wrapper">
@@ -59,7 +59,7 @@
                   v-model="loginForm.account" 
                   type="text" 
                   id="login-account" 
-                  placeholder="请输入手机号或邮箱"
+                  placeholder="Enter phone number or email"
                   required
                   :class="{ 'input-error': accountError }"
                   @blur="validateAccount"
@@ -76,7 +76,7 @@
             <div class="form-group">
               <label for="login-password">
                 <span class="label-icon">🔒</span>
-                密码
+                Password
                 <span class="required">*</span>
               </label>
               <div class="input-wrapper password-input">
@@ -84,7 +84,7 @@
                   v-model="loginForm.password" 
                   :type="showPassword ? 'text' : 'password'" 
                   id="login-password" 
-                  placeholder="请输入密码"
+                  placeholder="Enter password"
                   required
                 >
                 <button 
@@ -100,18 +100,18 @@
             
             <div class="form-options">
               <router-link to="/reset-password" class="forgot-link">
-                忘记密码？
+                Forgot Password?
               </router-link>
             </div>
             
             <button type="submit" class="login-btn" :disabled="loading">
               <span v-if="loading" class="loading-spinner"></span>
-              <span>{{ loading ? '登录中...' : '立即登录' }}</span>
+              <span>{{ loading ? 'Signing in...' : 'Sign In' }}</span>
             </button>
           </form>
           
           <div class="login-footer">
-            <p>还没有账号？<router-link to="/register">立即注册</router-link></p>
+            <p>Don't have an account? <router-link to="/register">Register Now</router-link></p>
           </div>
         </div>
       </div>
@@ -159,7 +159,7 @@ export default {
         this.accountError = '';
         return;
       }
-      this.accountError = '请输入有效的手机号或邮箱地址';
+      this.accountError = 'Please enter a valid phone number or email address';
     },
     async handleLogin() {
       this.validateAccount();
@@ -184,11 +184,11 @@ export default {
           const redirect = this.$route.query.redirect || '/dashboard';
           this.$router.push(redirect);
         } else {
-          this.$message.error(result.message || '登录失败，请重试');
+          this.$message.error(result.message || 'Login failed, please try again');
         }
       } catch (error) {
         console.error('Login error:', error);
-        this.$message.error('网络错误，请稍后重试');
+        this.$message.error('Network error, please try again later');
       }
     }
   }

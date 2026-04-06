@@ -75,11 +75,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         Users userToLogin;
         String email = user.getEmail();
         String phone = user.getPhone();
-        if (!StringUtils.hasText(email)) {
+        if (StringUtils.hasText(email)) {
             userToLogin = lambdaQuery()
                     .eq(Users::getEmail, email)
                     .one();
-        } else  if (!StringUtils.hasText(phone)) {
+        } else  if (StringUtils.hasText(phone)) {
             userToLogin = lambdaQuery()
                     .eq(Users::getPhone, phone)
                     .one();

@@ -122,19 +122,4 @@ public class ChatController {
             return Result.failure("清空知识库失败：" + e.getMessage());
         }
     }
-
-    @GetMapping(value = "/test", produces = "text/html;charset=utf-8")
-    public String test() {
-        ChatResponse response = chatClient.prompt()
-                .user("你好")
-                .call()
-                .chatResponse();
-
-        Usage usage = response.getMetadata().getUsage();
-        Integer promptTokens = usage.getPromptTokens();        // 输入 token
-        Integer generationTokens = usage.getCompletionTokens(); // 输出 token
-        Integer totalTokens = usage.getTotalTokens();          // 总 token
-        System.out.printf("prompt=%d, generation=%d, total=%d%n", promptTokens, generationTokens, totalTokens);
-        return String.valueOf(response.getResult());
-    }
 }

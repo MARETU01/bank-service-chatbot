@@ -12,6 +12,7 @@ spring:
       password: maretu
   config:
     import:
+      - "nacos:shared-log.yaml?group=DEFAULT_GROUP&refresh=true"
       - "nacos:gateway-config.yaml?group=DEFAULT_GROUP&refresh=true"
 
 maretu:

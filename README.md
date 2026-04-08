@@ -1,56 +1,56 @@
-# 银行服务聊天机器人项目
+# Bank Service Chatbot
 
-## 环境要求
+## Requirements
 
 - Java 21
-- Node.js 24+ 和 npm 11+
+- Node.js 24+ and npm 11+
 - Docker
 - Maven 3.8+
 
-## 启动步骤
+## Startup Steps
 
-### 1. 启动基础设施
+### 1. Start Infrastructure
 
 ```bash
-# 启动 MySQL
+# Start MySQL
 cd docker/mysql
 ./start.sh
 
-# 查看 MySQL 启动日志（等待 MySQL 启动成功）
+# Check MySQL startup logs (wait for MySQL to start successfully)
 docker logs -f mysql
 ```
 
-按 `Ctrl+C` 退出日志查看。
+Press `Ctrl+C` to exit log view.
 
 ```bash
-# 启动 Redis
+# Start Redis
 cd ../redis
 ./start.sh
 
-# 启动 Nacos（Nacos 依赖 MySQL，需确保 MySQL 已启动成功）
+# Start Nacos (Nacos depends on MySQL, ensure MySQL is running first)
 cd ../nacos
 ./start.sh
 ```
 
-> **注意**：
-> 1. Nacos 使用 MySQL 作为持久化存储，必须在 MySQL 启动成功后才能启动 Nacos。
-> 2. 建议在启动 Nacos 前，先使用数据库连接工具（如 Navicat、DataGrip 等）测试能否连接 MySQL：
->    - 主机：`localhost` 或服务器 IP
->    - 端口：`3306`
->    - 用户名：`root`
->    - 密码：`maretu`
-> 3. 确认 MySQL 连接成功后，再继续启动 Nacos。
+> **Note:**
+> 1. Nacos uses MySQL for persistent storage. MySQL must be running before starting Nacos.
+> 2. It is recommended to test MySQL connection using database tools (such as Navicat, DataGrip, etc.) before starting Nacos:
+>    - Host: `localhost` or server IP
+>    - Port: `3306`
+>    - Username: `root`
+>    - Password: `maretu`
+> 3. Confirm MySQL connection is successful before starting Nacos.
 
-### 2. 配置 Nacos
+### 2. Configure Nacos
 
-1. 浏览器访问 Nacos 控制台：`http://localhost:8848/nacos`
-2. 设置默认账号密码（用户名/密码：`nacos/maretu`）
-3. 用刚刚设置的账号密码登录进 nacos
-4. 上传配置文件：进入配置管理页面，上传 `/docker/nacos_config.zip` 文件导入配置
+1. Access Nacos console in browser: `http://localhost:8848/nacos`
+2. Set default credentials (username/password: `nacos/maretu`)
+3. Log in to Nacos with the credentials
+4. Upload configuration file: Go to Configuration Management page and upload `/docker/nacos_config.zip` to import configurations
 
-### 3. 配置后端服务
+### 3. Configure Backend Services
 
-通过设置环境变量 `DOCKER_SERVER_ADDR` 来配置服务地址：
+Set the `DOCKER_SERVER_ADDR` environment variable to configure service addresses:
 
 **Windows (PowerShell):**
 ```powershell
@@ -67,90 +67,90 @@ set DOCKER_SERVER_ADDR=192.168.1.1
 export DOCKER_SERVER_ADDR=192.168.1.1
 ```
 
-> **注意**：请将 `192.168.1.1` 替换为你实际的 docker 服务器 IP 地址（如本机局域网 IP）。如果不设置环境变量，默认使用 `ipv6.maretu.top` 作为服务器地址（不一定有效）。
+> **Note:** Replace `192.168.1.1` with your actual Docker server IP address (such as your local network IP). If the environment variable is not set, `ipv6.maretu.top` will be used as the default server address (may not be reliable).
 
-### 3.5. 配置 Chatbot 服务（可选）
+### 3.5. Configure Chatbot Service (Optional)
 
-修改 `backend/chatbot-service/src/main/resources/application.yaml` 文件，将 OpenAI 相关配置改为自己的 API 密钥：
+Modify `backend/chatbot-service/src/main/resources/application.yaml` to set your own OpenAI API configuration:
 
 ```yaml
 spring:
   ai:
     openai:
-      api-key: "你的 API 密钥"  # 替换为自己的 API 密钥
-      base-url: "你的 API 基础地址"  # 替换为自己的 API 基础地址
+      api-key: "your-api-key"  # Replace with your API key
+      base-url: "your-api-base-url"  # Replace with your API base URL
       chat:
         options:
-          model: "deepseek-ai/DeepSeek-V3.2"  # 可根据需要修改模型
+          model: "deepseek-ai/DeepSeek-V3.2"  # Can be changed as needed
 ```
 
-> **注意**：默认配置的 API 密钥和 base-url 可能有调用次数限制、速率限制或无法连接的问题，可以替换为自己的 API 密钥和 API 基础地址。
+> **Note:** The default API key and base-url may have call limits, rate limits, or connection issues. It is recommended to replace them with your own API key and API base URL.
 
-### 4. 启动后端服务
+### 4. Start Backend Services
 
-首先编译后端项目：
+First, compile the backend project:
 
 ```bash
 cd backend
 mvn clean install
 ```
 
-然后启动各服务：
+Then start each service:
 
 ```bash
-# 方式一：使用 IDEA 分别启动各服务模块
-# 依次运行以下服务的主启动类：
+# Method 1: Start each service module using IDEA
+# Run the main application classes in sequence:
 # - GatewayApplication
 # - BankServiceApplication
 # - UserServiceApplication
 # - ChatbotServiceApplication
 
-# 方式二：使用 Maven 命令启动
+# Method 2: Start using Maven commands
 cd backend/gateway
 mvn spring-boot:run
 
-# 新开终端，启动 bank-service
+# Open a new terminal and start bank-service
 cd backend/bank-service
 mvn spring-boot:run
 
-# 新开终端，启动 user-service
+# Open a new terminal and start user-service
 cd backend/user-service
 mvn spring-boot:run
 
-# 新开终端，启动 chatbot-service
+# Open a new terminal and start chatbot-service
 cd backend/chatbot-service
 mvn spring-boot:run
 ```
 
-### 5. 配置前端
+### 5. Configure Frontend
 
-修改 `frontend/src/http.js` 文件，将 `baseURL` 配置为后端 Gateway 的地址：
+Modify `frontend/src/http.js` to set the `baseURL` to the backend Gateway address:
 
 ```javascript
 const instance = axios.create({
-    baseURL: 'http://192.168.1.1:8080',  // 修改为实际的服务器 IP 地址
+    baseURL: 'http://192.168.1.1:8080',  // Replace with actual server IP address
     // ...
 })
 ```
 
-> **注意**：Gateway 默认端口为 `8080`，请将 `192.168.1.1` 替换为实际的服务器 IP 地址。
+> **Note:** Gateway default port is `8080`. Replace `192.168.1.1` with your actual server IP address.
 
-### 6. 启动前端
+### 6. Start Frontend
 
 ```bash
 cd frontend
 
-# 安装依赖
+# Install dependencies
 npm install
 
-# 启动开发服务器
+# Start development server
 npm run serve
 ```
 
-前端应用将在 `http://localhost:80` 启动。
+The frontend application will be available at `http://localhost:80`.
 
-## 默认配置
+## Default Configuration
 
-- **Nacos 地址**: ipv6.maretu.top:8848
-- **MySQL 密码**: maretu
-- **数据库端口**: 3306
+- **Nacos Address**: ipv6.maretu.top:8848
+- **MySQL Password**: maretu
+- **Database Port**: 3306

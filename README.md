@@ -151,9 +151,14 @@ The frontend application will be available at `http://localhost:80`.
 
 ## Default Configuration
 
-- **Nacos Address**: ipv6.maretu.top:8848
 - **MySQL Password**: maretu
-- **Database Port**: 3306
+- **MySQL Port**: 3306
+- **Nacos Port**: 8848
+- **Gateway Port**: 8080
+- **User-service Port**: 8081
+- **Bank-service Port**: 8082
+- **Chat-service Port**: 8083
+- **Front-end Port**: 80
 
 ## Default Login Credentials
 

@@ -7,7 +7,7 @@ spring:
   cloud:
     gateway:
     nacos:
-      server-addr: ipv6.maretu.top:8848
+      server-addr: ${DOCKER_SERVER_ADDR:ipv6.maretu.top}:8848
       username: nacos
       password: maretu
   config:

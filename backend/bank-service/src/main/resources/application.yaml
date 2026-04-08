@@ -6,7 +6,7 @@ spring:
     name: bank-service
   cloud:
     nacos:
-      server-addr: ipv6.maretu.top:8848
+      server-addr: ${DOCKER_SERVER_ADDR:ipv6.maretu.top}:8848
       username: nacos
       password: maretu
   config:
@@ -18,13 +18,13 @@ spring:
 
 maretu:
   mysql:
-    host: ipv6.maretu.top
+    host: ${DOCKER_SERVER_ADDR:ipv6.maretu.top}
     port: 3306
     database: bank_service
     username: root
     password: maretu
   redis:
-    host: ipv6.maretu.top
+    host: ${DOCKER_SERVER_ADDR:ipv6.maretu.top}
     port: 6379
     password: maretu
     db: 0

@@ -6,7 +6,7 @@ spring:
     name: chat-service
   cloud:
     nacos:
-      server-addr: ipv6.maretu.top:8848
+      server-addr: ${DOCKER_SERVER_ADDR:ipv6.maretu.top}:8848
       username: nacos
       password: maretu
   config:
@@ -29,19 +29,19 @@ spring:
           encoding-format: float
           dimensions: 1024
     ollama:
-      base-url: http://ipv6.maretu.top:11434
+      base-url: http://${DOCKER_SERVER_ADDR:ipv6.maretu.top}:11434
       chat:
         model: deepseek-r1:7b
 
 maretu:
   mysql:
-    host: ipv6.maretu.top
+    host: ${DOCKER_SERVER_ADDR:ipv6.maretu.top}
     port: 3306
     database: chat_service
     username: root
     password: maretu
   redis:
-    host: ipv6.maretu.top
+    host: ${DOCKER_SERVER_ADDR:ipv6.maretu.top}
     port: 6379
     password: maretu
     db: 0

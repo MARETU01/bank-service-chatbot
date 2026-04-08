@@ -154,3 +154,10 @@ The frontend application will be available at `http://localhost:80`.
 - **Nacos Address**: ipv6.maretu.top:8848
 - **MySQL Password**: maretu
 - **Database Port**: 3306
+
+## Default Login Credentials
+
+After starting the application, you can log in with the default admin account:
+
+- **Email**: `admin@bank.com`
+- **Password**: `admin123`

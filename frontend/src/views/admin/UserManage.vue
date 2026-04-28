@@ -94,18 +94,32 @@
         :disabled="currentPage <= 1"
         @click="changePage(currentPage - 1)"
       >Previous</button>
-      <button
-        class="page-btn"
-        v-for="p in totalPage"
-        :key="p"
-        :class="{ active: p === currentPage }"
-        @click="changePage(p)"
-      >{{ p }}</button>
+      <template v-for="(item, index) in visiblePages" :key="index">
+        <span v-if="item === '...'" class="page-ellipsis">…</span>
+        <button
+          v-else
+          class="page-btn"
+          :class="{ active: item === currentPage }"
+          @click="changePage(item)"
+        >{{ item }}</button>
+      </template>
       <button
         class="page-btn"
         :disabled="currentPage >= totalPage"
         @click="changePage(currentPage + 1)"
       >Next</button>
+      <div class="page-jump">
+        <span class="page-jump-label">Go to</span>
+        <input
+          v-model.number="jumpPage"
+          type="number"
+          class="page-jump-input"
+          :min="1"
+          :max="totalPage"
+          @keyup.enter="handleJumpPage"
+        />
+        <button class="page-jump-btn" @click="handleJumpPage">Go</button>
+      </div>
     </div>
 
     <!-- Role Assignment Modal -->
@@ -150,7 +164,7 @@
 </template>
 
 <script>
-import { ref, onMounted, getCurrentInstance } from 'vue'
+import { ref, computed, onMounted, getCurrentInstance } from 'vue'
 import { adminApi } from '@/api/api'
 
 export default {
@@ -170,6 +184,46 @@ export default {
     const pageSize = ref(10)
     const total = ref(0)
     const totalPage = ref(0)
+    const jumpPage = ref(null)
+
+    /**
+     * Compute visible page numbers with ellipsis for smart pagination.
+     * Always shows first page, last page, current page and its neighbors.
+     * Uses '...' for gaps.
+     */
+    const visiblePages = computed(() => {
+      const pages = []
+      const cur = currentPage.value
+      const total = totalPage.value
+
+      if (total <= 7) {
+        for (let i = 1; i <= total; i++) pages.push(i)
+        return pages
+      }
+
+      // Always show first page
+      pages.push(1)
+
+      if (cur > 3) {
+        pages.push('...')
+      }
+
+      // Show pages around current page
+      const start = Math.max(2, cur - 1)
+      const end = Math.min(total - 1, cur + 1)
+      for (let i = start; i <= end; i++) {
+        pages.push(i)
+      }
+
+      if (cur < total - 2) {
+        pages.push('...')
+      }
+
+      // Always show last page
+      pages.push(total)
+
+      return pages
+    })
 
     // User list (from backend)
     const userList = ref([])
@@ -285,6 +339,19 @@ export default {
     }
 
     /**
+     * Jump to a specific page via input
+     */
+    const handleJumpPage = () => {
+      const page = jumpPage.value
+      if (!page || page < 1 || page > totalPage.value) {
+        proxy.$message.warning(`Please enter a page number between 1 and ${totalPage.value}`)
+        return
+      }
+      changePage(page)
+      jumpPage.value = null
+    }
+
+    /**
      * Toggle user enable/disable status
      */
     const handleToggleStatus = async (user) => {
@@ -349,6 +416,9 @@ export default {
       currentPage,
       total,
       totalPage,
+      visiblePages,
+      jumpPage,
+      handleJumpPage,
       getRoleName,
       getRoleClass,
       sortRoles,
@@ -641,6 +711,70 @@ export default {
   cursor: not-allowed;
 }
 
+.page-ellipsis {
+  color: var(--text-on-gradient-muted);
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-sm) var(--spacing-sm);
+  user-select: none;
+  line-height: 1;
+}
+
+/* Page Jump */
+.page-jump {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-left: var(--spacing-lg);
+}
+
+.page-jump-label {
+  color: var(--text-on-gradient-muted);
+  font-size: var(--font-size-md);
+  white-space: nowrap;
+}
+
+.page-jump-input {
+  width: 56px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  text-align: center;
+  outline: none;
+  transition: all var(--transition-normal);
+  -moz-appearance: textfield;
+}
+
+.page-jump-input::-webkit-inner-spin-button,
+.page-jump-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.page-jump-input:focus {
+  border-color: var(--glass-border-active);
+  background: var(--glass-bg-hover);
+}
+
+.page-jump-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+}
+
+.page-jump-btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+}
+
 .btn-sm {
   padding: var(--spacing-xs) var(--spacing-md);
   border: none;
@@ -833,6 +967,16 @@ export default {
 
   .col-id, .col-time {
     display: none;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+
+  .page-jump {
+    margin-left: 0;
+    margin-top: var(--spacing-sm);
   }
 }
 </style>
